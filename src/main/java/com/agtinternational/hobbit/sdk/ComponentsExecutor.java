@@ -1,7 +1,5 @@
 package com.agtinternational.hobbit.sdk;
 
-import com.agtinternational.hobbit.sdk.examples.system.SystemAdapter;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import org.hobbit.core.components.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class ComponentsExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ComponentsExecutor.class);
     private final static int AWAIT_TERMINATION_MILLIS = 1;
-    private final static int CORE_POOL_SIZE = 100;
+    private final static int CORE_POOL_SIZE = 8;
 
     private final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
     private final ExecutorService executor = new ThreadPoolExecutor(0, CORE_POOL_SIZE, 60L, TimeUnit.SECONDS,

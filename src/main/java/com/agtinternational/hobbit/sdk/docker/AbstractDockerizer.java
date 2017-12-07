@@ -1,5 +1,6 @@
 package com.agtinternational.hobbit.sdk.docker;
 
+import com.agtinternational.hobbit.sdk.docker.builders.common.AbstractDockersBuilder;
 import com.google.common.collect.ImmutableList;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -13,14 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -32,42 +27,43 @@ public abstract class AbstractDockerizer implements Runnable {
     private String name;
     public Logger logger;
 
-    public String imageName;
-    public String hostName;
+    private String imageName;
+    private String hostName;
     private String containerName;
     private Map<String, List<PortBinding>> portBindings;
     private Collection<String> environmentVariables;
     private Collection<String> networks;
 
     public Exception exception;
-    public String containerId;
-    public Boolean useCachedContainer;
+    private String containerId;
+
     private Boolean skipLogsReading;
+    public Boolean useCachedContainer;
     public DockerClient dockerClient;
 
 
-    protected AbstractDockerizer(AbstractDockerizerBuilder abstractDockerizerBuilder) {
-        name = abstractDockerizerBuilder.name;
+    protected AbstractDockerizer(AbstractDockersBuilder builder) {
+        name = builder.getName();
         logger = LoggerFactory.getLogger(name);
-        imageName = abstractDockerizerBuilder.imageName;
-        hostName = abstractDockerizerBuilder.hostName;
-        containerName = abstractDockerizerBuilder.containerName;
-        portBindings = abstractDockerizerBuilder.portBindings;
-        environmentVariables = abstractDockerizerBuilder.environmentVariables;
-        networks = abstractDockerizerBuilder.networks;
-        useCachedContainer = abstractDockerizerBuilder.useCachedContainer;
-        skipLogsReading = abstractDockerizerBuilder.skipLogsReading;
+        imageName = builder.getImageName();
+        hostName = builder.getHostName();
+        containerName = builder.getContainerName();
+        portBindings = builder.getPortBindings();
+        environmentVariables = builder.getEnvironmentVariables();
+        networks = builder.getNetworks();
+        skipLogsReading = builder.getSkipLogsReading();
+        useCachedContainer = builder.getUseCachedContainer();
     }
 
         @Override
     public void run() {
         try {
-            dockerClient = DefaultDockerClient.fromEnv().build();
-            stop(true);
+            stop();
             createContainerIfNotExists();
+            int readLogsSince = (int)(System.currentTimeMillis() / 1000L);
             startContainer();
             if (skipLogsReading==null || !skipLogsReading)
-                attachToContainerAndReadLogs();
+                attachToContainerAndReadLogs(readLogsSince);
 
         }catch (DockerRequestException e){
             logger.error("Exception: {}", e.getResponseBody());
@@ -79,22 +75,19 @@ public abstract class AbstractDockerizer implements Runnable {
         }
     }
 
-    public void stop() throws InterruptedException, DockerException, DockerCertificateException {
-        stop(false);
+    public DockerClient getDockerClient() throws DockerCertificateException {
+        if(dockerClient==null)
+            dockerClient = DefaultDockerClient.fromEnv().build();
+        return dockerClient;
     }
 
-    public void stop(Boolean onStart) throws InterruptedException, DockerException, DockerCertificateException {
+    public void stop() throws InterruptedException, DockerException, DockerCertificateException {
         logger.debug("Stopping containers and removing if needed (imageName={})", imageName);
         try {
-//            if (!onStart && (skipLogsReading==null || !skipLogsReading))
-//                attachToContainerAndReadLogs();
-
-            if (this.useCachedContainer!=null && this.useCachedContainer) {
-                stopCachedContainer();
-            } else {
+            if(useCachedContainer!=null && useCachedContainer)
+                stopContainer();
+            else
                 removeAllSameNamedContainers();
-                removeAllSameNamedImages();
-            }
         }
         catch (Exception e){
             logger.error("Exception", e);
@@ -118,7 +111,7 @@ public abstract class AbstractDockerizer implements Runnable {
         }
     }
 
-    private void removeAllSameNamedImages() throws DockerException, InterruptedException, DockerCertificateException {
+    public void removeAllSameNamedImages() throws DockerException, InterruptedException, DockerCertificateException {
         logger.debug("Removing images (imageName={})", imageName);
 
         removeAllSameNamedImages(imageName);
@@ -141,8 +134,8 @@ public abstract class AbstractDockerizer implements Runnable {
 
     private void startContainer() throws Exception {
         logger.debug("Starting container (imageName={})", imageName);
-        dockerClient.startContainer(containerId);
-        connectContainerToNetworks(networks);
+        getDockerClient().startContainer(containerId);
+        //connectContainerToNetworks(networks);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
         logger.debug("Container started (imageName={})", imageName);
@@ -151,20 +144,32 @@ public abstract class AbstractDockerizer implements Runnable {
     /**
      * Blocks until the container is terminated
      */
-    public void attachToContainerAndReadLogs() throws Exception {
+    public void attachToContainerAndReadLogs(int since) throws Exception {
         logger.debug("Attaching to logs for container (imageName={})", imageName);
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
         Callable<String> callable = () -> {
-            String ret="";
+            //String ret="";
             LogStream logStream = null;
-            try{
-                String logs;
+
+                String logs="";
                 String prevLogs="";
                 while(true) {
-                    logStream = dockerClient.logs(containerId, DockerClient.LogsParam.stderr(), DockerClient.LogsParam.stdout());
-                    logs = logStream.readFully();
-                    if(logs.length()>0 && !logs.equals(prevLogs)) {
+                    try{
+                        logStream = getDockerClient().logs(containerId,
+                                DockerClient.LogsParam.stderr(),
+                                DockerClient.LogsParam.stdout(),
+                                DockerClient.LogsParam.since(since));
+                        logs=logStream.readFully();
+                    } catch (Exception e){
+                        logger.debug(String.format("No logs are available (imageName=%s):",imageName), e);
+                    } finally {
+                        if (logStream != null) {
+                            logStream.close();
+                        }
+                    }
+
+                    if(logs.length()>prevLogs.length()) {
                         String logsToPrint = logs.substring(prevLogs.length());
                         if (logsToPrint.toLowerCase().contains("error"))
                             logger.error(logsToPrint);
@@ -174,14 +179,8 @@ public abstract class AbstractDockerizer implements Runnable {
                     }
                     Thread.sleep(1000);
                 }
-            } catch (Exception e) {
-                logger.debug(String.format("No logs are available (imageName=%s):",imageName), e);
-            } finally {
-                if (logStream != null) {
-                    logStream.close();
-                }
-            }
-            return ret;
+
+            //return "";
         };
         //if(interruptable) {
         Future<String> future = threadPool.submit(callable);
@@ -194,7 +193,7 @@ public abstract class AbstractDockerizer implements Runnable {
             Thread.currentThread().interrupt();
             //throw new TimeoutException();
         } catch (TimeoutException e) {
-            logger.debug("Logs reader was attached");
+            //logger.debug("Logs reader was attached");
             //e.printStackTrace();
         }
         //}else
@@ -206,11 +205,11 @@ public abstract class AbstractDockerizer implements Runnable {
         logger.debug("Waiting for container finish (imageName={})", imageName);
 
 
-            dockerClient.waitContainer(containerId);
+        getDockerClient().waitContainer(containerId);
 
     }
 
-    public void stopCachedContainer(){
+    public void stopContainer(){
         logger.debug("Stopping containers (imageName={})", imageName);
         try{
             if(containerId==null){
@@ -219,19 +218,13 @@ public abstract class AbstractDockerizer implements Runnable {
                     containerId = results.get(0);
             }
             if(containerId!=null)
-                dockerClient.stopContainer(containerId, 0);
+                getDockerClient().stopContainer(containerId, 0);
         }
         catch (Exception e){
             logger.error("Exception", e);
             exception = e;
         }
     }
-
-//    public void stopContainer() throws DockerException, InterruptedException, DockerCertificateException {
-//        logger.debug("Stopping container (imageName={})", imageName);
-//            dockerClient.stopContainer(containerId, 0);
-//    }
-
 
 
     private void createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
@@ -264,7 +257,7 @@ public abstract class AbstractDockerizer implements Runnable {
 //        }
 
         ContainerConfig containerConfig = builder .build();
-        ContainerCreation creation = dockerClient.createContainer(containerConfig, containerName);
+        ContainerCreation creation = getDockerClient().createContainer(containerConfig, containerName);
         containerId = creation.id();
         if (containerId == null) {
             IllegalStateException exception = new IllegalStateException(format("Unable to create container %s", containerName));
@@ -272,7 +265,7 @@ public abstract class AbstractDockerizer implements Runnable {
             throw exception;
         }
 
-        //connectContainerToNetworks(networks);
+        connectContainerToNetworks(networks);
 
     }
 
@@ -293,7 +286,7 @@ public abstract class AbstractDockerizer implements Runnable {
         }
         ContainerInfo info = null;
         try {
-            info = dockerClient.inspectContainer(containerId);
+            info = getDockerClient().inspectContainer(containerId);
         } catch (ContainerNotFoundException e) {
             logger.error("The container " + containerId + " is not known.", e);
         } catch (Throwable e) {
@@ -302,24 +295,24 @@ public abstract class AbstractDockerizer implements Runnable {
         return info;
     }
 
-    private void connectContainerToNetworks(Collection<String> networks) throws DockerException, InterruptedException {
+    private void connectContainerToNetworks(Collection<String> networks) throws DockerException, InterruptedException, DockerCertificateException {
         logger.debug("Connecting container to networks (imageName={})", imageName);
 
-        ContainerInfo info = getContainerInfo(dockerClient);
-        Map<String, AttachedNetwork> prev_networks = info.networkSettings().networks();
-        for (String networkName : prev_networks.keySet()) {
-            dockerClient.disconnectFromNetwork(containerId, networkName);
-        }
+//        ContainerInfo info = getContainerInfo(dockerClient);
+//        Map<String, AttachedNetwork> prev_networks = info.networkSettings().networks();
+//        for (String networkName : prev_networks.keySet()) {
+//            getDockerClient().disconnectFromNetwork(containerId, networkName);
+//        }
 
         for (String network : networks) {
             String networkId = createDockerNetworkIfNeeded(dockerClient, network);
-            dockerClient.connectToNetwork(containerId, networkId);
+            getDockerClient().connectToNetwork(containerId, networkId);
         }
     }
 
-    public static String createDockerNetworkIfNeeded(DockerClient dockerClient, String networkName) throws
-            DockerException, InterruptedException {
-        for (Network network : dockerClient.listNetworks()) {
+    public  String createDockerNetworkIfNeeded(DockerClient dockerClient, String networkName) throws
+            DockerException, InterruptedException, DockerCertificateException {
+        for (Network network : getDockerClient().listNetworks()) {
             if (network.name() != null && network.name().equals(networkName)) {
                 return network.id();
             }
@@ -327,7 +320,7 @@ public abstract class AbstractDockerizer implements Runnable {
         NetworkConfig networkConfig = NetworkConfig.builder()
                 .name(networkName)
                 .build();
-        return dockerClient.createNetwork(networkConfig).id();
+        return getDockerClient().createNetwork(networkConfig).id();
     }
 
     private Set<String> getExposedPorts() {
@@ -338,12 +331,10 @@ public abstract class AbstractDockerizer implements Runnable {
         return environmentVariables.toArray(new String[environmentVariables.size()]);
     }
 
-
-
     private List<String> findContainersByName(String containerName) throws
-            DockerException, InterruptedException {
+            DockerException, InterruptedException, DockerCertificateException {
         List<String> ret = new ArrayList<String>();
-        for(Container container : dockerClient.listContainers(DockerClient.ListContainersParam.allContainers())) {
+        for(Container container : getDockerClient().listContainers(DockerClient.ListContainersParam.allContainers())) {
             for(String name : container.names()){
                 if (name.equals(dockerizeContainerName(containerName)))
                     ret.add(container.id());
@@ -354,10 +345,11 @@ public abstract class AbstractDockerizer implements Runnable {
     }
 
     private void removeAllSameNamedContainers(String containerName) throws
-            DockerException, InterruptedException {
+            DockerException, InterruptedException, DockerCertificateException {
         for(String name : findContainersByName(containerName))
             try {
-                dockerClient.removeContainer(name, DockerClient.RemoveContainerParam.forceKill());
+                getDockerClient().removeContainer(name, DockerClient.RemoveContainerParam.forceKill());
+                containerId = null;
             }
             catch (Exception e) {
                 //if(!e.getMessage().contains("not found"))
@@ -369,10 +361,10 @@ public abstract class AbstractDockerizer implements Runnable {
         return format("/%s", intendedContainerName);
     }
 
-    private List<String> findImagesByName(String imageName) throws DockerException, InterruptedException {
+    private List<String> findImagesByName(String imageName) throws DockerException, InterruptedException, DockerCertificateException {
         List<String> ret = new ArrayList<>();
         String imageNameToSearch = (imageName.contains(":")?imageName:imageName+":");
-        for (Image image : dockerClient.listImages(DockerClient.ListImagesParam.allImages())) {
+        for (Image image : getDockerClient().listImages(DockerClient.ListImagesParam.allImages())) {
             ImmutableList<String> repoTags = image.repoTags();
             if (repoTags != null) {
                 boolean nameMatch = repoTags.stream().anyMatch(name -> name != null && name.contains(imageNameToSearch));
@@ -383,14 +375,13 @@ public abstract class AbstractDockerizer implements Runnable {
         return ret;
     }
 
-    private void removeAllSameNamedImages(String imageName) throws DockerException, InterruptedException {
+    private void removeAllSameNamedImages(String imageName) throws DockerException, InterruptedException, DockerCertificateException {
         boolean force = true;
         boolean dontDeleteUntaggedParents = false;
         for (String id : findImagesByName(imageName)){
-            dockerClient.removeImage(id, force, dontDeleteUntaggedParents);
+            getDockerClient().removeImage(id, force, dontDeleteUntaggedParents);
         }
     }
-
 
 
     public Exception anyExceptions() {
@@ -401,105 +392,6 @@ public abstract class AbstractDockerizer implements Runnable {
         return format("%s=%s", key, value);
     }
 
-    public abstract static class AbstractDockerizerBuilder {
-        private final String name;
-        private String imageName;
-        private String hostName;
-        private String containerName;
-
-        private final Map<String, List<PortBinding>> portBindings = new HashMap<>();
-        private final Collection<String> environmentVariables = new HashSet<>();
-        private final Collection<String> networks = new HashSet<>();
-
-        private Boolean useCachedContainer;
-        private Boolean skipLogsReading;
-
-        public AbstractDockerizerBuilder(String name) {
-            this.name = name;
-        }
-
-        public AbstractDockerizerBuilder addNetworks(String... nets) {
-            if (nets != null) {
-                Stream.of(nets).forEach(networks::add);
-            }
-            return this;
-        }
 
 
-        public AbstractDockerizerBuilder addPortBindings(String containerPort, PortBinding... hostPorts) {
-            List<PortBinding> hostPortsList = new ArrayList<>();
-            hostPortsList.addAll(Arrays.asList(hostPorts));
-            portBindings.put(String.valueOf(containerPort), hostPortsList);
-            return this;
-        }
-
-        public AbstractDockerizerBuilder addEnvironmentVariable(String key, String value) {
-            environmentVariables.add(toEnvironmentEntry(key, value));
-            return this;
-        }
-
-        public AbstractDockerizerBuilder containerName(String containerName) {
-            this.containerName = containerName;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder imageName(String imageName) {
-            this.imageName = imageName;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder hostName(String value) {
-            this.hostName = value;
-            return this;
-        }
-
-
-        public AbstractDockerizerBuilder skipLogsReading() {
-            this.skipLogsReading = true;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder skipLogsReading(Boolean value) {
-            this.skipLogsReading = value;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder useCachedContainer() {
-            this.useCachedContainer = true;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder useCachedContainer(Boolean value) {
-            this.useCachedContainer = value;
-            return this;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getImageName() {
-            return imageName;
-        }
-
-        public String getContainerName() {
-            return containerName;
-        }
-
-        public abstract AbstractDockerizer build() throws Exception;
-
-
-        @Override
-        public String toString() {
-            return "AbstractDockerizerBuilder{" +
-                    "name='" + name + '\'' +
-                    ", environmentVariables=" + environmentVariables +
-                    ", networks=" + networks +
-                    ", imageName='" + imageName + '\'' +
-                    ", containerName='" + containerName + '\'' +
-                    ", useCachedContainer='" + useCachedContainer + '\'' +
-                    ", skipLogsReading='" + skipLogsReading + '\'' +
-                    '}';
-        }
-    }
 }

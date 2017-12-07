@@ -1,10 +1,10 @@
 package com.agtinternational.hobbit.sdk.docker;
 
 import com.agtinternational.hobbit.sdk.CommonConstants;
+import com.agtinternational.hobbit.sdk.docker.builders.common.PullBasedDockersBuilder;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
-import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.PortBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +19,13 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMqDockerizer extends PullBasedDockerizer {
     private static final Logger logger = LoggerFactory.getLogger(RabbitMqDockerizer.class);
-
+    private final String hostName;
     private final String imageName;
-    private final Boolean useCachedContainer;
 
     private RabbitMqDockerizer(Builder builder) {
-        super(builder.toGenericBuilder());
-
-        imageName = builder.imageName;
-        useCachedContainer = builder.useCachedContainer;
-
+        super(builder);
+        hostName = builder.getHostName();
+        imageName = builder.getImageName();
     }
 
     @Override
@@ -44,15 +41,6 @@ public class RabbitMqDockerizer extends PullBasedDockerizer {
         }
     }
 
-
-    @Override
-    public void stop(){
-        logger.debug("Stopping containers and deleting if needed (imageName={})", imageName);
-        if (useCachedContainer)
-            super.stopCachedContainer();
-        else
-            removeAllSameNamedContainers();
-    }
 
 
     public void waitUntilRunning() throws DockerCertificateException, InterruptedException, TimeoutException {
@@ -75,65 +63,26 @@ public class RabbitMqDockerizer extends PullBasedDockerizer {
 
 
     public static Builder builder() {
-        return new Builder("RabbitMqDockerizer");
+        return new Builder();
+
     }
 
-    public static class Builder extends PullBasedDockerizer.Builder {
+    public static class Builder extends PullBasedDockersBuilder {
 
-        private String imageName = "rabbitmq:latest";
-        private String[] networks = new String[]{ CommonConstants.HOBBIT_NETWORK_NAME, CommonConstants.HOBBIT_CORE_NETWORK_NAME };
-        private Boolean useCachedContainer = false;
-        private Boolean skipLogsReading = true;
-        AbstractDockerizerBuilder ret;
 
-        public Builder(String name) {
-            super(name);
-            ret = new PullBasedDockerizer.Builder(RabbitMqDockerizer.class.getName());
+        private static String[] networks = new String[]{ CommonConstants.HOBBIT_NETWORK_NAME, CommonConstants.HOBBIT_CORE_NETWORK_NAME };
 
+        public Builder() {
+            super("RabbitMqDockerizer");
+            hostName("rabbit");
+            containerName("rabbit");
+            imageName("rabbitmq:latest");
+            addPortBindings("5672/tcp", PortBinding.of("0.0.0.0", 5672));
+            useCachedContainer(true);
+            skipLogsReading(true);
+            addNetworks(networks);
         }
 
-
-        public Builder imageName(String imageName) {
-            this.imageName = imageName;
-            return this;
-        }
-
-        public Builder networks(String... networks) {
-            this.networks = networks;
-            return this;
-        }
-
-        public Builder useCachedContainer() {
-            this.useCachedContainer = true;
-            return this;
-        }
-
-        public Builder useCachedContainer(Boolean value) {
-            this.useCachedContainer = value;
-            return this;
-        }
-
-        public Builder hostName(String value) {
-            ret.hostName(value);
-            return this;
-        }
-
-        public Builder skipLogsReading(Boolean value) {
-            this.skipLogsReading = value;
-            return this;
-        }
-
-        public AbstractDockerizerBuilder toGenericBuilder(){
-                    ret
-                    .imageName(imageName)
-                    .containerName("rabbit")
-                    .addNetworks(networks)
-                    .addPortBindings("5672/tcp", PortBinding.of("0.0.0.0", 5672))
-                    .skipLogsReading(skipLogsReading)
-                    .useCachedContainer(useCachedContainer);
-
-            return ret;
-        }
 
         public RabbitMqDockerizer build() {
             return new RabbitMqDockerizer(this);

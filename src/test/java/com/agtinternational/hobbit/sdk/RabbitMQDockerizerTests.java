@@ -2,6 +2,8 @@ package com.agtinternational.hobbit.sdk;
 
 import com.agtinternational.hobbit.sdk.docker.PullBasedDockerizer;
 import com.agtinternational.hobbit.sdk.docker.RabbitMqDockerizer;
+import com.spotify.docker.client.exceptions.DockerCertificateException;
+import com.spotify.docker.client.exceptions.DockerException;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -10,7 +12,7 @@ import static org.junit.Assert.assertNull;
 public class RabbitMQDockerizerTests {
 
     @Test
-    public void checkHealth(){
+    public void checkHealth() throws InterruptedException, DockerException, DockerCertificateException {
         RabbitMqDockerizer dockerizer = RabbitMqDockerizer.builder().build();
         dockerizer.run();
         dockerizer.stop();

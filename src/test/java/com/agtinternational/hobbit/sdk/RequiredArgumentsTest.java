@@ -2,7 +2,7 @@ package com.agtinternational.hobbit.sdk;
 
 import com.agtinternational.hobbit.sdk.docker.AbstractDockerizer;
 
-import com.agtinternational.hobbit.sdk.docker.BuildBasedDockerizer;
+import com.agtinternational.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +26,7 @@ public class RequiredArgumentsTest {
 
     @Test
     public void checkRequiredArguments() throws Exception {
-        AbstractDockerizer dockerizer = new BuildBasedDockerizer.Builder(name)
+        AbstractDockerizer dockerizer = new BuildBasedDockersBuilder(name)
                 .imageName(imageName)
                 .containerName(containerName)
                 .build();

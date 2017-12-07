@@ -1,6 +1,5 @@
-package com.agtinternational.hobbit.sdk.examples.benchmark;
+package com.agtinternational.hobbit.sdk.examples.dummybenchmark;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;

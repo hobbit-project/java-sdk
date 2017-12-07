@@ -1,6 +1,5 @@
-package com.agtinternational.hobbit.sdk.examples.benchmark;
+package com.agtinternational.hobbit.sdk.examples.dummybenchmark;
 
-import org.apache.jena.shared.Command;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractDataGenerator;
 import org.slf4j.Logger;

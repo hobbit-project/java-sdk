@@ -2,10 +2,10 @@ package com.agtinternational.hobbit.sdk;
 
 import com.agtinternational.hobbit.sdk.docker.AbstractDockerizer;
 import com.agtinternational.hobbit.sdk.docker.BuildBasedDockerizer;
+import com.agtinternational.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Resources;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
@@ -18,9 +18,6 @@ import org.junit.Test;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -30,8 +27,7 @@ import static org.junit.Assert.fail;
  * @author Roman Katerinenko
  */
 public class BuildBasedDockerizerTest {
-    private static final String TEST_IMAGE_NAME = "testimagename";
-    //private static final String TEST_IMAGE_NAME = "registry:2";
+    private static final String TEST_IMAGE_NAME = "git.project-hobbit.eu:4567/smirnp/testimage";
 
     private static final String CONTAINER_NAME = "testcontainername";
     private static final String ENV1_KEY = "key1";
@@ -45,11 +41,12 @@ public class BuildBasedDockerizerTest {
     private static final PortBinding portBinding = PortBinding.of("0.0.0.0", HOST_PORT);
 
     @Test
-    public void checkHealth() {
+    public void checkHealth(){
 
         try {
-            AbstractDockerizer.AbstractDockerizerBuilder builder = new BuildBasedDockerizer.Builder("TestDockerizer")
+            BuildBasedDockersBuilder builder = new BuildBasedDockersBuilder("TestDockerizer")
                     .buildDirectory("target")
+                    .useCachedImage()
                     .dockerFileReader(newDockerFileReader())
                     .imageName(TEST_IMAGE_NAME)
                     .containerName(CONTAINER_NAME)
@@ -57,14 +54,15 @@ public class BuildBasedDockerizerTest {
                     .addEnvironmentVariable(ENV2_KEY, ENV2_VALUE)
                     .addNetworks(NETWORK1, NETWORK2)
                     .addPortBindings(CONTAINER_PORT, portBinding);
-                    //.useCachedContainer()
-            AbstractDockerizer dockerizer = builder.build();
-            dockerizer.run();
+
+            BuildBasedDockerizer dockerizer = builder.build();
+            //dockerizer.run();
             assertTrue(isImageExist(TEST_IMAGE_NAME));
             assertTrue(isEnvironmentVariableExist(CONTAINER_NAME, ENV1_KEY, ENV1_VALUE));
             assertTrue(isEnvironmentVariableExist(CONTAINER_NAME, ENV2_KEY, ENV2_VALUE));
             assertTrue(isConnectedToNetworks(CONTAINER_NAME, NETWORK1, NETWORK2));
             assertTrue(checkPortBindings(CONTAINER_NAME, HOST_PORT, portBinding));
+            //dockerizer.pushImage();
             dockerizer.stop();
             assertNull(dockerizer.anyExceptions());
         }
@@ -75,13 +73,13 @@ public class BuildBasedDockerizerTest {
     }
 
     private static Reader newDockerFileReader() {
-                //return new StringReader("sleep 100");
-        try {
-            Path path = Paths.get(Resources.getResource("Dockerfile").toURI());
-            return new StringReader(new String(Files.readAllBytes(path)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+//        try {
+//            Path path = Paths.get(Resources.getResource("Dockerfile").toURI());
+//            return new StringReader(new String(Files.readAllBytes(path)));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return new StringReader("FROM busybox \n CMD [\"sleep\",\"1\"] \n HEALTHCHECK CMD exit 1");
 
 

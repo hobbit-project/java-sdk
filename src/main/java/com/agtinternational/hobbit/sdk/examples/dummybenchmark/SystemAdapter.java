@@ -1,10 +1,14 @@
-package com.agtinternational.hobbit.sdk.examples.system;
+package com.agtinternational.hobbit.sdk.examples.dummybenchmark;
 
+import com.rabbitmq.client.AMQP;
+import org.apache.commons.io.Charsets;
+import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractSystemAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static com.agtinternational.hobbit.sdk.CommonConstants.SYSTEM_FINISHED_SIGNAL;
 
@@ -22,11 +26,7 @@ public class SystemAdapter extends AbstractSystemAdapter {
         // Your initialization code comes here...
 
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
-    }
-
-    public SystemAdapterDockerBuilder getBuilder() throws Exception {
-        SystemAdapterDockerBuilder ret = new SystemAdapterDockerBuilder();
-        return ret;
+        logger.debug("Sending SYSTEM_READY_SIGNAL");
     }
 
     @Override
@@ -52,6 +52,27 @@ public class SystemAdapter extends AbstractSystemAdapter {
     }
 
     @Override
+    public void sendToCmdQueue(byte command, byte data[], AMQP.BasicProperties props) throws IOException {
+        byte sessionIdBytes[] = getHobbitSessionId().getBytes(Charsets.UTF_8);
+        // + 5 because 4 bytes for the session ID length and 1 byte for the
+        // command
+        int dataLength = sessionIdBytes.length + 5;
+        boolean attachData = (data != null) && (data.length > 0);
+        if (attachData) {
+            dataLength += data.length;
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(dataLength);
+        buffer.putInt(sessionIdBytes.length);
+        buffer.put(sessionIdBytes);
+        buffer.put(command);
+        if (attachData) {
+            buffer.put(data);
+        }
+        cmdChannel.basicPublish(Constants.HOBBIT_COMMAND_EXCHANGE_NAME, "", props, buffer.array());
+        logger.debug("Command published");
+    }
+
+    @Override
     public void close() throws IOException {
 
         sendToCmdQueue(SYSTEM_FINISHED_SIGNAL);
@@ -63,3 +84,4 @@ public class SystemAdapter extends AbstractSystemAdapter {
     }
 
 }
+

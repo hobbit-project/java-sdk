@@ -1,4 +1,5 @@
 package com.agtinternational.hobbit.sdk;
+import com.agtinternational.hobbit.sdk.docker.AbstractDockerizer;
 import com.agtinternational.hobbit.sdk.docker.RabbitMqDockerizer;
 import com.agtinternational.hobbit.sdk.io.Communication;
 import com.agtinternational.hobbit.sdk.io.RabbitMqCommunication;
@@ -18,13 +19,13 @@ import static org.junit.Assert.assertNull;
 public class RabbitMqCommunicationTest {
     private static final String RABBIT_HOST_NAME = "127.0.0.1";
     private static final String RABBIT_MQ_CONTAINER_NAME = "rabbit";
-    private RabbitMqDockerizer dockerizer;
+    private AbstractDockerizer dockerizer;
 
     private String actualMessage;
     @Before
     public void before() throws Exception {
         dockerizer = RabbitMqDockerizer.builder()
-                .useCachedContainer()
+                //.useCachedContainer(false)
                 .build();
         dockerizer.run();
         assertNull(dockerizer.anyExceptions());

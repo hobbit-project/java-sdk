@@ -1,4 +1,4 @@
-package com.agtinternational.hobbit.sdk.examples.benchmark;
+package com.agtinternational.hobbit.sdk.examples.dummybenchmark;
 
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractTaskGenerator;

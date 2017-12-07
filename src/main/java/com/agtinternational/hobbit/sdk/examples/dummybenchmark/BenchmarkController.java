@@ -1,4 +1,4 @@
-package com.agtinternational.hobbit.sdk.examples.benchmark;
+package com.agtinternational.hobbit.sdk.examples.dummybenchmark;
 
 import org.apache.jena.rdf.model.NodeIterator;
 import org.hobbit.core.Commands;
@@ -68,16 +68,22 @@ public class BenchmarkController extends AbstractBenchmarkController {
 
     @Override
     protected void executeBenchmark() throws Exception {
+        logger.debug("executeBenchmark(sending TASK_GENERATOR_START_SIGNAL & DATA_GENERATOR_START_SIGNAL)");
         // give the start signals
         sendToCmdQueue(Commands.TASK_GENERATOR_START_SIGNAL);
         sendToCmdQueue(Commands.DATA_GENERATOR_START_SIGNAL);
 
         // wait for the data generators to finish their work
-        if(!runLocal)
+        if(!runLocal){
+            logger.debug("waitForDataGenToFinish() to send DATA_GENERATION_FINISHED_SIGNAL");
             waitForDataGenToFinish();
+        }
 ////
 ////        // wait for the task generators to finish their work
-//        waitForTaskGenToFinish();
+        if(!runLocal) {
+            logger.debug("waitForTaskGenToFinish() to finish to send TASK_GENERATION_FINISHED_SIGNAL");
+            waitForTaskGenToFinish();
+        }
 ////
 ////        // wait for the system to terminate. Note that you can also use
 ////        // the method waitForSystemToFinish(maxTime) where maxTime is
@@ -86,6 +92,8 @@ public class BenchmarkController extends AbstractBenchmarkController {
         //taskGenContainerIds.add("system");
         systemContainerId = "";
 
+
+        logger.debug("waitForSystemToFinish() to finish to send TASK_GENERATION_FINISHED_SIGNAL");
         waitForSystemToFinish();
 
         // Create the evaluation module
