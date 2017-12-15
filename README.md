@@ -1,4 +1,6 @@
 # HOBBIT Java SDK
+Summarizing the experience of the successful co-organization of the DEBS Grand Challenge 2017 on the HOBBIT platform, we made one step towards a more lightweight and productive design-development of HOBBIT-related software components. We are happy to announce a standalone software library called the HOBBIT Java SDK.
+
 The proposed SDK was is targeted to make the design and development of HOBBIT-compatible components easier and to execute them locally without having a running HOBBIT-platform instance. More details about the [HOBBIT platform](https://github.com/hobbit-project/platform) and the HOBBIT project can be found [here](https://project-hobbit.eu/). 
 
 The SDK helps platform users with the following tasks:
