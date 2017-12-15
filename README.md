@@ -36,3 +36,7 @@ The SDK provides a basis for tests creation for your HOBBIT-related components. 
 # Support & Feedback
 Feel free to ask your questions and suggestions under the Issues tab. 
 Also feel free to put feedback about benchmarks and systems, for which SDK have been helpful.
+
+# Changelog
+Revision 2: Namespaces changed. Removed any SDK-specifics from components. LocalEvalStorage refactored. Full-managed hooks-listening mechanism implemented. 
+Revision 1: RabbitMQ dynamic host problem resolved. Reusable DockerBuilders for components added.
