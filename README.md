@@ -18,9 +18,13 @@ As a result users may execute and debug their systems/benchmarks either “as is
 3) Include the following dependency into your pom-file:
 
 `<dependency>`
+
 `<groupId>com.agtinternational.hobbit</groupId>`
+
 `<artifactId>hobbit-java-sdk</artifactId>`
+
 `<version>1.0</version>`
+
 `</dependency>`
 
 # Usage
