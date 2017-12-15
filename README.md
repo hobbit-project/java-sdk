@@ -32,7 +32,7 @@ As a result users may execute and debug their systems/benchmarks either “as is
 # Usage
 The SDK provides a basis for tests creation for your HOBBIT-related components. You may just copy the contents of “ExampleBenchmarkTest.java” to your project and use it as a starting point. Replace the components in the pipeline by your own to debug your benchmark or benchmarking system.  SDK offers developers to consequently pass the following development steps:
 1. [Test/Debug the components as java code](https://github.com/hobbit-project/java-sdk/wiki/Debug-components-as-java-code)
-1. [Test/Debug the components as docker containers](https://github.com/hobbit-project/java-sdk/wiki/Building-images-and-debugging-containers)
+1. [Build images and test/debug your components as docker containers](https://github.com/hobbit-project/java-sdk/wiki/Building-images-and-debugging-containers)
 1. [Upload images to the online platform](https://github.com/hobbit-project/java-sdk/wiki/Upload-images-to-the-platform)
 
 # Support & Feedback
