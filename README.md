@@ -19,7 +19,7 @@ As a result users may execute and debug their systems/benchmarks either “as is
 
 `<dependency>`
 
-`<groupId>com.agtinternational.hobbit</groupId>`
+`<groupId>org.hobbit</groupId>`
 
 `<artifactId>hobbit-java-sdk</artifactId>`
 
