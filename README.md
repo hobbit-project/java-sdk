@@ -1,4 +1,6 @@
 # HOBBIT Java SDK
+Summarizing the experience of the successful co-organization of the DEBS Grand Challenge 2017 on the HOBBIT platform, we made one step towards a more lightweight and productive design-development of HOBBIT-related software components. We are happy to announce a standalone software library called the HOBBIT Java SDK.
+
 The proposed SDK was is targeted to make the design and development of HOBBIT-compatible components easier and to execute them locally without having a running HOBBIT-platform instance. More details about the [HOBBIT platform](https://github.com/hobbit-project/platform) and the HOBBIT project can be found [here](https://project-hobbit.eu/). 
 
 The SDK helps platform users with the following tasks:
@@ -19,7 +21,7 @@ As a result users may execute and debug their systems/benchmarks either “as is
 
 `<dependency>`
 
-`<groupId>com.agtinternational.hobbit</groupId>`
+`<groupId>org.hobbit</groupId>`
 
 `<artifactId>hobbit-java-sdk</artifactId>`
 
@@ -28,11 +30,15 @@ As a result users may execute and debug their systems/benchmarks either “as is
 `</dependency>`
 
 # Usage
-The SDK provides a basis for tests creation for your HOBBIT-related components. You may just copy the contents of “ExampleBenchmarkTest.java” to your project and use it as a starting point. Replace the components in the pipeline by your own to debug your benchmark or benchmarking system.  SDK offers developers to consequently pass these the following steps for their code:
-1. [Test/Debug the components in non-dockerized mode](https://github.com/hobbit-project/java-sdk/wiki/Test-the-components-in-non-dockerized-mode)
-1. [Test/Debug the components in dockerized mode](https://github.com/hobbit-project/java-sdk/wiki/Test-the-components-in-non-dockerized-mode)
+The SDK provides a basis for tests creation for your HOBBIT-related components. You may just copy the contents of “ExampleBenchmarkTest.java” to your project and use it as a starting point. Replace the components in the pipeline by your own to debug your benchmark or benchmarking system.  SDK offers developers to consequently pass the following development steps:
+1. [Test/Debug the components as java code](https://github.com/hobbit-project/java-sdk/wiki/Debug-components-as-java-code)
+1. [Build images and test/debug your components as docker containers](https://github.com/hobbit-project/java-sdk/wiki/Building-images-and-debugging-containers)
 1. [Upload images to the online platform](https://github.com/hobbit-project/java-sdk/wiki/Upload-images-to-the-platform)
 
 # Support & Feedback
 Feel free to ask your questions and suggestions under the Issues tab. 
 Also feel free to put feedback about benchmarks and systems, for which SDK have been helpful.
+
+# Changelog
+* **Revision 1:** RabbitMQ dynamic host problem resolved. Reusable DockerBuilders for components added.
+* **Revision 2:** Namespaces changed. LocalEvalStorage, EvaluationModule (from examples) refactored. Full-managed hooks-listening mechanism implemented. Any SDK-specifics removed from example components. Wiki pages updated. Released as v1.0. 
