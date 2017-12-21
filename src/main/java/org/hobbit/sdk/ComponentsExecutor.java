@@ -37,56 +37,61 @@ public class ComponentsExecutor {
     }
 
 
-    public void submit(Object object) throws Exception {
-        if(Runnable.class.isInstance(object))
-            submit((Runnable) object);
-        else if(Component.class.isInstance(object))
-            submit((Component) object);
-        else
-            throw new Exception("Type is not supported!");
-    }
+//    public void submit(Object object) throws Exception {
+//        if(Runnable.class.isInstance(object))
+//            submit((Runnable) object);
+//        else if(Component.class.isInstance(object))
+//            submit((Component) object);
+//        else
+//            throw new Exception("Type is not supported!");
+//    }
 
     public void submit(Runnable runnable) {
         executor.submit(runnable);
     }
 
     public void submit(Component component){
+        submit(component, null);
+    }
+
+    public void submit(Component component, String containerId){
 
         executor.submit(() -> {
 
-            String containerName = component.getClass().getSimpleName();
+            String componentName = component.getClass().getSimpleName();
             if(AbstractDockerizer.class.isInstance(component))
-                containerName = ((AbstractDockerizer)component).getContainerName();
+                componentName = ((AbstractDockerizer)component).getContainerName();
             int exitCode = 0;
             try {
-                logger.debug("Initing "+containerName);
+                logger.debug("Initing "+componentName);
                 component.init();
-                logger.debug("Running "+containerName);
+                logger.debug("Running "+componentName);
                 component.run();
             } catch (Throwable e) {
-                String message = containerName+" error: "+ e.getMessage();
+                String message = componentName+" error: "+ e.getMessage();
                 logger.error(message);
                 exceptions.add(new Exception(message));
                 exitCode = 1;
             } finally {
-                    if(AbstractDockerizer.class.isInstance(component)){
-                        final String finalContainerName = containerName;
-                        final int finalExitCode = exitCode;
-                        ((AbstractDockerizer)component).setOnTermination(new Callable() {
-                            @Override
-                            public Object call() throws Exception {
-                                CommandSender.sendContainerTerminatedCommand(finalContainerName, (byte)finalExitCode);
-                                return finalContainerName;
+                    if (containerId!=null){
+                        if (AbstractDockerizer.class.isInstance(component)) {
+                            final String finalContainerName = componentName;
+                            final int finalExitCode = exitCode;
+                            ((AbstractDockerizer) component).setOnTermination(new Callable() {
+                                @Override
+                                public Object call() throws Exception {
+                                    CommandSender.sendContainerTerminatedCommand(containerId, (byte) finalExitCode);
+                                    return finalContainerName;
+                                }
+                            });
+                        } else if (!CommandQueueListener.class.isInstance(component)) {
+                            try {
+                                CommandSender.sendContainerTerminatedCommand(containerId, (byte) exitCode);
+                                component.close();
+                            } catch (Exception e) {
+                                exceptions.add(e);
                             }
-                        });
-                    }else if(!CommandQueueListener.class.isInstance(component)){
-                        try {
-                            CommandSender.sendContainerTerminatedCommand(containerName, (byte)exitCode);
-                            component.close();
-                        } catch (Exception e) {
-                            exceptions.add(e);
                         }
-
                     }
               }
         });

@@ -1,6 +1,5 @@
 package org.hobbit.sdk.docker.builders;
 
-import org.hobbit.sdk.CommonConstants;
 import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
 import org.hobbit.sdk.docker.builders.common.DynamicDockerFileBuilder;
 
@@ -12,11 +11,10 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
  * @author Pavel Smirnov
  */
 
-public class DataGeneratorDockerBuilder extends BuildBasedDockersBuilder {
-    public DataGeneratorDockerBuilder(DynamicDockerFileBuilder builder) {
-        super("ExampleDataGenDockerizer");
-
-        imageName("data-generator");
+public class EvalStorageDockerBuilder extends BuildBasedDockersBuilder {
+    public EvalStorageDockerBuilder(DynamicDockerFileBuilder builder) {
+        super("EvalStorageDockerizer");
+        imageName("eval-storage");
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());
@@ -26,10 +24,9 @@ public class DataGeneratorDockerBuilder extends BuildBasedDockersBuilder {
         addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
         addNetworks(HOBBIT_NETWORKS);
 
-        addEnvironmentVariable(GENERATOR_ID_KEY, (String)System.getenv().get(GENERATOR_ID_KEY));
-        addEnvironmentVariable(GENERATOR_COUNT_KEY, (String)System.getenv().get(GENERATOR_COUNT_KEY));
+        addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
+        addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
         addEnvironmentVariable(CONTAINER_NAME_KEY, getContainerName());
     }
-
 
 }

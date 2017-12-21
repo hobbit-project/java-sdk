@@ -114,6 +114,9 @@ public abstract class AbstractDockerizer implements Component {
     public String getName(){
         return name;
     }
+    public String getImageName(){
+        return imageName;
+    }
     public String getContainerName(){
         return containerName;
     }
@@ -158,7 +161,7 @@ public abstract class AbstractDockerizer implements Component {
 
     private void startContainer() throws Exception {
         logger.debug("Starting container (imageName={})", imageName);
-        getDockerClient().startContainer(containerId);
+        getDockerClient().restartContainer(containerId);
         //connectContainerToNetworks(networks);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
@@ -167,7 +170,7 @@ public abstract class AbstractDockerizer implements Component {
 
 
     public void startMonitoringAndLogsReading(int since) throws Exception {
-        logger.debug("Attaching to logs for container (imageName={})", imageName);
+        logger.debug("Starting monitoring & logs reading for container (imageName={})", imageName);
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -208,6 +211,7 @@ public abstract class AbstractDockerizer implements Component {
             }
             if(onTermination!=null)
                 onTermination.call();
+            stop();
             return "";
         };
         //if(interruptable) {
@@ -274,15 +278,6 @@ public abstract class AbstractDockerizer implements Component {
                 .exposedPorts(getExposedPorts())
                 .image(imageName)
                 .env(getEnvironmentVariables());
-
-//        if(hostName!=null) {
-//            Map endPointConf = new HashMap<>();
-//            endPointConf.put("alias",hostName)
-//            ContainerConfig.NetworkingConfig networkConfig = ContainerConfig.NetworkingConfig.create();
-//            //networkConfig.endpointsConfig()..addOption("network-alias", hostName).build();
-//            builder.hostname(hostName)
-//                    .networkingConfig(networkConfig);
-//        }
 
         ContainerConfig containerConfig = builder .build();
         ContainerCreation creation = getDockerClient().createContainer(containerConfig, containerName);

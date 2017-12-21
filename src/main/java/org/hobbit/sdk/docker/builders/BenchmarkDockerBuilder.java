@@ -30,18 +30,7 @@ public class BenchmarkDockerBuilder extends BuildBasedDockersBuilder {
 
         addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
         addEnvironmentVariable(BENCHMARK_PARAMETERS_MODEL_KEY, createParameters());
-
-//        //SDK's properties
-//
-//        addEnvironmentVariable(LOCAL_DATAGEN_CONTAINER_KEY, (String)System.getenv().get(LOCAL_DATAGEN_CONTAINER_KEY));
-//        addEnvironmentVariable(LOCAL_TASKGEN_CONTAINER_KEY, (String)System.getenv().get(LOCAL_TASKGEN_CONTAINER_KEY));
-//        addEnvironmentVariable(LOCAL_EVALSTORAGE_CONTAINER_KEY, (String)System.getenv().get(LOCAL_EVALSTORAGE_CONTAINER_KEY));
-//        addEnvironmentVariable(LOCAL_SYSTEM_CONTAINER_KEY, (String)System.getenv().get(LOCAL_SYSTEM_CONTAINER_KEY));
-//        addEnvironmentVariable(LOCAL_EVALMODULE_CONTAINER_KEY, (String)System.getenv().get(LOCAL_EVALMODULE_CONTAINER_KEY));
-//
-//        //addEnvironmentVariable(DOCKERIZE_KEY, (String)System.getenv().get(DOCKERIZE_KEY));
-//        //addEnvironmentVariable(CACHED_IMAGES_KEY, (String)System.getenv().get(CACHED_IMAGES_KEY));
-
+        addEnvironmentVariable(CONTAINER_NAME_KEY, getContainerName());
 
     }
 

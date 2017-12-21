@@ -17,6 +17,7 @@ public class CommandSender extends AbstractCommandReceivingComponent {
     private byte command;
 
     private String address;
+    private String replyTo;
     private byte[] data;
     private AMQP.BasicProperties properties;
 
@@ -59,8 +60,8 @@ public class CommandSender extends AbstractCommandReceivingComponent {
         this.properties = properties;
     }
 
-    public CommandSender(String address, byte[] data, AMQP.BasicProperties properties) {
-        this.address = address;
+    public CommandSender(byte[] data, AMQP.BasicProperties properties, String replyTo) {
+        this.replyTo = replyTo;
         this.data = data;
         this.properties = properties;
     }
@@ -80,14 +81,14 @@ public class CommandSender extends AbstractCommandReceivingComponent {
 
     public void send() throws Exception {
         super.init();
-        sendToCmdQueue(address, command, data, properties);
+        sendToCmdQueue(address, command, data, properties, replyTo);
         close();
     }
 
     /**
      * @param data must be encoded with {@link RabbitMQUtils#writeByteArrays}
      */
-    private void sendToCmdQueue(String address2, byte command, byte[] data, AMQP.BasicProperties props) throws IOException {
+    private void sendToCmdQueue(String address2, byte command, byte[] data, AMQP.BasicProperties props, String replyTo) throws IOException {
         String address = address2 == null ? getHobbitSessionId() : address2;
         byte addressBytes[] = RabbitMQUtils.writeString(address);
         int addressBytesLength = addressBytes.length;
@@ -104,10 +105,14 @@ public class CommandSender extends AbstractCommandReceivingComponent {
             buffer.put(data);
         }
 
-        if(address2==null)  //sending command
-            cmdChannel.basicPublish(Constants.HOBBIT_COMMAND_EXCHANGE_NAME, "", props, buffer.array());
-        else //sending reply top receiver
-            cmdChannel.basicPublish("", address, props, data);
+        if(replyTo!=null)
+            cmdChannel.basicPublish("", replyTo, props, data);
+        else {
+            if (address2 == null)  //sending command
+                address2 = Constants.HOBBIT_COMMAND_EXCHANGE_NAME;
+            cmdChannel.basicPublish(address2, "", props, buffer.array());
+        } //sending reply top receiver
+
 
         //cmdChannel.basicPublish(address, "", props, buffer.array());
         //cmdChannel.basicPublish("", address, MessageProperties.PERSISTENT_BASIC, RabbitMQUtils.writeString(containerName));

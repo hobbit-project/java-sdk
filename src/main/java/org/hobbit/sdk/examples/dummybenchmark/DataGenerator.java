@@ -13,7 +13,6 @@ import java.io.IOException;
 
 public class DataGenerator extends AbstractDataGenerator {
     private static final Logger logger = LoggerFactory.getLogger(DataGenerator.class);
-    public static final String contName = "dataGenContainer";
 
     @Override
     public void init() throws Exception {
@@ -42,6 +41,7 @@ public class DataGenerator extends AbstractDataGenerator {
             // the data can be sent to the task generator(s) ...
             logger.debug("sendDataToTaskGenerator()->{}",data);
             sendDataToTaskGenerator(data.getBytes());
+
             // an to system adapter
             //logger.debug("sendDataToSystemAdapter()->{}",data);
             //sendDataToSystemAdapter(data.getBytes());

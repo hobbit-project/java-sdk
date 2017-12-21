@@ -26,9 +26,7 @@ public class EvalModuleDockerBuilder extends BuildBasedDockersBuilder {
         addNetworks(HOBBIT_NETWORKS);
 
         addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
-        addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
+        addEnvironmentVariable(CONTAINER_NAME_KEY, getContainerName());
     }
-
-
 
 }

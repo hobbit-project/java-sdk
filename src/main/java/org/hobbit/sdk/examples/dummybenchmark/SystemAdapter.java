@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
 
 public class SystemAdapter extends AbstractSystemAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SystemAdapter.class);
-    public static final String contName = "systemAdapterContainer";
 
     @Override
     public void init() throws Exception {

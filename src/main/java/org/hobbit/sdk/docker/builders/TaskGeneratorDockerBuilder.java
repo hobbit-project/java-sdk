@@ -29,6 +29,7 @@ public class TaskGeneratorDockerBuilder extends BuildBasedDockersBuilder {
 
         addEnvironmentVariable(GENERATOR_ID_KEY, (String)System.getenv().get(GENERATOR_ID_KEY));
         addEnvironmentVariable(GENERATOR_COUNT_KEY, (String)System.getenv().get(GENERATOR_COUNT_KEY));
+        addEnvironmentVariable(CONTAINER_NAME_KEY, getContainerName());
     }
 
 

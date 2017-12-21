@@ -13,7 +13,6 @@ import java.io.IOException;
 
 public class TaskGenerator extends AbstractTaskGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TaskGenerator.class);
-    public static final String contName = "taskGenContainer";
 
     @Override
     public void init() throws Exception {

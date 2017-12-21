@@ -4,6 +4,7 @@ import org.hobbit.sdk.docker.BuildBasedDockerizer;
 import com.spotify.docker.client.messages.PortBinding;
 
 import java.io.Reader;
+import java.nio.file.Paths;
 
 public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
 
@@ -13,6 +14,7 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     private Boolean useCachedImage;
 
     public BuildBasedDockersBuilder(String dockerizerName){
+
         super(dockerizerName);
     }
 
@@ -100,7 +102,8 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     @Override
     public BuildBasedDockerizer build() throws Exception {
 
-        imageName(imageNamePrefix+getImageName());
+        if(!getImageName().startsWith(imageNamePrefix))
+            imageName(Paths.get(imageNamePrefix,getImageName()).toString());
 
         if(buildDirectory==null)
             throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
