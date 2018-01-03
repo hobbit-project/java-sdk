@@ -15,9 +15,10 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 public class SystemAdapterDockerBuilder extends BuildBasedDockersBuilder {
     public SystemAdapterDockerBuilder(DynamicDockerFileBuilder builder) {
 
-        super("DummySystemAdapterDockerizer");
+        super("SystemAdapterDockerizer");
 
-        imageName("system-adapter");
+        imageName(builder.getImageNamePrefix()+"system-adapter");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

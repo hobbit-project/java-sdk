@@ -2,13 +2,12 @@ package org.hobbit.sdk;
 
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
-import org.hobbit.sdk.docker.BuildBasedDockerizer;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +18,7 @@ import java.util.concurrent.*;
  * @author Roman Katerinenko
  */
 public class ComponentsExecutor {
+    public EnvironmentVariables environmentVariables;
     private static final Logger logger = LoggerFactory.getLogger(ComponentsExecutor.class);
     private final static int AWAIT_TERMINATION_MILLIS = 1;
     private final static int CORE_POOL_SIZE = 8;
@@ -32,8 +32,9 @@ public class ComponentsExecutor {
         commandQueueListener = new CommandQueueListener();
     }
 
-    public ComponentsExecutor(CommandQueueListener commandListener){
-        commandQueueListener = commandListener;
+    public ComponentsExecutor(CommandQueueListener commandListener, EnvironmentVariables environmentVariables){
+        this.commandQueueListener = commandListener;
+        this.environmentVariables = environmentVariables;
     }
 
 
@@ -51,16 +52,29 @@ public class ComponentsExecutor {
     }
 
     public void submit(Component component){
-        submit(component, null);
+        submit(component, null, null);
     }
 
     public void submit(Component component, String containerId){
+        submit(component, containerId, null);
+    }
+
+    public void submit(Component component, String containerId, String[] envVariables){
 
         executor.submit(() -> {
-
             String componentName = component.getClass().getSimpleName();
-            if(AbstractDockerizer.class.isInstance(component))
-                componentName = ((AbstractDockerizer)component).getContainerName();
+            if(AbstractDockerizer.class.isInstance(component)) {
+                componentName = ((AbstractDockerizer) component).getContainerName();
+                if (envVariables!=null)
+                    for (String pair : envVariables)
+                        ((AbstractDockerizer)component).addEnvironmentVariable(pair);
+            }else{
+                if (envVariables!=null)
+                    for (String pair : envVariables){
+                        String[] splitted = pair.split("=");
+                        environmentVariables.set(splitted[0], splitted[1]);
+                    }
+            }
             int exitCode = 0;
             try {
                 logger.debug("Initing "+componentName);

@@ -4,7 +4,6 @@ import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.*;
-import org.hobbit.sdk.docker.builders.common.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
 import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder;
@@ -20,9 +19,9 @@ import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.
  * @author Pavel Smirnov
  */
 
-public class ExampleBenchmarkDockerizedTest extends EnvironmentVariables{
+public class ExampleBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
 
-    private AbstractDockerizer rabbitMqDockerizer;
+    private RabbitMqDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
 
@@ -42,14 +41,14 @@ public class ExampleBenchmarkDockerizedTest extends EnvironmentVariables{
         setupGeneratorEnvironmentVariables(1,1);
         setupSystemEnvironmentVariables(SYSTEM_URI);
 
-        benchmarkDB = new BenchmarkDockerBuilder(new DummyDockersBuilder(BenchmarkController.class).init());
-        dataGeneratorDB = new DataGeneratorDockerBuilder(new DummyDockersBuilder(DataGenerator.class).init());
-        taskGeneratorDB = new TaskGeneratorDockerBuilder(new DummyDockersBuilder(TaskGenerator.class).init());
+        benchmarkDB = new BenchmarkDockerBuilder(new DummyDockersBuilder(DummyBenchmarkController.class).init());
+        dataGeneratorDB = new DataGeneratorDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class).init());
+        taskGeneratorDB = new TaskGeneratorDockerBuilder(new DummyDockersBuilder(DummyTaskGenerator.class).init());
 
         evalStorageDB = new EvalStorageDockerBuilder(new DummyDockersBuilder(LocalEvalStorage.class).init());
 
-        systemAdapterDB = new SystemAdapterDockerBuilder(new DummyDockersBuilder(SystemAdapter.class).init());
-        evalModuleDB = new EvalModuleDockerBuilder(new DummyDockersBuilder(EvaluationModule.class).init());
+        systemAdapterDB = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class).init());
+        evalModuleDB = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class).init());
     }
 
     @Test
@@ -78,12 +77,19 @@ public class ExampleBenchmarkDockerizedTest extends EnvironmentVariables{
         Assert.assertNull(dockerizer.anyExceptions());
     }
 
-    public void exec(Boolean useCachedImages, Boolean useCachedContainer) throws Exception {
+    @Test
+    public void checkHealth() throws Exception {
+
+        Boolean useCachedImages = true;
+        Boolean useCachedContainer = false;
+
+        init();
 
         commandQueueListener = new CommandQueueListener();
-        componentsExecutor = new ComponentsExecutor(commandQueueListener);
+        componentsExecutor = new ComponentsExecutor(commandQueueListener, environmentVariables);
 
         rabbitMqDockerizer.run();
+
 
         Component datagen = dataGeneratorDB.useCachedImage(useCachedImages).useCachedContainer(useCachedContainer).build();
         Component taskgen = taskGeneratorDB.useCachedImage(useCachedImages).useCachedContainer(useCachedContainer).build();
@@ -92,20 +98,20 @@ public class ExampleBenchmarkDockerizedTest extends EnvironmentVariables{
 
         commandQueueListener.setCommandReactions(
                 new MultipleCommandsReaction(componentsExecutor, commandQueueListener)
-                        .dataGenerator(datagen).dataGeneratorImageName(DATAGEN_IMAGE_NAME)
-                        .taskGenerator(taskgen).taskGeneratorImageName(TASKGEN_IMAGE_NAME)
-                        .evalStorage(evalstorage).evalStorageImageName(EVAL_STORAGE_IMAGE_NAME)
+                        .dataGenerator(datagen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
+                        .taskGenerator(taskgen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
+                        .evalStorage(evalstorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                         .systemContainerId(systemAdapterDB.getImageName())
-                        .evalModule(evalmodule).evalModuleImageName(EVALMODULE_IMAGE_NAME)
+                        .evalModule(evalmodule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
         Component benchmark = benchmarkDB.useCachedImage(useCachedImages).useCachedContainer(useCachedContainer).build();
-        //Component benchmark = new BenchmarkController();
+        //Component benchmark = new DummyBenchmarkController();
         Component system = systemAdapterDB.useCachedImage(useCachedImages).useCachedContainer(useCachedContainer).build();
-        //Component system = new SystemAdapter();
+        //Component system = new DummySystemAdapter();
 
         componentsExecutor.submit(benchmark);
         componentsExecutor.submit(system, systemAdapterDB.getImageName());
@@ -115,19 +121,12 @@ public class ExampleBenchmarkDockerizedTest extends EnvironmentVariables{
         componentsExecutor.shutdown();
 
         rabbitMqDockerizer.stop();
-    }
 
-
-    @Test
-    public void checkHealth() throws Exception {
-
-        Boolean useCachedImages = true;
-        Boolean useCachedContainers = false;
-
-        init();
-        exec(useCachedImages, useCachedContainers);
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }
+
+
+
 
 
 

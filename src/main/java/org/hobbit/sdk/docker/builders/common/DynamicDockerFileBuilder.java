@@ -17,8 +17,7 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
 
     private Class[] runnerClass;
     private String dockerWorkDir;
-    private String jarFilePath;
-    //private Reader dockerFileReader;
+    private String jarFileName;
 
     public DynamicDockerFileBuilder(String dockerizerName) {
 
@@ -36,8 +35,8 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         return this;
     }
 
-    public DynamicDockerFileBuilder jarFilePath(String value) {
-        this.jarFilePath = value;
+    public DynamicDockerFileBuilder jarFileName(String value) {
+        this.jarFileName = value;
         return this;
     }
 
@@ -53,20 +52,20 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         if(dockerWorkDir ==null)
             throw new Exception("WorkingDirName class is not specified for "+this.getClass().getSimpleName());
 
-        if(jarFilePath==null)
+        if(jarFileName ==null)
             throw new Exception("JarFileName class is not specified for "+this.getClass().getSimpleName());
 
-        if(!Paths.get(getBuildDirectory(), jarFilePath).toFile().exists())
-            throw new Exception(jarFilePath+" not found in "+getBuildDirectory());
+        if(!Paths.get(getBuildDirectory(), jarFileName).toFile().exists())
+            throw new Exception(jarFileName +" not found in "+getBuildDirectory());
 
         List<String> classNames = Arrays.stream(runnerClass).map(c->"\""+c.getCanonicalName()+"\"").collect(Collectors.toList());
         String content =
                 "FROM java\n" +
                         "RUN mkdir -p "+ dockerWorkDir +"\n" +
                         "WORKDIR "+ dockerWorkDir +"\n" +
-                        "ADD ./"+ jarFilePath +" "+ dockerWorkDir +"\n" +
-                        "CMD [\"java\", \"-cp\", \""+ jarFilePath +"\", "+ String.join(",", classNames) +"]\n"
-                        //"CMD [\"java\", \"-cp\", \""+ jarFilePath +"\", \""+runnerClass.getCanonicalName()+"\"]\n"
+                        "ADD ./"+ jarFileName +" "+ dockerWorkDir +"\n" +
+                        "CMD [\"java\", \"-cp\", \""+ jarFileName +"\", "+ String.join(",", classNames) +"]\n"
+                        //"CMD [\"java\", \"-cp\", \""+ jarFileName +"\", \""+runnerClass.getCanonicalName()+"\"]\n"
                 ;
         return new StringReader(content);
     }

@@ -15,9 +15,10 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 public class TaskGeneratorDockerBuilder extends BuildBasedDockersBuilder {
     public TaskGeneratorDockerBuilder(DynamicDockerFileBuilder builder){
 
-        super("ExampleTaskGenDockerizer");
+        super("TaskGenDockerizer");
 
-        imageName("task-generator");
+        imageName(builder.getImageNamePrefix()+"task-generator");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

@@ -14,7 +14,8 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 public class EvalStorageDockerBuilder extends BuildBasedDockersBuilder {
     public EvalStorageDockerBuilder(DynamicDockerFileBuilder builder) {
         super("EvalStorageDockerizer");
-        imageName("eval-storage");
+        imageName(builder.getImageNamePrefix()+"eval-storage");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

@@ -14,9 +14,10 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 
 public class DataGeneratorDockerBuilder extends BuildBasedDockersBuilder {
     public DataGeneratorDockerBuilder(DynamicDockerFileBuilder builder) {
-        super("ExampleDataGenDockerizer");
+        super("DataGenDockerizer");
 
-        imageName("data-generator");
+        imageName(builder.getImageNamePrefix()+"data-generator");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

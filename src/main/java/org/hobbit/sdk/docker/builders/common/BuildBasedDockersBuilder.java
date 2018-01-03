@@ -102,8 +102,9 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     @Override
     public BuildBasedDockerizer build() throws Exception {
 
-        if(!getImageName().startsWith(imageNamePrefix))
-            imageName(Paths.get(imageNamePrefix,getImageName()).toString());
+//        if(!getImageName().startsWith(imageNamePrefix))
+//            imageName(imageNamePrefix+getImageName());
+//            //imageName(Paths.get(imageNamePrefix,getImageName()).toString());
 
         if(buildDirectory==null)
             throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());

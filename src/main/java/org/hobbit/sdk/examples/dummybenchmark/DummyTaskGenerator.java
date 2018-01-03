@@ -1,6 +1,5 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
-import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractTaskGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +10,8 @@ import java.io.IOException;
  * @author Pavel Smirnov
  */
 
-public class TaskGenerator extends AbstractTaskGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(TaskGenerator.class);
+public class DummyTaskGenerator extends AbstractTaskGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(DummyTaskGenerator.class);
 
     @Override
     public void init() throws Exception {

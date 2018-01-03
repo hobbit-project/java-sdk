@@ -14,8 +14,9 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 
 public class EvalModuleDockerBuilder extends BuildBasedDockersBuilder {
     public EvalModuleDockerBuilder(DynamicDockerFileBuilder builder) {
-        super("ExampleEvalModuleDockerizer");
-        imageName("eval-module");
+        super("EvalModuleDockerizer");
+        imageName(builder.getImageNamePrefix()+"eval-module");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

@@ -4,24 +4,19 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractBenchmarkController;
-import org.hobbit.sdk.ComponentsExecutor;
-import org.hobbit.sdk.LocalEvalStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.CommonConstants.*;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.DATAGEN_IMAGE_NAME;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.EVALMODULE_IMAGE_NAME;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.TASKGEN_IMAGE_NAME;
+import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
  */
 
-public class BenchmarkController extends AbstractBenchmarkController {
-    private static final Logger logger = LoggerFactory.getLogger(BenchmarkController.class);
+public class DummyBenchmarkController extends AbstractBenchmarkController {
+    private static final Logger logger = LoggerFactory.getLogger(DummyBenchmarkController.class);
 
     @Override
     public void init() throws Exception {
@@ -31,8 +26,7 @@ public class BenchmarkController extends AbstractBenchmarkController {
         // Your initialization code comes here...
 
         // You might want to load parameters from the benchmarks parameter model
-        NodeIterator iterator = benchmarkParamModel.listObjectsOfProperty(benchmarkParamModel
-                .getProperty("http://example.org/myParameter"));
+        NodeIterator iterator = benchmarkParamModel.listObjectsOfProperty(benchmarkParamModel.getProperty("http://example.org/myParameter"));
 
         // Create the other components
 
@@ -41,16 +35,17 @@ public class BenchmarkController extends AbstractBenchmarkController {
 
         int numberOfDataGenerators = 1;
         String[] envVariables = new String[]{"key1=value1" };
-        createDataGenerators(DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
+        createDataGenerators(DUMMY_DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
 
         logger.debug("createTaskGenerators()");
         int numberOfTaskGenerators = 1;
         envVariables = new String[]{"key1=value1" };
-        createTaskGenerators(TASKGEN_IMAGE_NAME, numberOfTaskGenerators, envVariables);
+        createTaskGenerators(DUMMY_TASKGEN_IMAGE_NAME, numberOfTaskGenerators, envVariables);
 
         // Create evaluation storage
         logger.debug("createEvaluationStorage()");
-        createEvaluationStorage();
+        envVariables = (String[])ArrayUtils.add(DEFAULT_EVAL_STORAGE_PARAMETERS, "HOBBIT_RABBIT_HOST=" + this.rabbitMQHostName);
+        this.createEvaluationStorage(DUMMY_EVAL_STORAGE_IMAGE_NAME, envVariables);
 
         // Wait for all components to finish their initialization
         waitForComponentsInit();
@@ -97,7 +92,7 @@ public class BenchmarkController extends AbstractBenchmarkController {
 
         String[] envVariables = new String[]{"key1=value1"};
         logger.debug("createEvaluationModule()");
-        createEvaluationModule(EVALMODULE_IMAGE_NAME, envVariables);
+        createEvaluationModule(DUMMY_EVALMODULE_IMAGE_NAME, envVariables);
 
         // wait for the evaluation to finish
         logger.debug("Waiting for the evaluation module to finish.");

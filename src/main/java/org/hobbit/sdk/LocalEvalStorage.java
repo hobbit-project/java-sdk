@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 
 public class LocalEvalStorage extends AbstractEvaluationStorage {
     private static final Logger logger = LoggerFactory.getLogger(LocalEvalStorage.class);
-    public static final String contName = "evalStorageContainer";
     protected Exception exception;
 
     private static final int MAX_OBJECT_SIZE = 100 * 1024; // 100mb

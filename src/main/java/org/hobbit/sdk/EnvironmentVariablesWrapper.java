@@ -4,6 +4,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.hobbit.core.Constants;
 import org.hobbit.core.rabbit.RabbitMQUtils;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 //import org.junit.Rule;
 import static org.hobbit.sdk.CommonConstants.*;
 
@@ -11,9 +12,9 @@ import static org.hobbit.sdk.CommonConstants.*;
 /**
  * @author Roman Katerinenko
  */
-public class EnvironmentVariables {
+public class EnvironmentVariablesWrapper {
 
-    public final org.junit.contrib.java.lang.system.EnvironmentVariables environmentVariables = new org.junit.contrib.java.lang.system.EnvironmentVariables();
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
 
     public void setupCommunicationEnvironmentVariables(String rabbitHostName, String sesstionId) {

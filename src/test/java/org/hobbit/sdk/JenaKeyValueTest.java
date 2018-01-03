@@ -17,7 +17,7 @@ public class JenaKeyValueTest {
     private static final double DOUBLE_EXPECTED = 0.43;
 
     @Test
-    public void checkEncodingDecoding() {
+    public void checkEncodingDecoding() throws Exception {
         JenaKeyValue expectedKeyValue = new JenaKeyValue();
         expectedKeyValue.setValue(STRING_URI, STRING_EXPECTED);
         expectedKeyValue.setValue(INT_URI, INT_EXPECTED);
@@ -39,7 +39,7 @@ public class JenaKeyValueTest {
 
     }
 
-    private static void checkParameters(KeyValue actual) {
+    private static void checkParameters(KeyValue actual) throws Exception {
         Assert.assertEquals(STRING_EXPECTED, actual.getStringValueFor(STRING_URI));
         Assert.assertTrue(INT_EXPECTED == actual.getIntValueFor(INT_URI));
         Double d = actual.getDoubleValueFor(DOUBLE_URI);

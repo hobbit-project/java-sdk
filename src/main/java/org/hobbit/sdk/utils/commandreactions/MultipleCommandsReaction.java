@@ -133,8 +133,8 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if(compToSubmit!=null){
-                componentsExecutor.submit(compToSubmit, containerId);
 
+                componentsExecutor.submit(compToSubmit, containerId, startCommandData.getEnvironmentVariables());
                 synchronized (this) {
                     if (containerId!=null){
                         try {

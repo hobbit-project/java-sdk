@@ -1,6 +1,5 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
-import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +10,8 @@ import java.io.IOException;
  * @author Pavel Smirnov
  */
 
-public class DataGenerator extends AbstractDataGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(DataGenerator.class);
+public class DummyDataGenerator extends AbstractDataGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(DummyDataGenerator.class);
 
     @Override
     public void init() throws Exception {

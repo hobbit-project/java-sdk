@@ -68,10 +68,12 @@ public abstract class AbstractDockerizer implements Component {
     public void run() {
         try {
             stop(true);
-            createContainerIfNotExists();
-            int readLogsSince = (int)(System.currentTimeMillis() / 1000L);
-            startContainer();
-            startMonitoringAndLogsReading(readLogsSince);
+            Boolean requiresStart = createContainerIfNotExists();
+            if(requiresStart) {
+                startContainer();
+                int readLogsSince = (int) (System.currentTimeMillis() / 1000L);
+                startMonitoringAndLogsReading(readLogsSince);
+            }
 
         }catch (DockerRequestException e){
             logger.error("Exception: {}", e.getResponseBody());
@@ -94,11 +96,11 @@ public abstract class AbstractDockerizer implements Component {
     }
 
     public void stop(Boolean onstart) throws InterruptedException, DockerException, DockerCertificateException {
-        logger.debug("Stopping containers and removing if needed (imageName={})", imageName);
         try {
-            if(useCachedContainer!=null && useCachedContainer)
-                stopContainer();
-            else if(onstart)
+            if(useCachedContainer!=null && useCachedContainer) {
+                if(!onstart)
+                   stopContainer();
+            }else if(onstart)
                 removeAllSameNamedContainers();
         }
         catch (Exception e){
@@ -140,6 +142,9 @@ public abstract class AbstractDockerizer implements Component {
         removeAllSameNamedImages(imageName);
     }
 
+    public void addEnvironmentVariable(String keyValue){
+        this.environmentVariables.add(keyValue);
+    }
 
     public void prepareImage() throws InterruptedException, DockerException, DockerCertificateException, IOException{
         prepareImage(imageName);
@@ -148,26 +153,36 @@ public abstract class AbstractDockerizer implements Component {
     public abstract void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException;
 
 
-    private void createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public Boolean createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
         if(containerId!=null)
-            return;
+            return true;
 
-        List<String> results = findContainersByName(containerName);
-        if(results.size()==0)
-            createContainer();
-        else
-            containerId = results.get(0);
+        Boolean requiresToBeStarted = false;
+        List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
+        if(results.size()==0){
+            containerId = createContainer();
+            requiresToBeStarted = true;
+        }else{
+            for(Container container : results)
+                if(container.state().equals("running"))
+                    containerId = results.get(0).id();
+
+            if(containerId==null) {
+                containerId = results.get(0).id();
+                requiresToBeStarted = true;
+            }
+        }
+        return requiresToBeStarted;
     }
 
-    private void startContainer() throws Exception {
+    public void startContainer() throws Exception {
         logger.debug("Starting container (imageName={})", imageName);
         getDockerClient().restartContainer(containerId);
-        //connectContainerToNetworks(networks);
+        connectContainerToNetworks(networks);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
         logger.debug("Container started (imageName={})", imageName);
     }
-
 
     public void startMonitoringAndLogsReading(int since) throws Exception {
         logger.debug("Starting monitoring & logs reading for container (imageName={})", imageName);
@@ -235,8 +250,6 @@ public abstract class AbstractDockerizer implements Component {
 
     public void waitForContainerFinish() throws DockerException, InterruptedException, DockerCertificateException {
         logger.debug("Waiting for container finish (imageName={})", imageName);
-
-
         getDockerClient().waitContainer(containerId);
 
     }
@@ -245,9 +258,9 @@ public abstract class AbstractDockerizer implements Component {
         logger.debug("Stopping containers (imageName={})", imageName);
         try{
             if(containerId==null){
-                List<String> results = findContainersByName(containerName);
+                List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.withStatusRunning());
                 if(results.size()>0)
-                    containerId = results.get(0);
+                    containerId = results.get(0).id();
             }
             if(containerId!=null)
                 getDockerClient().stopContainer(containerId, 0);
@@ -259,7 +272,7 @@ public abstract class AbstractDockerizer implements Component {
     }
 
 
-    private void createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    private String createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
 
         if(findImagesByName(imageName).size()==0)
             prepareImage(imageName);
@@ -281,15 +294,14 @@ public abstract class AbstractDockerizer implements Component {
 
         ContainerConfig containerConfig = builder .build();
         ContainerCreation creation = getDockerClient().createContainer(containerConfig, containerName);
-        containerId = creation.id();
-        if (containerId == null) {
+        String contId = creation.id();
+        if (contId == null) {
             IllegalStateException exception = new IllegalStateException(format("Unable to create container %s", containerName));
             logger.error(String.format("Failed to create container (imageName=%s): ",imageName), exception);
             throw exception;
         }
 
-        connectContainerToNetworks(networks);
-
+        return contId;
     }
 
     private static void awaitRunning(final DockerClient client, final String containerId)
@@ -355,13 +367,13 @@ public abstract class AbstractDockerizer implements Component {
         return environmentVariables.toArray(new String[environmentVariables.size()]);
     }
 
-    private List<String> findContainersByName(String containerName) throws
+    private List<Container> findContainersByName(String containerName, DockerClient.ListContainersParam param) throws
             DockerException, InterruptedException, DockerCertificateException {
-        List<String> ret = new ArrayList<String>();
-        for(Container container : getDockerClient().listContainers(DockerClient.ListContainersParam.allContainers())) {
+        List<Container> ret = new ArrayList<>();
+        for(Container container : getDockerClient().listContainers(param)) {
             for(String name : container.names()){
                 if (name.equals(dockerizeContainerName(containerName)))
-                    ret.add(container.id());
+                    ret.add(container);
             }
         }
 
@@ -370,11 +382,11 @@ public abstract class AbstractDockerizer implements Component {
 
     private void removeAllSameNamedContainers(String containerName) throws
             DockerException, InterruptedException, DockerCertificateException {
-        for(String name : findContainersByName(containerName)) {
+        for(Container container : findContainersByName(containerName, DockerClient.ListContainersParam.allContainers())) {
             boolean removed = false;
             while (!removed) {
                 try {
-                    getDockerClient().removeContainer(name, DockerClient.RemoveContainerParam.forceKill());
+                    getDockerClient().removeContainer(container.id(), DockerClient.RemoveContainerParam.forceKill());
                     removed = true;
                     containerId = null;
                 } catch (Exception e) {

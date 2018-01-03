@@ -1,23 +1,17 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
-import com.rabbitmq.client.AMQP;
-import org.apache.commons.io.Charsets;
-import org.hobbit.core.Commands;
-import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractSystemAdapter;
-import org.hobbit.sdk.CommonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * @author Pavel Smirnov
  */
 
-public class SystemAdapter extends AbstractSystemAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(SystemAdapter.class);
+public class DummySystemAdapter extends AbstractSystemAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);
 
     @Override
     public void init() throws Exception {

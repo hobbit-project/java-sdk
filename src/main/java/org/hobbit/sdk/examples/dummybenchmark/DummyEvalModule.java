@@ -3,23 +3,20 @@ package org.hobbit.sdk.examples.dummybenchmark;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractEvaluationModule;
 import org.hobbit.vocab.HOBBIT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 
 /**
  * @author Pavel Smirnov
  */
 
-public class EvaluationModule extends AbstractEvaluationModule {
-    private static final Logger logger = LoggerFactory.getLogger(EvaluationModule.class);
+public class DummyEvalModule extends AbstractEvaluationModule {
+    private static final Logger logger = LoggerFactory.getLogger(DummyEvalModule.class);
 
 
     @Override
@@ -41,11 +38,16 @@ public class EvaluationModule extends AbstractEvaluationModule {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close(){
         // Free the resources you requested here
         logger.debug("close()");
         // Always close the super class after yours!
-        super.close();
+        try {
+            super.close();
+        }
+        catch (Exception e){
+
+        }
     }
 
 }

@@ -3,11 +3,8 @@ package org.hobbit.sdk;
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
-import org.hobbit.sdk.examples.dummybenchmark.BenchmarkController;
-import org.hobbit.sdk.examples.dummybenchmark.DataGenerator;
-import org.hobbit.sdk.examples.dummybenchmark.EvaluationModule;
-import org.hobbit.sdk.examples.dummybenchmark.TaskGenerator;
-import org.hobbit.sdk.examples.dummybenchmark.SystemAdapter;
+import org.hobbit.sdk.examples.dummybenchmark.*;
+import org.hobbit.sdk.examples.dummybenchmark.DummyBenchmarkController;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 
@@ -21,25 +18,25 @@ import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.
  * @author Pavel Smirnov
  */
 
-public class ExampleBenchmarkTest extends EnvironmentVariables{
+public class ExampleBenchmarkTest extends EnvironmentVariablesWrapper {
 
     private AbstractDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
 
-    Component benchmark = new BenchmarkController();
-    Component datagen = new DataGenerator();
-    Component taskgen = new TaskGenerator();
+    Component benchmark = new DummyBenchmarkController();
+    Component datagen = new DummyDataGenerator();
+    Component taskgen = new DummyTaskGenerator();
     Component evalstorage = new LocalEvalStorage();
-    Component system = new SystemAdapter();
-    Component evalmodule = new EvaluationModule();
+    Component system = new DummySystemAdapter();
+    Component evalmodule = new DummyEvalModule();
 
 
     @Test
     public void checkHealth() throws Exception {
 
         commandQueueListener = new CommandQueueListener();
-        componentsExecutor = new ComponentsExecutor(commandQueueListener);
+        componentsExecutor = new ComponentsExecutor(commandQueueListener, environmentVariables);
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder()
                 .build();
@@ -53,10 +50,10 @@ public class ExampleBenchmarkTest extends EnvironmentVariables{
 
         commandQueueListener.setCommandReactions(
                 new MultipleCommandsReaction(componentsExecutor, commandQueueListener)
-                        .dataGenerator(datagen).dataGeneratorImageName(DATAGEN_IMAGE_NAME)
-                        .taskGenerator(taskgen).taskGeneratorImageName(TASKGEN_IMAGE_NAME)
-                        .evalStorage(evalstorage).evalStorageImageName(EVAL_STORAGE_IMAGE_NAME)
-                        .evalModule(evalmodule).evalModuleImageName(EVALMODULE_IMAGE_NAME)
+                        .dataGenerator(datagen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
+                        .taskGenerator(taskgen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
+                        .evalStorage(evalstorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
+                        .evalModule(evalmodule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
                         .systemContainerId(systemContainerId)
         );
 

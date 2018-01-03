@@ -15,9 +15,10 @@ import static org.hobbit.sdk.CommonConstants.*;
 public class BenchmarkDockerBuilder extends BuildBasedDockersBuilder {
 
     public BenchmarkDockerBuilder(DynamicDockerFileBuilder builder) {
-        super("ExampleBenchmarkDockerizer");
+        super("BenchmarkDockerizer");
 
-        imageName("benchmark-controller");
+        imageName(builder.getImageNamePrefix()+"benchmark-controller");
+
         containerName(builder.getContainerName());
         buildDirectory(builder.getBuildDirectory());
         dockerFileReader(builder.getDockerFileReader());

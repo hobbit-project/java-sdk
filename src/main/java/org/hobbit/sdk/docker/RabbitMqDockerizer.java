@@ -1,5 +1,6 @@
 package org.hobbit.sdk.docker;
 
+import com.spotify.docker.client.exceptions.DockerRequestException;
 import org.hobbit.sdk.CommonConstants;
 import org.hobbit.sdk.docker.builders.common.PullBasedDockersBuilder;
 import com.rabbitmq.client.Connection;
@@ -59,7 +60,8 @@ public class RabbitMqDockerizer extends PullBasedDockerizer {
             } catch (IOException e) {
                 // ignore
             }
-            Thread.sleep(300);
+            if(!connected)
+                Thread.sleep(300);
         }
     }
 
