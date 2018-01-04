@@ -13,7 +13,7 @@ Technically the SDK is focused on the orchestration of docker images/containers 
 As a result users may execute and debug their systems/benchmarks either “as is” (and hit the breakpoints in the code) or being packed into docker containers (the same manner as components will be operated by the online platform). The SDK provides users with internal log messages from the containers, which make the debugging process more effective and less error-prone. 
 
 # Usage
-HowTo examples have been moved to the separated [repository](https://github.com/hobbit-project/java-sdk-example), which can be cloned for each new project. Here is the detailed manuals of the development process:
+Any examples have been placed to the standalone [repository](https://github.com/hobbit-project/java-sdk-example), which you can clone for every new benchmark/system project. Here is the detailed manuals of the development process:
 1. [Test/Debug the components as java code](https://github.com/hobbit-project/java-sdk/wiki/Debug-components-as-java-code)
 1. [Build images and test/debug your components as docker containers](https://github.com/hobbit-project/java-sdk/wiki/Building-images-and-debugging-containers)
 1. [Upload images to the online platform](https://github.com/hobbit-project/java-sdk/wiki/Upload-images-to-the-platform)
