@@ -102,7 +102,10 @@ public class MultipleCommandsReaction implements CommandReaction {
 
 
     @Override
-    public void handleCmd(Byte command, byte[] bytes, String replyTo){
+    public void handleCmd(Byte command, byte[] bytes, String replyTo) throws Exception {
+        if(systemContainerId==null) {
+            throw new Exception("SystemContainerId not specified. Impossible to continue");
+        }
 
         if (command == Commands.DOCKER_CONTAINER_START){
             String dataString = RabbitMQUtils.readString(bytes);
@@ -149,6 +152,8 @@ public class MultipleCommandsReaction implements CommandReaction {
                 }
             }else{
                 logger.error("No component to submit for imageName="+startCommandData.image);
+                throw new Exception("No component to submit for imageName="+startCommandData.image);
+
             }
         }
 

@@ -1,4 +1,4 @@
-package org.hobbit.sdk.examples.dummybenchmark;
+package org.hobbit.sdk.dummybenchmark;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.jena.rdf.model.NodeIterator;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
@@ -55,12 +55,6 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
         logger.debug("waitForComponentsInit()");
         //throw new NotImplementedException();
     }
-
-//    @Override
-//    protected void createEvaluationStorage(){
-//        String[] envVariables = (String[]) ArrayUtils.add(DEFAULT_EVAL_STORAGE_PARAMETERS, "HOBBIT_RABBIT_HOST=" + this.rabbitMQHostName);
-//        this.createEvaluationStorage("git.project-hobbit.eu:4567/defaulthobbituser/defaultevaluationstorage:1.0.5", envVariables);
-//    }
 
     @Override
     protected void executeBenchmark() throws Exception {

@@ -4,6 +4,6 @@ import java.io.IOException;
 
 @FunctionalInterface
 public interface TriConsumer<T,U,S> {
-    void handleCmd(T t, U u, S s);
+    void handleCmd(T t, U u, S s) throws Exception;
 
 }

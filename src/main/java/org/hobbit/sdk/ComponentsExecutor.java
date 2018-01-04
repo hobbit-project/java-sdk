@@ -64,7 +64,7 @@ public class ComponentsExecutor {
         executor.submit(() -> {
             String componentName = component.getClass().getSimpleName();
             if(AbstractDockerizer.class.isInstance(component)) {
-                componentName = ((AbstractDockerizer) component).getContainerName();
+                componentName = ((AbstractDockerizer) component).getName();
                 if (envVariables!=null)
                     for (String pair : envVariables)
                         ((AbstractDockerizer)component).addEnvironmentVariable(pair);
@@ -98,14 +98,15 @@ public class ComponentsExecutor {
                                     return finalContainerName;
                                 }
                             });
-                        } else if (!CommandQueueListener.class.isInstance(component)) {
+                        } else
+                            //if (!CommandQueueListener.class.isInstance(component)){
                             try {
                                 CommandSender.sendContainerTerminatedCommand(containerId, (byte) exitCode);
                                 component.close();
                             } catch (Exception e) {
                                 exceptions.add(e);
                             }
-                        }
+                        //}
                     }
               }
         });

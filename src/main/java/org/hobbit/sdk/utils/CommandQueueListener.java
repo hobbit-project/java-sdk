@@ -74,7 +74,11 @@ public class CommandQueueListener extends AbstractCommandReceivingComponent {
     @Override
     public void receiveCommand(byte command, byte[] data) {
         for (CommandReaction commandReaction : commandReactions) {
-            commandReaction.handleCmd(command, data, replyTo);
+            try {
+                commandReaction.handleCmd(command, data, replyTo);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
     }
 

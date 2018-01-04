@@ -3,22 +3,23 @@ package org.hobbit.sdk;
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
-import org.hobbit.sdk.examples.dummybenchmark.*;
-import org.hobbit.sdk.examples.dummybenchmark.DummyBenchmarkController;
+import org.hobbit.sdk.dummybenchmark.*;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.hobbit.sdk.CommonConstants.*;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
  */
 
-public class ExampleBenchmarkTest extends EnvironmentVariablesWrapper {
+public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
 
     private AbstractDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
@@ -43,7 +44,7 @@ public class ExampleBenchmarkTest extends EnvironmentVariablesWrapper {
         rabbitMqDockerizer.run();
 
         String systemContainerId = "exampleSystem";
-        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), HOBBIT_SESSION_ID);
+        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
         setupBenchmarkEnvironmentVariables(EXPERIMENT_URI);
         setupGeneratorEnvironmentVariables(1,1);
         setupSystemEnvironmentVariables(SYSTEM_URI);

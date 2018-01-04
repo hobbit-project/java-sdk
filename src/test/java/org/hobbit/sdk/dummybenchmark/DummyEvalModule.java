@@ -1,4 +1,4 @@
-package org.hobbit.sdk.examples.dummybenchmark;
+package org.hobbit.sdk.dummybenchmark;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -7,8 +7,6 @@ import org.hobbit.core.components.AbstractEvaluationModule;
 import org.hobbit.vocab.HOBBIT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 
 /**

@@ -1,4 +1,4 @@
-package org.hobbit.sdk.examples.dummybenchmark;
+package org.hobbit.sdk.dummybenchmark;
 
 import org.hobbit.core.components.AbstractDataGenerator;
 import org.slf4j.Logger;
