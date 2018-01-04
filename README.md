@@ -12,25 +12,8 @@ Technically the SDK is focused on the orchestration of docker images/containers 
 
 As a result users may execute and debug their systems/benchmarks either “as is” (and hit the breakpoints in the code) or being packed into docker containers (the same manner as components will be operated by the online platform). The SDK provides users with internal log messages from the containers, which make the debugging process more effective and less error-prone. 
 
-# Installation
-1) Make sure that docker (version 17 and higher) is installed on your system 
-(Otherwise install it by the following command: `sudo curl -sSL https://get.docker.com/ | sh`
-2) Clone the repository and install its artifacts to the local maven repository:
-`mnv install -DskipTests=true`
-3) Include the following dependency into your pom-file:
-
-`<dependency>`
-
-`<groupId>org.hobbit</groupId>`
-
-`<artifactId>hobbit-java-sdk</artifactId>`
-
-`<version>1.0</version>`
-
-`</dependency>`
-
 # Usage
-The SDK provides a basis for tests creation for your HOBBIT-related components. You may just copy the contents of the [ExampleBenchmarkTest](https://github.com/hobbit-project/java-sdk/blob/master/src/test/java/org/hobbit/sdk/ExampleBenchmarkTest.java) and the [ExampleBenchmarkDockerizedTest](https://github.com/hobbit-project/java-sdk/blob/master/src/test/java/org/hobbit/sdk/ExampleBenchmarkDockerizedTest.java) to your project and use it as a starting point. Replace the components in the pipeline by your own to debug your benchmark or benchmarking system.  SDK offers developers to consequently pass the following development steps:
+Any examples have been placed to the standalone [repository](https://github.com/hobbit-project/java-sdk-example), which you can clone for every new benchmark/system project. Here is the detailed manuals of the development process:
 1. [Test/Debug the components as java code](https://github.com/hobbit-project/java-sdk/wiki/Debug-components-as-java-code)
 1. [Build images and test/debug your components as docker containers](https://github.com/hobbit-project/java-sdk/wiki/Building-images-and-debugging-containers)
 1. [Upload images to the online platform](https://github.com/hobbit-project/java-sdk/wiki/Upload-images-to-the-platform)
