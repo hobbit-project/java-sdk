@@ -24,7 +24,7 @@ public class PullBasedDockerizer extends AbstractDockerizer {
 
     public void pullImage(String imageName) throws InterruptedException, DockerException, IOException, DockerCertificateException {
         logger.debug("Pulling image (imageName={})", imageName);
-        dockerClient.pull(imageName);
+        this.getDockerClient().pull(imageName);
     }
 
 

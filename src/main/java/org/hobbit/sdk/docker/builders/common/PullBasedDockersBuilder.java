@@ -5,14 +5,12 @@ import org.hobbit.sdk.docker.PullBasedDockerizer;
 
 public class PullBasedDockersBuilder extends AbstractDockersBuilder {
 
-    public PullBasedDockersBuilder(String name){
-        super(name);
+    public PullBasedDockersBuilder(String imageName){
+        super(imageName);
+        super.imageName(imageName);
     }
 
-    public PullBasedDockersBuilder imageName(String value) {
-        super.imageName(value);
-        return this;
-    }
+
 
     @Override
     public PullBasedDockerizer build() {

@@ -7,6 +7,7 @@ import org.hobbit.core.components.Component;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.ComponentsExecutor;
+import org.hobbit.sdk.docker.PullBasedDockerizer;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
 import org.junit.Assert;
@@ -151,8 +152,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                     }
                 }
             }else{
-                logger.error("No component to submit for imageName="+startCommandData.image);
-                throw new Exception("No component to submit for imageName="+startCommandData.image);
+                throw new Exception("No component to start as imageName="+startCommandData.image);
 
             }
         }

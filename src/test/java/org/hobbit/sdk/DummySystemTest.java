@@ -4,6 +4,7 @@ import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.*;
+import org.hobbit.sdk.docker.builders.common.PullBasedDockersBuilder;
 import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder;
 import org.hobbit.sdk.utils.CommandQueueListener;
@@ -17,17 +18,32 @@ import java.util.Date;
 import static org.hobbit.sdk.CommonConstants.*;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
+
 /**
  * @author Pavel Smirnov
  * This code here is just for testing and debugging SDK.
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
+ *
+ *
+ * This test shows how to debug your system under already published benchmark images (sml-v2 benchmark)
+ * if docker images of benchmarkController components are available online
+ *
+ *
  */
 
-public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
+
+public class DummySystemTest extends EnvironmentVariablesWrapper {
 
     private RabbitMqDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
+
+
+    String benchmarkImageName = "git.project-hobbit.eu:4567/smirnp/sml-v2/benchmark-controller";
+    String dataGeneratorImageName = "git.project-hobbit.eu:4567/smirnp/sml-v2/data-generator";
+    String taskGeneratorImageName = "git.project-hobbit.eu:4567/smirnp/sml-v2/task-generator";
+    String evalStorageImageName = "git.project-hobbit.eu:4567/smirnp/sml-v2/eval-storage";
+    String evalModuleImageName = "git.project-hobbit.eu:4567/smirnp/sml-v2/eval-module";
 
     BenchmarkDockerBuilder benchmarkBuilder;
     DataGenDockerBuilder dataGeneratorBuilder;
@@ -43,7 +59,8 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
     Component evalModule;
     Component systemAdapter;
 
-    public void init(Boolean useCachedImages) throws Exception {
+
+    public void init(boolean useCachedImages) throws Exception {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
@@ -52,14 +69,13 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
         setupGeneratorEnvironmentVariables(1,1);
         setupSystemEnvironmentVariables(SYSTEM_URI);
 
-        benchmarkBuilder = new BenchmarkDockerBuilder(new DummyDockersBuilder(DummyBenchmarkController.class, DUMMY_BENCHMARK_IMAGE_NAME).useCachedImage(useCachedImages));
-        dataGeneratorBuilder = new DataGenDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class, DUMMY_DATAGEN_IMAGE_NAME).useCachedImage(useCachedImages));
-        taskGeneratorBuilder = new TaskGenDockerBuilder(new DummyDockersBuilder(DummyTaskGenerator.class, DUMMY_TASKGEN_IMAGE_NAME).useCachedImage(useCachedImages));
-
-        evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(InMemoryEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
+        benchmarkBuilder = new BenchmarkDockerBuilder(new PullBasedDockersBuilder(benchmarkImageName));
+        dataGeneratorBuilder = new DataGenDockerBuilder(new PullBasedDockersBuilder(dataGeneratorImageName));
+        taskGeneratorBuilder = new TaskGenDockerBuilder(new PullBasedDockersBuilder(taskGeneratorImageName));
+        evalStorageBuilder = new EvalStorageDockerBuilder(new PullBasedDockersBuilder(evalStorageImageName));
+        evalModuleBuilder = new EvalModuleDockerBuilder(new PullBasedDockersBuilder(evalModuleImageName));
 
         systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
-        evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
 
         benchmarkController = benchmarkBuilder.build();
         dataGen = dataGeneratorBuilder.build();
@@ -74,13 +90,7 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
     public void buildImages() throws Exception {
 
         init(false);
-
-        ((AbstractDockerizer)benchmarkController).prepareImage();
-        ((AbstractDockerizer)dataGen).prepareImage();
-        ((AbstractDockerizer)taskGen).prepareImage();
-        ((AbstractDockerizer)evalStorage).prepareImage();
         ((AbstractDockerizer)systemAdapter).prepareImage();
-        ((AbstractDockerizer)evalModule).prepareImage();
     }
 
     @Test
@@ -95,7 +105,6 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer.run();
 
-
         commandQueueListener.setCommandReactions(
                 new MultipleCommandsReaction(componentsExecutor, commandQueueListener)
                         .dataGenerator(dataGen).dataGeneratorImageName(dataGeneratorBuilder.getImageName())
@@ -108,9 +117,7 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        //you can run clear java-code instead of dockerized one
-
-        //benchmarkController = new DummyBenchmarkController();
+        //Here you can switch between dockerized (by default) and pure java code of your system
         //systemAdapter = new DummySystemAdapter();
 
         componentsExecutor.submit(benchmarkController);
@@ -124,9 +131,6 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
 
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }
-
-
-
 
 
 

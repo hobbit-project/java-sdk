@@ -8,13 +8,12 @@ import java.nio.file.Paths;
 
 public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
 
-    private String imageNamePrefix="";
+    //private String imageNamePrefix="";
     private String buildDirectory;
     private Reader dockerFileReader;
     private Boolean useCachedImage;
 
     public BuildBasedDockersBuilder(String dockerizerName){
-
         super(dockerizerName);
     }
 
@@ -28,10 +27,10 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
-    public BuildBasedDockersBuilder imageNamePrefix(String value){
-        this.imageNamePrefix = value;
-        return this;
-    }
+//    public BuildBasedDockersBuilder imageNamePrefix(String value){
+//        this.imageNamePrefix = value;
+//        return this;
+//    }
 
     public BuildBasedDockersBuilder useCachedImage() {
         this.useCachedImage = true;
@@ -94,7 +93,6 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
-    public String getImageNamePrefix(){ return imageNamePrefix; };
     public String getBuildDirectory(){ return buildDirectory; }
     public Reader getDockerFileReader(){ return dockerFileReader; }
     public Boolean getUseCachedImage(){ return useCachedImage;}
@@ -102,9 +100,6 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     @Override
     public BuildBasedDockerizer build() throws Exception {
 
-//        if(!getImageName().startsWith(imageNamePrefix))
-//            imageName(imageNamePrefix+getImageName());
-//            //imageName(Paths.get(imageNamePrefix,getImageName()).toString());
 
         if(buildDirectory==null)
             throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());

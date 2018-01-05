@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hobbit</groupId>
     <artifactId>hobbit-java-sdk</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -33,11 +33,12 @@
     </repositories>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.hobbit</groupId>-->
-            <!--<artifactId>evaluation-storage</artifactId>-->
-            <!--<version>1.0.5</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.log4mongo</groupId>
             <artifactId>log4mongo-java</artifactId>

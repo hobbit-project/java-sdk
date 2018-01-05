@@ -19,10 +19,9 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
     private String dockerWorkDir;
     private String jarFileName;
 
-    public DynamicDockerFileBuilder(String dockerizerName) {
+    public DynamicDockerFileBuilder(String dockerizerName) throws Exception {
 
         super(dockerizerName);
-
    }
 
     public DynamicDockerFileBuilder runnerClass(Class... values) {
@@ -40,12 +39,27 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         return this;
     }
 
+    public DynamicDockerFileBuilder useCachedImage(Boolean value) {
+        super.useCachedImage(value);
+        return this;
+    }
+
+    public DynamicDockerFileBuilder useCachedContainer(Boolean value) {
+        super.useCachedContainer(value);
+        return this;
+    }
+
     public DynamicDockerFileBuilder customDockerFileReader(Reader value) {
         super.dockerFileReader(value);
         return this;
     }
 
-    protected Reader createDefaultReader() throws Exception {
+    public DynamicDockerFileBuilder imageName(String value) {
+        super.imageName(value);
+        return this;
+    }
+
+    protected void createDefaultReader() throws Exception {
         if(runnerClass==null)
             throw new Exception("Runner class is not specified for "+this.getClass().getSimpleName());
 
@@ -67,19 +81,16 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
                         "CMD [\"java\", \"-cp\", \""+ jarFileName +"\", "+ String.join(",", classNames) +"]\n"
                         //"CMD [\"java\", \"-cp\", \""+ jarFileName +"\", \""+runnerClass.getCanonicalName()+"\"]\n"
                 ;
-        return new StringReader(content);
+        //return new StringReader(content);
+        dockerFileReader(new StringReader(content));
     }
 
-    public DynamicDockerFileBuilder init() throws Exception {
-        if(getDockerFileReader()==null)
-            super.dockerFileReader(createDefaultReader());
-        return this;
-    }
+
 
     @Override
     public BuildBasedDockerizer build() throws Exception {
         if(getDockerFileReader()==null)
-            super.dockerFileReader(createDefaultReader());
+            createDefaultReader();
         return super.build();
     }
 }

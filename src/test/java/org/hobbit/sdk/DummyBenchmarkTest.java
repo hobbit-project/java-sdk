@@ -3,7 +3,7 @@ package org.hobbit.sdk;
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
-import org.hobbit.sdk.dummybenchmark.*;
+import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 
@@ -13,10 +13,12 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.hobbit.sdk.CommonConstants.*;
-import static org.hobbit.sdk.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
+ * This code here is just for testing and debugging SDK.
+ * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
 public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
@@ -28,7 +30,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     Component benchmark = new DummyBenchmarkController();
     Component datagen = new DummyDataGenerator();
     Component taskgen = new DummyTaskGenerator();
-    Component evalstorage = new LocalEvalStorage();
+    Component evalstorage = new InMemoryEvalStorage();
     Component system = new DummySystemAdapter();
     Component evalmodule = new DummyEvalModule();
 

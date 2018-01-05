@@ -1,4 +1,4 @@
-package org.hobbit.sdk.dummybenchmark;
+package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.hobbit.core.components.AbstractSystemAdapter;
 import org.slf4j.Logger;
@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * @author Pavel Smirnov
+ * This code is here just for testing and debugging the SDK.
+ * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
 public class DummySystemAdapter extends AbstractSystemAdapter {

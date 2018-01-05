@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 public abstract class AbstractDockersBuilder {
-    private final String name;
+    private String name;
     private String imageName;
 
     private String hostName;
@@ -22,7 +22,7 @@ public abstract class AbstractDockersBuilder {
 
     private Boolean skipLogsReading;
 
-    public AbstractDockersBuilder(String name) {
+    public AbstractDockersBuilder(String name){
         this.name = name;
     }
 
@@ -42,6 +42,11 @@ public abstract class AbstractDockersBuilder {
 
     public AbstractDockersBuilder addEnvironmentVariable(String key, String value) {
         environmentVariables.add(AbstractDockerizer.toEnvironmentEntry(key, value));
+        return this;
+    }
+
+    public AbstractDockersBuilder name(String value) {
+        this.name = value;
         return this;
     }
 

@@ -1,4 +1,4 @@
-package org.hobbit.sdk.dummybenchmark;
+package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author Pavel Smirnov
+ * This code is here just for testing and debugging the SDK.
+ * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
 public class DummyEvalModule extends AbstractEvaluationModule {

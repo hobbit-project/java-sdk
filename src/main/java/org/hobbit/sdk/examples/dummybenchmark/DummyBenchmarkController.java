@@ -1,4 +1,4 @@
-package org.hobbit.sdk.dummybenchmark;
+package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.jena.rdf.model.NodeIterator;
@@ -9,10 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
- * @author Pavel Smirnov
+ * This code is here just for testing and debugging the SDK.
+ * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
 public class DummyBenchmarkController extends AbstractBenchmarkController {
