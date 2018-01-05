@@ -22,7 +22,7 @@ Any examples have been placed to the standalone [repository](https://github.com/
 Feel free to ask your questions and suggestions under the Issues tab. 
 Also feel free to put feedback about benchmarks and systems, for which SDK have been helpful.
 
-# Changelog
+# News/Changelog
 * **Revision 1:** RabbitMQ dynamic host problem resolved. Reusable DockerBuilders for components added.
 * **Revision 2:** Namespaces changed. LocalEvalStorage, EvaluationModule (from examples) refactored. Full-managed hooks-listening mechanism implemented. Any SDK-specifics removed from example components. Wiki pages updated. Released as v1.0. 
-* **Revision 3:** DockerBuilders refactored to support build-based and pull-based dockerizers. ExampleSystemTest added (demonstates how to run your system under third-party benchmark containers). Released as v1.1. 
+* **Revision 3:** DockerBuilders refactored to support build-based and pull-based dockerizers. ExampleSystemTest added (demonstates how to run your system under third-party benchmark containers). SDK starting kit placed to standalone [repository](https://github.com/hobbit-project/java-sdk-example). Released as v1.1. 
