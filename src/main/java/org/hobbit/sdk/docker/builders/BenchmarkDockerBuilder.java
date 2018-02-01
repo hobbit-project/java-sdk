@@ -17,22 +17,10 @@ import static org.hobbit.sdk.CommonConstants.*;
 
 public class BenchmarkDockerBuilder extends BothTypesDockersBuilder {
     private static final String name = "benchmark-controller";
-    private String parameters = new JenaKeyValue().encodeToString();
 
     public BenchmarkDockerBuilder(AbstractDockersBuilder builder) {
         super(builder);
     }
-
-    public BenchmarkDockerBuilder parameters(String parameters){
-        this.parameters = parameters;
-        return this;
-    }
-
-    public BenchmarkDockerBuilder parameters(JenaKeyValue parameters){
-        this.parameters = parameters.encodeToString();
-        return this;
-    }
-
 
     @Override
     public void addEnvVars(AbstractDockersBuilder ret) {
@@ -41,7 +29,7 @@ public class BenchmarkDockerBuilder extends BothTypesDockersBuilder {
         ret.addNetworks(HOBBIT_NETWORKS);
 
         ret.addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
-        ret.addEnvironmentVariable(BENCHMARK_PARAMETERS_MODEL_KEY, parameters);
+        ret.addEnvironmentVariable(BENCHMARK_PARAMETERS_MODEL_KEY, (String)System.getenv().get(BENCHMARK_PARAMETERS_MODEL_KEY));
         ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
     }
 

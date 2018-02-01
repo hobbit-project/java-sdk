@@ -1,6 +1,7 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.hobbit.core.components.AbstractSystemAdapter;
+import org.hobbit.sdk.JenaKeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 public class DummySystemAdapter extends AbstractSystemAdapter {
     private static final Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);
+    private static JenaKeyValue parameters;
 
     @Override
     public void init() throws Exception {
@@ -21,7 +23,8 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // Your initialization code comes here...
 
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
-        logger.debug("Sending SYSTEM_READY_SIGNAL");
+        parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
+        logger.debug("SystemModel: "+parameters.encodeToString());
     }
 
     @Override
@@ -43,7 +46,6 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

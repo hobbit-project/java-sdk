@@ -1,5 +1,6 @@
 package org.hobbit.sdk;
 
+import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
@@ -12,6 +13,9 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static org.hobbit.core.Constants.BENCHMARK_PARAMETERS_MODEL_KEY;
+import static org.hobbit.core.Constants.EXPERIMENT_URI_NS;
+import static org.hobbit.core.Constants.SYSTEM_PARAMETERS_MODEL_KEY;
 import static org.hobbit.sdk.CommonConstants.*;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
@@ -47,9 +51,8 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
 
         String systemContainerId = "exampleSystem";
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
-        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI);
-        setupGeneratorEnvironmentVariables(1,1);
-        setupSystemEnvironmentVariables(SYSTEM_URI);
+        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
+        setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
         commandQueueListener.setCommandReactions(
                 new MultipleCommandsReaction(componentsExecutor, commandQueueListener)
@@ -75,5 +78,16 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     }
 
 
+    public JenaKeyValue createBenchmarkParameters(){
+        JenaKeyValue kv = new JenaKeyValue(EXPERIMENT_URI);
+        kv.setValue(BENCHMARK_URI+"/benchmarkParam1", 123);
+        kv.setValue(BENCHMARK_URI+"/benchmarkParam2", 456);
+        return kv;
+    }
 
+    public JenaKeyValue createSystemParameters(){
+        JenaKeyValue kv = new JenaKeyValue();
+        kv.setValue(SYSTEM_URI+"/systemParam1", 123);
+        return kv;
+    }
 }

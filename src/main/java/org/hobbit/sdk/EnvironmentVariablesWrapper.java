@@ -22,42 +22,19 @@ public class EnvironmentVariablesWrapper {
         environmentVariables.set(Constants.HOBBIT_SESSION_ID_KEY, sesstionId);
     }
 
-    public void setupBenchmarkEnvironmentVariables(String experimentId){
-        Model emptyModel = ModelFactory.createDefaultModel();
-        environmentVariables.set(Constants.BENCHMARK_PARAMETERS_MODEL_KEY, RabbitMQUtils.writeModel2String(emptyModel));
-        environmentVariables.set(Constants.HOBBIT_EXPERIMENT_URI_KEY, "http://w3id.org/hobbit/experiments#" + experimentId);
+    public void setupBenchmarkEnvironmentVariables(String experimentUri, JenaKeyValue benchmarkParameters){
+        environmentVariables.set(Constants.HOBBIT_EXPERIMENT_URI_KEY, experimentUri);
+        environmentVariables.set(Constants.BENCHMARK_PARAMETERS_MODEL_KEY, benchmarkParameters.encodeToString());
     }
 
     public void setupGeneratorEnvironmentVariables(int generatorId, int generatorCount) {
-        Model emptyModel = ModelFactory.createDefaultModel();
         environmentVariables.set(Constants.GENERATOR_ID_KEY, String.valueOf(generatorId));
         environmentVariables.set(Constants.GENERATOR_COUNT_KEY, String.valueOf(generatorCount));
     }
 
-    public void setupSystemEnvironmentVariables(String systemUri) {
-        Model emptyModel = ModelFactory.createDefaultModel();
-        environmentVariables.set(Constants.SYSTEM_PARAMETERS_MODEL_KEY, RabbitMQUtils.writeModel2String(emptyModel));
+    public void setupSystemEnvironmentVariables(String systemUri, JenaKeyValue systemParameters) {
+        environmentVariables.set(Constants.SYSTEM_PARAMETERS_MODEL_KEY, systemParameters.encodeToString());
         environmentVariables.set(Constants.SYSTEM_URI_KEY, systemUri);
     }
 
-//    public void setupSdkEnvironmentVariables(String datagenContainerId,
-//                                             String taskgenContainerId,
-//                                             String evalStorageContainerId,
-//                                             String systemContainerId,
-//                                             String evalModuleContainerId
-//                                             //Boolean dockerize,
-//                                             //Boolean useCachedImages
-//    ){
-//        Model emptyModel = ModelFactory.createDefaultModel();
-//        environmentVariables.set(LOCAL_DATAGEN_CONTAINER_KEY, datagenContainerId);
-//        environmentVariables.set(LOCAL_TASKGEN_CONTAINER_KEY, taskgenContainerId);
-//        environmentVariables.set(LOCAL_EVALSTORAGE_CONTAINER_KEY, evalStorageContainerId);
-//        environmentVariables.set(LOCAL_SYSTEM_CONTAINER_KEY, systemContainerId);
-//        environmentVariables.set(LOCAL_EVALMODULE_CONTAINER_KEY, evalModuleContainerId);
-////        if(dockerize)
-////            environmentVariables.set(DOCKERIZE_KEY, String.valueOf(useCachedImages));
-////        if(useCachedImages)
-////            environmentVariables.set(CACHED_IMAGES_KEY, String.valueOf(useCachedImages));
-//
-//    }
 }

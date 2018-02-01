@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
+
 /**
  * This code is here just for testing and debugging the SDK.
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
@@ -19,6 +21,10 @@ public class DummyTaskGenerator extends AbstractTaskGenerator {
         // Always init the super class first!
         super.init();
         logger.debug("Init()");
+        if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
+            String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
+        }
+
         // Your initialization code comes here...
     }
 

@@ -3,6 +3,8 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.*;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,6 +26,15 @@ public class JenaKeyValue extends KeyValue {
 
     public String encodeToString() {
         return RabbitMQUtils.writeModel2String(toModel());
+    }
+
+    public String[] mapToArray(){
+        List<String> ret= new ArrayList<String>();
+        Map<String, Object> map = toMap();
+        for(String key: map.keySet()){
+            ret.add(key+"="+map.get(key).toString());
+        }
+        return ret.toArray(new String[0]);
     }
 
     public byte[] toBytes() {

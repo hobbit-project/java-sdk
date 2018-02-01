@@ -24,13 +24,13 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
 
     private final String imageName;
     private final String containerName;
-    private final String buildDirectory;
+    private final Path buildDirectory;
     private final Reader dockerFileReader;
     private final Boolean useCachedImage;
 
 
     private String imageId;
-    private String tempDockerFileName;
+    //private String tempDockerFileName;
 
 
 
@@ -67,28 +67,28 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
             InterruptedException, DockerException, IOException, IllegalStateException, DockerCertificateException {
 
         logger.debug("Building image (imageName={})", imageName);
-        createTempDockerFile();
-        fillDockerFile();
-        Path path = Paths.get(buildDirectory);
-        imageId = getDockerClient().build(path, imageName, tempDockerFileName, message -> {
+        Path filePath = createTempDockerFile();
+        fillDockerFile(filePath);
+
+        imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
 
         });
+
         if (imageId == null) {
             IllegalStateException exception = new IllegalStateException(format("Unable to create image %s", imageName));
             logger.error("Exception", exception);
             throw exception;
         }
-        removeTempDockerFile();
+        removeTempDockerFile(filePath);
     }
 
-    private void createTempDockerFile() throws IOException {
-        File file = File.createTempFile("dockerFile", "temp", new File(buildDirectory));
-        tempDockerFileName = file.getName();
+    private Path createTempDockerFile() throws IOException {
+        File file = File.createTempFile("Dockerfile", ".tmp", buildDirectory.toFile());
+        return Paths.get(file.getPath());
     }
 
-    private void fillDockerFile() throws IOException {
-        Path path = Paths.get(buildDirectory, tempDockerFileName);
-        try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE)) {
+    private void fillDockerFile(Path filePath) throws IOException {
+        try (OutputStream outputStream = Files.newOutputStream(filePath, StandardOpenOption.WRITE)) {
             outputStream.write(readAllFromDockerFileReader());
         }
     }
@@ -106,8 +106,7 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
     }
 
 
-    private void removeTempDockerFile() throws IOException {
-        Path path = Paths.get(buildDirectory, tempDockerFileName);
+    private void removeTempDockerFile(Path path) throws IOException {
         Files.deleteIfExists(path);
     }
 

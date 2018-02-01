@@ -5,7 +5,7 @@ import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.*;
 import org.hobbit.sdk.docker.builders.common.PullBasedDockersBuilder;
-import org.hobbit.sdk.examples.dummybenchmark.*;
+import org.hobbit.sdk.examples.dummybenchmark.DummySystemAdapter;
 import org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
@@ -65,9 +65,8 @@ public class DummySystemTest extends EnvironmentVariablesWrapper {
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
-        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI);
-        setupGeneratorEnvironmentVariables(1,1);
-        setupSystemEnvironmentVariables(SYSTEM_URI);
+        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
+        setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
         benchmarkBuilder = new BenchmarkDockerBuilder(new PullBasedDockersBuilder(benchmarkImageName));
         dataGeneratorBuilder = new DataGenDockerBuilder(new PullBasedDockersBuilder(dataGeneratorImageName));
@@ -75,7 +74,7 @@ public class DummySystemTest extends EnvironmentVariablesWrapper {
         evalStorageBuilder = new EvalStorageDockerBuilder(new PullBasedDockersBuilder(evalStorageImageName));
         evalModuleBuilder = new EvalModuleDockerBuilder(new PullBasedDockersBuilder(evalModuleImageName));
 
-        systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
+        systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages).init());
 
         benchmarkController = benchmarkBuilder.build();
         dataGen = dataGeneratorBuilder.build();
@@ -132,6 +131,17 @@ public class DummySystemTest extends EnvironmentVariablesWrapper {
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }
 
+    public JenaKeyValue createBenchmarkParameters(){
+        JenaKeyValue kv = new JenaKeyValue(EXPERIMENT_URI);
+        kv.setValue(BENCHMARK_URI+"/benchmarkParam1", 123);
+        kv.setValue(BENCHMARK_URI+"/benchmarkParam2", 456);
+        return kv;
+    }
 
+    public JenaKeyValue createSystemParameters(){
+        JenaKeyValue kv = new JenaKeyValue();
+        kv.setValue(SYSTEM_URI+"/systemParam1", 123);
+        return kv;
+    }
 
 }

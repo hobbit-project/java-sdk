@@ -4,12 +4,13 @@ import org.hobbit.sdk.docker.BuildBasedDockerizer;
 import com.spotify.docker.client.messages.PortBinding;
 
 import java.io.Reader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
 
     //private String imageNamePrefix="";
-    private String buildDirectory;
+    private Path buildDirectory;
     private Reader dockerFileReader;
     private Boolean useCachedImage;
 
@@ -23,7 +24,9 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     }
 
     public BuildBasedDockersBuilder buildDirectory(String value) {
-        this.buildDirectory = value;
+        if(value.equals("."))
+            value = "";
+        this.buildDirectory = Paths.get(value).toAbsolutePath();
         return this;
     }
 
@@ -93,7 +96,7 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
-    public String getBuildDirectory(){ return buildDirectory; }
+    public Path getBuildDirectory(){ return buildDirectory; }
     public Reader getDockerFileReader(){ return dockerFileReader; }
     public Boolean getUseCachedImage(){ return useCachedImage;}
 
@@ -105,7 +108,7 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
             throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
 
         if(dockerFileReader==null)
-            throw new Exception("DockerFile reader is not specified for "+this.getClass().getSimpleName());
+            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+". You can initialize it by the calling the init()");
 
         BuildBasedDockerizer ret = new BuildBasedDockerizer(this);
         return ret;

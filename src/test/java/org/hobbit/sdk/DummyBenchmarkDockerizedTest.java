@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.hobbit.sdk.CommonConstants.*;
+import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
@@ -48,21 +48,22 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
-        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI);
+        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
         setupGeneratorEnvironmentVariables(1,1);
-        setupSystemEnvironmentVariables(SYSTEM_URI);
+        setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
-        benchmarkBuilder = new BenchmarkDockerBuilder(new DummyDockersBuilder(DummyBenchmarkController.class, DUMMY_BENCHMARK_IMAGE_NAME).useCachedImage(useCachedImages));
-        dataGeneratorBuilder = new DataGenDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class, DUMMY_DATAGEN_IMAGE_NAME).useCachedImage(useCachedImages));
-        taskGeneratorBuilder = new TaskGenDockerBuilder(new DummyDockersBuilder(DummyTaskGenerator.class, DUMMY_TASKGEN_IMAGE_NAME).useCachedImage(useCachedImages));
+        benchmarkBuilder = new BenchmarkDockerBuilder(new DummyDockersBuilder(DummyBenchmarkController.class, DUMMY_BENCHMARK_IMAGE_NAME).useCachedImage(useCachedImages).init());
+        dataGeneratorBuilder = new DataGenDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class, DUMMY_DATAGEN_IMAGE_NAME).useCachedImage(useCachedImages).addFileOrFolder("data").init());
+        taskGeneratorBuilder = new TaskGenDockerBuilder(new DummyDockersBuilder(DummyTaskGenerator.class, DUMMY_TASKGEN_IMAGE_NAME).useCachedImage(useCachedImages).init());
 
-        evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(InMemoryEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
+        evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(InMemoryEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages).init());
 
-        systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
-        evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
+        systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages).init());
+        evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages).init());
 
         benchmarkController = benchmarkBuilder.build();
-        dataGen = dataGeneratorBuilder.build();
+        dataGen = new DummyDataGenerator();
+        //dataGen = dataGeneratorBuilder.build();
         taskGen = taskGeneratorBuilder.build();
         evalStorage = evalStorageBuilder.build();
         evalModule = evalModuleBuilder.build();
@@ -126,8 +127,18 @@ public class DummyBenchmarkDockerizedTest extends EnvironmentVariablesWrapper {
     }
 
 
+    public JenaKeyValue createBenchmarkParameters(){
+        JenaKeyValue kv = new JenaKeyValue();
+        kv.setValue(BENCHMARK_URI+"benchmarkParam1", 123);
+        kv.setValue(BENCHMARK_URI+"benchmarkParam2", 456);
+        return kv;
+    }
 
-
+    public JenaKeyValue createSystemParameters(){
+        JenaKeyValue kv = new JenaKeyValue();
+        kv.setValue(SYSTEM_URI+"systemParam1", 123);
+        return kv;
+    }
 
 
 }

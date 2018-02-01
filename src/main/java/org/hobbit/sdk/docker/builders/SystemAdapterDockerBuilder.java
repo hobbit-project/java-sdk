@@ -1,6 +1,7 @@
 package org.hobbit.sdk.docker.builders;
 
 import org.hobbit.sdk.CommonConstants;
+import org.hobbit.sdk.JenaKeyValue;
 import org.hobbit.sdk.docker.builders.common.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.common.BothTypesDockersBuilder;
 import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
@@ -16,11 +17,22 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
 
 public class SystemAdapterDockerBuilder extends BothTypesDockersBuilder {
     private static final String name = "system-adapter";
+//    private String parameters = new JenaKeyValue().encodeToString();
 
     public SystemAdapterDockerBuilder(AbstractDockersBuilder builder) {
         super(builder);
+
     }
 
+//    public SystemAdapterDockerBuilder parameters(String parameters){
+//        this.parameters = parameters;
+//        return this;
+//    }
+//
+//    public SystemAdapterDockerBuilder parameters(JenaKeyValue parameters){
+//        this.parameters = parameters.encodeToString();
+//        return this;
+//    }
 
     @Override
     public void addEnvVars(AbstractDockersBuilder ret) {

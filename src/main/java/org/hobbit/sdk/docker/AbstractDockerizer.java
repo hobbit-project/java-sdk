@@ -70,8 +70,8 @@ public abstract class AbstractDockerizer implements Component {
             stop(true);
             Boolean requiresStart = createContainerIfNotExists();
             if(requiresStart) {
-                startContainer();
                 int readLogsSince = (int) (System.currentTimeMillis() / 1000L);
+                startContainer();
                 startMonitoringAndLogsReading(readLogsSince);
             }
 
@@ -176,12 +176,12 @@ public abstract class AbstractDockerizer implements Component {
     }
 
     public void startContainer() throws Exception {
-        logger.debug("Starting container (imageName={})", imageName);
+        logger.debug("Starting container (imageName={}, containerId={})", imageName, containerId);
         getDockerClient().restartContainer(containerId);
         connectContainerToNetworks(networks);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
-        logger.debug("Container started (imageName={})", imageName);
+        logger.debug("Container started (imageName={}, containerId={})", imageName, containerId);
     }
 
     public void startMonitoringAndLogsReading(int since) throws Exception {
@@ -195,15 +195,15 @@ public abstract class AbstractDockerizer implements Component {
 
             String logs="";
             String prevLogs="";
-            Boolean running = getDockerClient().inspectContainer(containerId).state().running();
+            Boolean running = true;
             while(running){
-                running = getDockerClient().inspectContainer(containerId).state().running();
                 if (skipLogsReading==null || !skipLogsReading){
                     try {
                         logStream = getDockerClient().logs(containerId,
                                 DockerClient.LogsParam.stderr(),
                                 DockerClient.LogsParam.stdout(),
-                                DockerClient.LogsParam.since(since));
+                                DockerClient.LogsParam.since(since)
+                        );
                         logs = logStream.readFully();
                     } catch (Exception e) {
                         logger.debug(String.format("No logs are available (imageName=%s):", imageName), e);
@@ -221,6 +221,7 @@ public abstract class AbstractDockerizer implements Component {
                             logger.debug(logsToPrint);
                         prevLogs = logs;
                     }
+                    running = getDockerClient().inspectContainer(containerId).state().running();
                 }
                 Thread.sleep(1000);
             }

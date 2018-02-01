@@ -1,9 +1,9 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractBenchmarkController;
+import org.hobbit.sdk.JenaKeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +18,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.
 
 public class DummyBenchmarkController extends AbstractBenchmarkController {
     private static final Logger logger = LoggerFactory.getLogger(DummyBenchmarkController.class);
+    private static JenaKeyValue parameters;
 
     @Override
     public void init() throws Exception {
@@ -26,21 +27,20 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
 
         // Your initialization code comes here...
 
-        // You might want to load parameters from the benchmarks parameter model
-        NodeIterator iterator = benchmarkParamModel.listObjectsOfProperty(benchmarkParamModel.getProperty("http://example.org/myParameter"));
-
+        parameters = new JenaKeyValue.Builder().buildFrom(benchmarkParamModel);
+        logger.debug("BenchmarkModel: "+parameters.encodeToString());
         // Create the other components
 
         // Create data generators
         logger.debug("createDataGenerators()");
 
         int numberOfDataGenerators = 1;
-        String[] envVariables = new String[]{"key1=value1" };
+        String [] envVariables = parameters.mapToArray();
         createDataGenerators(DUMMY_DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
 
         logger.debug("createTaskGenerators()");
         int numberOfTaskGenerators = 1;
-        envVariables = new String[]{"key1=value1" };
+
         createTaskGenerators(DUMMY_TASKGEN_IMAGE_NAME, numberOfTaskGenerators, envVariables);
 
         // Create evaluation storage
@@ -85,7 +85,7 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
 
         // Create the evaluation module
 
-        String[] envVariables = new String[]{"key1=value1"};
+        String [] envVariables = parameters.mapToArray();
         logger.debug("createEvaluationModule()");
         createEvaluationModule(DUMMY_EVALMODULE_IMAGE_NAME, envVariables);
 
