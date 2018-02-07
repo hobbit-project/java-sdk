@@ -18,7 +18,7 @@ public class DummyTaskGenerator extends AbstractTaskGenerator {
 
     @Override
     public void init() throws Exception {
-        // Always init the super class first!
+        // Always initFileReader the super class first!
         super.init();
         logger.debug("Init()");
         if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){

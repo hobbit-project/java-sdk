@@ -2,7 +2,7 @@ package org.hobbit.sdk;
 
 import org.hobbit.sdk.docker.AbstractDockerizer;
 
-import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

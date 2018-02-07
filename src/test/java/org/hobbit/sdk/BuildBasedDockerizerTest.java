@@ -2,7 +2,7 @@ package org.hobbit.sdk;
 
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.BuildBasedDockerizer;
-import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

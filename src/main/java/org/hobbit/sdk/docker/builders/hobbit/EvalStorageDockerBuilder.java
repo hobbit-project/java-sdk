@@ -1,10 +1,7 @@
-package org.hobbit.sdk.docker.builders;
+package org.hobbit.sdk.docker.builders.hobbit;
 
-import org.hobbit.sdk.CommonConstants;
-import org.hobbit.sdk.docker.builders.common.AbstractDockersBuilder;
-import org.hobbit.sdk.docker.builders.common.BothTypesDockersBuilder;
-import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
-import org.hobbit.sdk.docker.builders.common.DynamicDockerFileBuilder;
+import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
+import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
 
 import static org.hobbit.core.Constants.*;
 import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
@@ -14,13 +11,12 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
  * @author Pavel Smirnov
  */
 
-public class EvalModuleDockerBuilder extends BothTypesDockersBuilder {
-    private static final String name = "eval-module";
+public class EvalStorageDockerBuilder extends BothTypesDockersBuilder {
+    private static final String name = "eval-storage";
 
-    public EvalModuleDockerBuilder(AbstractDockersBuilder builder) {
+    public EvalStorageDockerBuilder(AbstractDockersBuilder builder) {
         super(builder);
     }
-
 
     @Override
     public void addEnvVars(AbstractDockersBuilder ret) {
@@ -29,6 +25,7 @@ public class EvalModuleDockerBuilder extends BothTypesDockersBuilder {
         ret.addNetworks(HOBBIT_NETWORKS);
 
         ret.addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
+        ret.addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
         ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
     }
 

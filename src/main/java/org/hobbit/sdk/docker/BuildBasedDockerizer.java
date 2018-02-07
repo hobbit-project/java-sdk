@@ -1,6 +1,6 @@
 package org.hobbit.sdk.docker;
 
-import org.hobbit.sdk.docker.builders.common.BuildBasedDockersBuilder;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 

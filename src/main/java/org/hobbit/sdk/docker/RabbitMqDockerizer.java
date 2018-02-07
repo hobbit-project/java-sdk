@@ -1,8 +1,6 @@
 package org.hobbit.sdk.docker;
 
-import com.spotify.docker.client.exceptions.DockerRequestException;
-import org.hobbit.sdk.CommonConstants;
-import org.hobbit.sdk.docker.builders.common.PullBasedDockersBuilder;
+import org.hobbit.sdk.docker.builders.PullBasedDockersBuilder;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.spotify.docker.client.exceptions.DockerCertificateException;

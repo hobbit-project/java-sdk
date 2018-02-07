@@ -18,7 +18,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
 
     @Override
     public void init() throws Exception {
-        // Always init the super class first!
+        // Always initFileReader the super class first!
         super.init();
         logger.debug("Init()");
 

@@ -1,7 +1,7 @@
-package org.hobbit.sdk.docker.builders;
+package org.hobbit.sdk.docker.builders.hobbit;
 
-import org.hobbit.sdk.CommonConstants;
-import org.hobbit.sdk.docker.builders.common.*;
+import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
+import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
 
 import static org.hobbit.core.Constants.*;
 import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
@@ -11,12 +11,13 @@ import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
  * @author Pavel Smirnov
  */
 
-public class TaskGenDockerBuilder extends BothTypesDockersBuilder {
-    private static final String name = "task-generator";
+public class DataGenDockerBuilder extends BothTypesDockersBuilder {
+    private static final String name = "data-generator";
 
-    public TaskGenDockerBuilder(AbstractDockersBuilder builder) {
+    public DataGenDockerBuilder(AbstractDockersBuilder builder) {
         super(builder);
     }
+
 
     @Override
     public void addEnvVars(AbstractDockersBuilder ret) {
@@ -34,6 +35,3 @@ public class TaskGenDockerBuilder extends BothTypesDockersBuilder {
         return name;
     }
 }
-
-
-

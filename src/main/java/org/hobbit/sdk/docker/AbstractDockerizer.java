@@ -1,7 +1,7 @@
 package org.hobbit.sdk.docker;
 
 import org.hobbit.core.components.Component;
-import org.hobbit.sdk.docker.builders.common.AbstractDockersBuilder;
+import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import com.google.common.collect.ImmutableList;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;

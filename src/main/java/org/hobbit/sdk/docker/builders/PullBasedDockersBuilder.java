@@ -1,4 +1,4 @@
-package org.hobbit.sdk.docker.builders.common;
+package org.hobbit.sdk.docker.builders;
 
 import org.hobbit.sdk.docker.PullBasedDockerizer;
 

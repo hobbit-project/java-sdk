@@ -1,4 +1,4 @@
-package org.hobbit.sdk.docker.builders.common;
+package org.hobbit.sdk.docker.builders;
 
 import org.hobbit.sdk.docker.BuildBasedDockerizer;
 import com.spotify.docker.client.messages.PortBinding;
@@ -103,12 +103,11 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     @Override
     public BuildBasedDockerizer build() throws Exception {
 
-
         if(buildDirectory==null)
             throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
 
         if(dockerFileReader==null)
-            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+". You can initialize it by the calling the init()");
+            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+". You can initialize it by the calling the initFileReader()");
 
         BuildBasedDockerizer ret = new BuildBasedDockerizer(this);
         return ret;
