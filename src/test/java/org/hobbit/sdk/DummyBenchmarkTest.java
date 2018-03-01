@@ -38,11 +38,10 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
 
 
     public void init(Boolean useCachedImages) throws Exception {
-
         benchmarkBuilder = new BenchmarkDockerBuilder(new DummyDockersBuilder(DummyBenchmarkController.class, DUMMY_BENCHMARK_IMAGE_NAME).useCachedImage(useCachedImages));
-        dataGeneratorBuilder = new DataGenDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class, DUMMY_DATAGEN_IMAGE_NAME).useCachedImage(useCachedImages).addFileOrFolder("data"));
+        dataGeneratorBuilder = new DataGenDockerBuilder(new DummyDockersBuilder(DummyDataGenerator.class, DUMMY_DATAGEN_IMAGE_NAME).useCachedImage(useCachedImages).addFileOrFolder("data/data.dat"));
         taskGeneratorBuilder = new TaskGenDockerBuilder(new DummyDockersBuilder(DummyTaskGenerator.class, DUMMY_TASKGEN_IMAGE_NAME).useCachedImage(useCachedImages));
-        evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(InMemoryEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
+        evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(DummyEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
         systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
         evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
     }
@@ -52,12 +51,12 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     public void buildImages() throws Exception {
 
         init(false);
-        ((AbstractDockerizer)benchmarkBuilder.build()).prepareImage();
-        ((AbstractDockerizer)dataGeneratorBuilder.build()).prepareImage();
-        ((AbstractDockerizer)taskGeneratorBuilder.build()).prepareImage();
-        ((AbstractDockerizer)evalStorageBuilder.build()).prepareImage();
-        ((AbstractDockerizer)evalModuleBuilder.build()).prepareImage();
-        ((AbstractDockerizer)systemAdapterBuilder.build()).prepareImage();
+        benchmarkBuilder.build().prepareImage();
+        dataGeneratorBuilder.build().prepareImage();
+        taskGeneratorBuilder.build().prepareImage();
+        evalStorageBuilder.build().prepareImage();
+        evalModuleBuilder.build().prepareImage();
+        systemAdapterBuilder.build().prepareImage();
     }
 
     @Test
@@ -71,10 +70,6 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     }
 
     private void checkHealth(Boolean dockerize) throws Exception {
-
-        Boolean useCachedImages = true;
-
-        init(useCachedImages);
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
@@ -91,11 +86,13 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
         Component benchmarkController = new DummyBenchmarkController();
         Component dataGen = new DummyDataGenerator();
         Component taskGen = new DummyTaskGenerator();
-        Component evalStorage  = new InMemoryEvalStorage();
+        Component evalStorage  = new DummyEvalStorage();
         Component evalModule = new DummyEvalModule();
         Component systemAdapter = new DummySystemAdapter();
 
         if(dockerize) {
+            Boolean useCachedImages = true;
+            init(useCachedImages);
             benchmarkController = benchmarkBuilder.build();
             dataGen = dataGeneratorBuilder.build();
             taskGen = taskGeneratorBuilder.build();
@@ -106,18 +103,18 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
 
         commandQueueListener.setCommandReactions(
                 new MultipleCommandsReaction(componentsExecutor, commandQueueListener)
-                        .dataGenerator(dataGen).dataGeneratorImageName(dataGeneratorBuilder.getImageName())
-                        .taskGenerator(taskGen).taskGeneratorImageName(taskGeneratorBuilder.getImageName())
-                        .evalStorage(evalStorage).evalStorageImageName(evalStorageBuilder.getImageName())
-                        .evalModule(evalModule).evalModuleImageName(evalModuleBuilder.getImageName())
-                        .systemContainerId(systemAdapterBuilder.getImageName())
+                        .dataGenerator(dataGen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
+                        .taskGenerator(taskGen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
+                        .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
+                        .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
+                        .systemContainerId(DUMMY_SYSTEM_IMAGE_NAME)
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
         componentsExecutor.submit(benchmarkController);
-        componentsExecutor.submit(systemAdapter, systemAdapterBuilder.getImageName());
+        componentsExecutor.submit(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME);
 
         commandQueueListener.waitForTermination();
         commandQueueListener.terminate();

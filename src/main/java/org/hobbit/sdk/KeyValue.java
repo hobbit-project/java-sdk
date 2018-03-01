@@ -1,14 +1,8 @@
 package org.hobbit.sdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.mongodb.util.JSON;
-import jdk.nashorn.internal.objects.Global;
-import jdk.nashorn.internal.parser.JSONParser;
-import jdk.nashorn.internal.runtime.Context;
+import com.google.gson.*;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -16,11 +10,24 @@ import java.util.*;
 /**
  * @author Roman Katerinenko
  */
-public class KeyValue {
-    private final Map<String, Object> keyValueMap = new LinkedHashMap<>();
+public class KeyValue implements Map{
+    private Map keyValueMap = new LinkedHashMap<>();
+
+    public KeyValue(){
+
+    }
+
+
+    public KeyValue(Map from){
+        keyValueMap = from;
+    }
 
     public String getStringValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
+        Object value = keyValueMap.get(propertyName);
+        if (JsonPrimitive.class.isInstance(value))
+            return ((JsonPrimitive)value).getAsString();
+
         return (String) keyValueMap.get(propertyName);
     }
 
@@ -31,11 +38,21 @@ public class KeyValue {
 
     public int getIntValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
+
+        Object value = keyValueMap.get(propertyName);
+        if (JsonPrimitive.class.isInstance(value))
+            return ((JsonPrimitive)value).getAsInt();
+
         return (Integer) keyValueMap.get(propertyName);
     }
 
     public Double getDoubleValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
+
+        Object value = keyValueMap.get(propertyName);
+        if (JsonPrimitive.class.isInstance(value))
+            return ((JsonPrimitive)value).getAsDouble();
+
         return (Double) keyValueMap.get(propertyName);
     }
 
@@ -59,11 +76,11 @@ public class KeyValue {
         keyValueMap.putAll(keyValue.keyValueMap);
     }
 
-    public Set<Map.Entry<String, Object>> getEntries() {
+    public Set<Map.Entry<Object, Object>> getEntries() {
         return keyValueMap.entrySet();
     }
 
-    public Map<String, Object> toMap(){ return keyValueMap; }
+    public Map<Object, Object> toMap(){ return keyValueMap; }
 
     private void checkExistence(String propertyName) throws Exception {
         if(!keyValueMap.containsKey(propertyName))
@@ -81,6 +98,66 @@ public class KeyValue {
     }
 
     @Override
+    public int size() {
+        return keyValueMap.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return keyValueMap.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return keyValueMap.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return keyValueMap.containsValue(value);
+    }
+
+    @Override
+    public Object get(Object key) {
+        return keyValueMap.get(key);
+    }
+
+    @Override
+    public Object put(Object key, Object value) {
+        return keyValueMap.put(key, value);
+    }
+
+    @Override
+    public Object remove(Object key) {
+        return keyValueMap.remove(key);
+    }
+
+    @Override
+    public void putAll(Map m) {
+        keyValueMap.putAll(m);
+    }
+
+    @Override
+    public void clear() {
+        keyValueMap.clear();
+    }
+
+    @Override
+    public Set keySet() {
+        return keyValueMap.keySet();
+    }
+
+    @Override
+    public Collection values() {
+        return keyValueMap.values();
+    }
+
+    @Override
+    public Set<Entry> entrySet() {
+        return keyValueMap.entrySet();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -94,22 +171,43 @@ public class KeyValue {
         return keyValueMap.hashCode();
     }
 
-//    public static KeyValue parseFromString(String input) throws JsonProcessingException {
-//        KeyValue ret = new KeyValue();
-//        //JSONParser jsonParser = new JSONParser();
-//
-////        ObjectMapper mapper = new ObjectMapper();
-////        String jsonString = mapper.writeValueAsString(input);
-////        Object obj = JSON.parse(jsonString);
-//
-//        JsonParser jsonParser = new JsonParser();
-//        JsonElement jsonElement = jsonParser.parse(input);
-//        for(Map.Entry entry : jsonElement.getAsJsonObject().entrySet()){
-//            Object value = entry.getValue();
-//            ret.setValue((String)entry.getKey(), value);
-//        }
-//
-//
-//        return ret;
-//    }
+    public static KeyValue parseFromString(String input) throws JsonProcessingException {
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(input);
+        return parseFromObject(jsonElement.getAsJsonObject());
+    }
+
+    private static KeyValue parseFromObject(JsonObject input) throws JsonProcessingException {
+        KeyValue ret = new KeyValue();
+
+        for(Map.Entry entry : input.entrySet()){
+            Object value = entry.getValue();
+
+            if(JsonArray.class.isInstance(value))
+                value = parseFromJsonArray((JsonArray)value);
+
+            if(JsonObject.class.isInstance(value))
+                ret.setValue((String)entry.getKey(), parseFromObject((JsonObject)value));
+            else
+                ret.setValue((String)entry.getKey(), value);
+        }
+
+
+        return ret;
+    }
+
+    private static Object parseFromJsonArray(JsonArray array) throws JsonProcessingException {
+        List<Object> ret = new ArrayList<>();
+        for (Object obj : array) {
+            Object value = obj;
+            if(JsonArray.class.isInstance(value))
+                value = parseFromJsonArray((JsonArray)obj);
+
+            if(JsonObject.class.isInstance(value))
+                    ret.add(parseFromObject((JsonObject)value));
+            else
+                ret.add(value);
+        }
+        return ret.toArray();
+    }
 }

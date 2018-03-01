@@ -4,6 +4,7 @@ import org.hobbit.core.components.AbstractDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileReader;
 import java.io.IOException;
 
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
@@ -21,6 +22,8 @@ public class DummyDataGenerator extends AbstractDataGenerator {
         // Always initFileReader the super class first!
         super.init();
         logger.debug("Init()");
+
+        //FileReader fileReader = new FileReader("data/data.dat");
 
         if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
             String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
@@ -40,7 +43,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
         logger.debug("generateData()");
         String data;
         int i=0;
-        while(i<1) {
+        while(i<60){
             i++;
             // Create your data here
             data = new String("data_"+String.valueOf(i));
@@ -52,6 +55,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
             // an to system adapter
             //logger.debug("sendDataToSystemAdapter()->{}",data);
             //sendDataToSystemAdapter(data.getBytes());
+            //Thread.sleep(1000);
         }
 
     }

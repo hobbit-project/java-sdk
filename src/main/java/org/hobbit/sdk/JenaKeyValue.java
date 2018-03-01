@@ -30,8 +30,8 @@ public class JenaKeyValue extends KeyValue {
 
     public String[] mapToArray(){
         List<String> ret= new ArrayList<String>();
-        Map<String, Object> map = toMap();
-        for(String key: map.keySet()){
+        Map map = toMap();
+        for(Object key: map.keySet()){
             ret.add(key+"="+map.get(key).toString());
         }
         return ret.toArray(new String[0]);
@@ -44,9 +44,9 @@ public class JenaKeyValue extends KeyValue {
     public Model toModel() {
         Model model = ModelFactory.createDefaultModel();
         Resource subject = model.createResource(experimentUri);
-        for (Map.Entry<String, Object> entry : getEntries()) {
+        for (Map.Entry entry : getEntries()) {
             Literal literal = model.createTypedLiteral(entry.getValue());
-            Property property = model.createProperty(entry.getKey());
+            Property property = model.createProperty(String.valueOf(entry.getKey()));
             model.add(subject, property, literal);
         }
         return model;

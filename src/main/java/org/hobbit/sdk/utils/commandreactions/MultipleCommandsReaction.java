@@ -111,6 +111,7 @@ public class MultipleCommandsReaction implements CommandReaction {
         if (command == Commands.DOCKER_CONTAINER_START){
             String dataString = RabbitMQUtils.readString(bytes);
             StartCommandData startCommandData = gson.fromJson(dataString, StartCommandData.class);
+
             logger.debug("CONTAINER_START signal received with imageName="+startCommandData.image+"");
 
             Component compToSubmit = null;

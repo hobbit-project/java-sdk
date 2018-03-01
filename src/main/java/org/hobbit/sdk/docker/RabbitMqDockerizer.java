@@ -34,7 +34,7 @@ public class RabbitMqDockerizer extends PullBasedDockerizer {
         try {
 
             super.run();
-            waitUntilRunning();
+            //waitUntilRunning();
 
         } catch (Exception e) {
 
