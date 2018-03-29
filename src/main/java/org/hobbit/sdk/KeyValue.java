@@ -46,6 +46,16 @@ public class KeyValue implements Map{
         return (Integer) keyValueMap.get(propertyName);
     }
 
+    public long getLongValueFor(String propertyName) throws Exception {
+        checkExistence(propertyName);
+
+        Object value = keyValueMap.get(propertyName);
+        if (JsonPrimitive.class.isInstance(value))
+            return ((JsonPrimitive)value).getAsLong();
+
+        return (long) keyValueMap.get(propertyName);
+    }
+
     public Double getDoubleValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
 
@@ -65,6 +75,10 @@ public class KeyValue implements Map{
     }
 
     public void setValue(String propertyName, double value) {
+        keyValueMap.put(propertyName, value);
+    }
+
+    public void setValue(String propertyName, long value) {
         keyValueMap.put(propertyName, value);
     }
 

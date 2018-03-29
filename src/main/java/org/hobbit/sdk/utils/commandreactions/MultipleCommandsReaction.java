@@ -40,11 +40,11 @@ public class MultipleCommandsReaction implements CommandReaction {
     private String evalStorageImageName;
     private String evalModuleImageName;
 
-    private String dataGenContainerId;
-    private String taskGenContainerId;
+//    private String dataGenContainerId;
+//    private String taskGenContainerId;
     private String systemContainerId;
-    private String evalModuleContainerId;
-    private String evalStorageContainerId;
+//    private String evalModuleContainerId;
+//    private String evalStorageContainerId;
 
 
     private Gson gson = new Gson();
@@ -163,20 +163,31 @@ public class MultipleCommandsReaction implements CommandReaction {
             CommandSender commandSender = null;
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             String containerName = RabbitMQUtils.readString(buffer);
-            if(containerName.equals(systemContainerId)){
-                String test1="123";
-            }
+
+            logger.debug("DOCKER_CONTAINER_TERMINATED {} received", containerName);
+
+            String commandToSend = null;
             //if(containerName.equals(dataGenContainerId))
-            if(containerName.equals(dataGeneratorImageName))
+            if(containerName.equals(dataGeneratorImageName)) {
                 commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
+                commandToSend = "DATA_GENERATION_FINISHED";
+            }
 
             //if(containerName.equals(taskGenContainerId))
-            if(containerName.equals(taskGeneratorImageName))
+            if(containerName.equals(taskGeneratorImageName)) {
                 commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
+                commandToSend = "TASK_GENERATION_FINISHED";
+            }
+
+            if(containerName.equals(systemContainerId)) {
+                commandSender = new CommandSender(Commands.EVAL_STORAGE_TERMINATE);
+                commandToSend = "EVAL_STORAGE_TERMINATE";
+            }
 
             synchronized (this){
                 if (commandSender!=null){
                     try {
+                        logger.debug("Sending "+commandToSend+" signal");
                         commandSender.send();
                     } catch (Exception e) {
                         //Assert.fail(e.getMessage());
@@ -187,6 +198,7 @@ public class MultipleCommandsReaction implements CommandReaction {
         }
 
         if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
+            logger.debug("BENCHMARK_FINISHED_SIGNAL received");
             try {
                 commandQueueListener.terminate();
                 componentsExecutor.shutdown();
@@ -196,20 +208,30 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
         }
 
-        if (command == Commands.BENCHMARK_READY_SIGNAL)
+        if (command == Commands.BENCHMARK_READY_SIGNAL) {
             benchmarkReady = true;
+            logger.debug("BENCHMARK_READY_SIGNAL signal received");
+        }
 
-        if (command == Commands.DATA_GENERATOR_READY_SIGNAL)
+        if (command == Commands.DATA_GENERATOR_READY_SIGNAL) {
             dataGenReady = true;
+            logger.debug("DATA_GENERATOR_READY_SIGNAL signal received");
+        }
 
-        if (command == Commands.TASK_GENERATOR_READY_SIGNAL)
+        if (command == Commands.TASK_GENERATOR_READY_SIGNAL) {
             taskGenReady = true;
+            logger.debug("TASK_GENERATOR_READY_SIGNAL signal received");
+        }
 
-        if (command == Commands.EVAL_STORAGE_READY_SIGNAL)
+        if (command == Commands.EVAL_STORAGE_READY_SIGNAL) {
             evalStorageReady = true;
+            logger.debug("EVAL_STORAGE_READY_SIGNAL signal received");
+        }
 
-        if (command == Commands.SYSTEM_READY_SIGNAL)
+        if (command == Commands.SYSTEM_READY_SIGNAL) {
             systemReady = true;
+            logger.debug("SYSTEM_READY_SIGNAL signal received");
+        }
 
         synchronized (this){
             if (benchmarkReady &&
@@ -219,6 +241,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                     systemReady && !startBenchmarkCommandSent) {
                 startBenchmarkCommandSent = true;
                 try {
+                    logger.debug("sending START_BENCHMARK_SIGNAL");
                     new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemContainerId).send();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
