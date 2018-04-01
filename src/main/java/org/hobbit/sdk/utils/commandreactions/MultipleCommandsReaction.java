@@ -178,11 +178,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                 commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
                 commandToSend = "TASK_GENERATION_FINISHED";
             }
-
-            if(containerName.equals(systemContainerId)) {
-                commandSender = new CommandSender(Commands.EVAL_STORAGE_TERMINATE);
-                commandToSend = "EVAL_STORAGE_TERMINATE";
-            }
+ 
 
             synchronized (this){
                 if (commandSender!=null){
