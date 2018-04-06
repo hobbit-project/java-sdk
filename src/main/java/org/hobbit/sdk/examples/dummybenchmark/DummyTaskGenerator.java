@@ -14,13 +14,17 @@ import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
  */
 
 public class DummyTaskGenerator extends AbstractTaskGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(DummyTaskGenerator.class);
+    //private static final Logger logger = LoggerFactory.getLogger(DummyTaskGenerator.class);
+    private Logger logger;
 
     @Override
     public void init() throws Exception {
         // Always initFileReader the super class first!
         super.init();
-        logger.debug("Init()");
+
+        logger = LoggerFactory.getLogger(this.getClass().getName()+"_"+getGeneratorId());
+        logger.debug("Init finished");
+
         if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
             String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
         }
@@ -31,7 +35,7 @@ public class DummyTaskGenerator extends AbstractTaskGenerator {
     @Override
     protected void generateTask(byte[] data) throws Exception {
         String dataString = new String(data);
-        logger.debug("generateTask()->{}",dataString);
+        logger.trace("generateTask()->{}",dataString);
         // Create tasks based on the incoming data inside this method.
         // You might want to use the id of this task generator and the
         // number of all task generators running in parallel.
@@ -49,11 +53,11 @@ public class DummyTaskGenerator extends AbstractTaskGenerator {
         // Send the task to the system (and store the timestamp)
         long timestamp = System.currentTimeMillis();
 
-        logger.debug("sendTaskToSystemAdapter({})->{}",taskId, taskDataStr);
+        logger.trace("sendTaskToSystemAdapter({})->{}",taskId, taskDataStr);
         sendTaskToSystemAdapter(taskId, taskDataStr.getBytes());
 
         // Send the expected answer to the evaluation store
-        logger.debug("sendTaskToEvalStorage({})->{}", taskId, expectedAnswerDataStr);
+        logger.trace("sendTaskToEvalStorage({})->{}", taskId, expectedAnswerDataStr);
         sendTaskToEvalStorage(taskId, timestamp, expectedAnswerDataStr.getBytes());
     }
 

@@ -18,25 +18,26 @@ import java.util.concurrent.*;
  * @author Roman Katerinenko
  */
 public class ComponentsExecutor {
-    public EnvironmentVariables environmentVariables;
+    public EnvironmentVariables environmentVariables = new EnvironmentVariables();
     private static final Logger logger = LoggerFactory.getLogger(ComponentsExecutor.class);
     private final static int AWAIT_TERMINATION_MILLIS = 1;
     private final static int CORE_POOL_SIZE = 8;
-    private final CommandQueueListener commandQueueListener;
 
     private final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
-    private final ExecutorService executor = new ThreadPoolExecutor(0, CORE_POOL_SIZE, 60L, TimeUnit.SECONDS,
-            new SynchronousQueue<>());
+    private final ExecutorService executor;
 
     public ComponentsExecutor(){
-        commandQueueListener = new CommandQueueListener();
+        this(CORE_POOL_SIZE);
     }
 
-    public ComponentsExecutor(CommandQueueListener commandListener, EnvironmentVariables environmentVariables){
-        this.commandQueueListener = commandListener;
-        this.environmentVariables = environmentVariables;
+    public ComponentsExecutor(int poolSize){
+        executor = new ThreadPoolExecutor(0, poolSize, 60L, TimeUnit.SECONDS,
+                new SynchronousQueue<>());
     }
 
+//    public ComponentsExecutor(EnvironmentVariables environmentVariables){
+//        this.environmentVariables = environmentVariables;
+//    }
 
 //    public void submit(Object object) throws Exception {
 //        if(Runnable.class.isInstance(object))
@@ -64,6 +65,7 @@ public class ComponentsExecutor {
     public void submit(Component component, String containerId, String[] envVariables){
 
         executor.submit(() -> {
+        //new Thread(() -> {
             String componentName = component.getClass().getSimpleName();
             if(AbstractDockerizer.class.isInstance(component)) {
                 componentName = ((AbstractDockerizer) component).getName();
@@ -79,9 +81,9 @@ public class ComponentsExecutor {
             }
             int exitCode = 0;
             try {
-                logger.debug("Initing "+componentName);
+                logger.debug("Initing "+componentName /*+" "+component.hashCode()*/);
                 component.init();
-                logger.debug("Running "+componentName);
+                logger.debug("Running "+componentName /*+" "+component.hashCode() */ );
                 component.run();
             } catch (Throwable e) {
                 String message = componentName+" error: "+ e.getMessage();

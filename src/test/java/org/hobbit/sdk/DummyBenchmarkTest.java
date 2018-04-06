@@ -2,6 +2,7 @@ package org.hobbit.sdk;
 
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.docker.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.hobbit.*;
 import org.hobbit.sdk.examples.dummybenchmark.*;
@@ -15,6 +16,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
+import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_COUNT_KEY;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
@@ -51,12 +53,14 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     public void buildImages() throws Exception {
 
         init(false);
-        benchmarkBuilder.build().prepareImage();
-        dataGeneratorBuilder.build().prepareImage();
-        taskGeneratorBuilder.build().prepareImage();
-        evalStorageBuilder.build().prepareImage();
-        evalModuleBuilder.build().prepareImage();
-        systemAdapterBuilder.build().prepareImage();
+        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(5);
+        builder.addTask(benchmarkBuilder);
+        builder.addTask(dataGeneratorBuilder);
+        builder.addTask(taskGeneratorBuilder);
+        builder.addTask(evalStorageBuilder);
+        builder.addTask(systemAdapterBuilder);
+        builder.build();
+
     }
 
     @Test
@@ -79,7 +83,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
         setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
         commandQueueListener = new CommandQueueListener();
-        componentsExecutor = new ComponentsExecutor(commandQueueListener, environmentVariables);
+        componentsExecutor = new ComponentsExecutor();
 
         rabbitMqDockerizer.run();
 
@@ -136,6 +140,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     public JenaKeyValue createSystemParameters(){
         JenaKeyValue kv = new JenaKeyValue();
         kv.setValue(SYSTEM_URI+"systemParam1", 123);
+        kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
         return kv;
     }
 

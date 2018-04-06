@@ -12,16 +12,20 @@ import java.util.Map;
  * @author Roman Katerinenko
  */
 public class JenaKeyValue extends KeyValue {
-    public static String DEFAULT_EXPERIMENT_URI = "http://jenaKeyValue.com/experimentUri";
+    public static String DEFAULT_URI = "http://jenaKeyValue.com/URI";
 
-    private final String experimentUri;
+    private final String URI;
 
     public JenaKeyValue(String experimentUri) {
-        this.experimentUri = experimentUri;
+        this.URI = experimentUri;
     }
 
     public JenaKeyValue() {
-        this.experimentUri = DEFAULT_EXPERIMENT_URI;
+        this.URI = DEFAULT_URI;
+    }
+
+    public String getURI(){
+        return URI;
     }
 
     public String encodeToString() {
@@ -43,7 +47,7 @@ public class JenaKeyValue extends KeyValue {
 
     public Model toModel() {
         Model model = ModelFactory.createDefaultModel();
-        Resource subject = model.createResource(experimentUri);
+        Resource subject = model.createResource(URI);
         for (Map.Entry entry : getEntries()) {
             Literal literal = model.createTypedLiteral(entry.getValue());
             Property property = model.createProperty(String.valueOf(entry.getKey()));
@@ -64,10 +68,13 @@ public class JenaKeyValue extends KeyValue {
         }
 
         public JenaKeyValue buildFrom(Model model) {
-            JenaKeyValue keyValue = new JenaKeyValue();
+            JenaKeyValue keyValue = null;
             StmtIterator iterator = model.listStatements(null, null, (RDFNode) null);
-            while (iterator.hasNext()) {
+            while (iterator.hasNext()){
+
                 Statement statement = iterator.nextStatement();
+                if(keyValue==null)
+                    keyValue = new JenaKeyValue(statement.getSubject().getURI());
                 String propertyUri = statement.getPredicate().getURI();
                 RDFNode object = statement.getObject();
                 if (object.isLiteral()) {

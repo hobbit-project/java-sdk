@@ -16,11 +16,17 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 
+import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_FINISHED;
+
 
 public class MultipleCommandsReaction implements CommandReaction {
     private static final Logger logger = LoggerFactory.getLogger(MultipleCommandsReaction.class);
     private final ComponentsExecutor componentsExecutor;
     private final CommandQueueListener commandQueueListener;
+
+    private int dataGeneratorsCount = 0;
+    private int taskGeneratorsCount = 0;
+    private int systemContainersCount = 0;
 
     private boolean benchmarkReady = false;
     private boolean dataGenReady = false;
@@ -34,6 +40,7 @@ public class MultipleCommandsReaction implements CommandReaction {
     private Component taskGenerator;
     private Component evalStorage;
     private Component evalModule;
+    private Component systemContainer;
 
     private String dataGeneratorImageName;
     private String taskGeneratorImageName;
@@ -84,6 +91,11 @@ public class MultipleCommandsReaction implements CommandReaction {
         return this;
     }
 
+    public MultipleCommandsReaction systemContainer(Component value){
+        this.systemContainer = value;
+        return this;
+    }
+
     public MultipleCommandsReaction systemContainerId(String value){
         this.systemContainerId = value;
         return this;
@@ -99,7 +111,6 @@ public class MultipleCommandsReaction implements CommandReaction {
         this.evalModuleImageName = value;
         return this;
     }
-
 
 
     @Override
@@ -118,13 +129,15 @@ public class MultipleCommandsReaction implements CommandReaction {
             String containerId = null;
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
-                compToSubmit = dataGenerator;
+                compToSubmit = dataGenerator.getClass().getConstructor(null).newInstance(null);
                 containerId = dataGeneratorImageName;
+                dataGeneratorsCount++;
             }
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
-                compToSubmit = taskGenerator;
+                compToSubmit = taskGenerator.getClass().getConstructor(null).newInstance(null);
                 containerId = taskGeneratorImageName;
+                taskGeneratorsCount++;
             }
 
             if(evalStorage!=null && startCommandData.image.equals(evalStorageImageName)){
@@ -135,6 +148,12 @@ public class MultipleCommandsReaction implements CommandReaction {
             if(evalModule!=null && startCommandData.image.equals(evalModuleImageName)) {
                 compToSubmit = evalModule;
                 containerId = evalModuleImageName;
+            }
+
+            if(systemContainer!=null && startCommandData.image.equals(systemContainerId)) {
+                compToSubmit = systemContainer.getClass().getConstructor(null).newInstance(null);
+                systemContainersCount++;
+                containerId = systemContainerId+"_"+String.valueOf(systemContainersCount);
             }
 
             if(compToSubmit!=null){
@@ -168,15 +187,29 @@ public class MultipleCommandsReaction implements CommandReaction {
 
             String commandToSend = null;
             //if(containerName.equals(dataGenContainerId))
-            if(containerName.equals(dataGeneratorImageName)) {
-                commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
-                commandToSend = "DATA_GENERATION_FINISHED";
+            if(containerName.equals(dataGeneratorImageName)){
+                dataGeneratorsCount--;
+                if(dataGeneratorsCount==0) {
+                    commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
+                    commandToSend = "DATA_GENERATION_FINISHED";
+                }
             }
 
             //if(containerName.equals(taskGenContainerId))
             if(containerName.equals(taskGeneratorImageName)) {
-                commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
-                commandToSend = "TASK_GENERATION_FINISHED";
+                taskGeneratorsCount--;
+                if(taskGeneratorsCount==0){
+                    commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
+                    commandToSend = "TASK_GENERATION_FINISHED";
+                }
+            }
+
+            if(containerName.equals(systemContainerId)) {
+                systemContainersCount--;
+                if(systemContainersCount==0){
+                    commandSender = new CommandSender(SYSTEM_CONTAINERS_FINISHED);
+                    commandToSend = "SYSTEM_CONTAINERS_FINISHED";
+                }
             }
  
 
