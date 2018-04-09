@@ -7,7 +7,6 @@ import org.hobbit.core.components.Component;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.ComponentsExecutor;
-import org.hobbit.sdk.docker.PullBasedDockerizer;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
 import org.junit.Assert;
@@ -40,18 +39,16 @@ public class MultipleCommandsReaction implements CommandReaction {
     private Component taskGenerator;
     private Component evalStorage;
     private Component evalModule;
-    private Component systemContainer;
+    private Component systemSlaveContainer;
 
     private String dataGeneratorImageName;
     private String taskGeneratorImageName;
     private String evalStorageImageName;
     private String evalModuleImageName;
+    private String systemSlaveImageName;
 
-//    private String dataGenContainerId;
-//    private String taskGenContainerId;
     private String systemContainerId;
-//    private String evalModuleContainerId;
-//    private String evalStorageContainerId;
+
 
 
     private Gson gson = new Gson();
@@ -91,8 +88,13 @@ public class MultipleCommandsReaction implements CommandReaction {
         return this;
     }
 
-    public MultipleCommandsReaction systemContainer(Component value){
-        this.systemContainer = value;
+    public MultipleCommandsReaction systemSlaveContainer(Component value){
+        this.systemSlaveContainer = value;
+        return this;
+    }
+
+    public MultipleCommandsReaction systemSlaveImageName(String value){
+        this.systemSlaveImageName = value;
         return this;
     }
 
@@ -150,8 +152,8 @@ public class MultipleCommandsReaction implements CommandReaction {
                 containerId = evalModuleImageName;
             }
 
-            if(systemContainer!=null && startCommandData.image.equals(systemContainerId)) {
-                compToSubmit = systemContainer.getClass().getConstructor(null).newInstance(null);
+            if(systemSlaveContainer !=null && startCommandData.image.equals(systemContainerId)) {
+                compToSubmit = systemSlaveContainer.getClass().getConstructor(null).newInstance(null);
                 systemContainersCount++;
                 containerId = systemContainerId+"_"+String.valueOf(systemContainersCount);
             }

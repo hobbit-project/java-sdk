@@ -1,12 +1,13 @@
 package org.hobbit.sdk;
 
 import org.hobbit.core.components.Component;
-import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.hobbit.*;
 import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.examples.dummybenchmark.docker.*;
+import org.hobbit.sdk.examples.dummybenchmark.system.DummySystemAdapter;
+import org.hobbit.sdk.examples.dummybenchmark.system.SlaveSystemAdapter;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 import org.junit.Assert;
@@ -16,8 +17,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
-import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_COUNT_KEY;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.Constants.*;
 
 /**
  * @author Pavel Smirnov
@@ -77,7 +77,8 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
-        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
+        //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
+        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_1");
         setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
         setupGeneratorEnvironmentVariables(1,1);
         setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
@@ -93,6 +94,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
         Component evalStorage  = new DummyEvalStorage();
         Component evalModule = new DummyEvalModule();
         Component systemAdapter = new DummySystemAdapter();
+        Component systemSlave = new SlaveSystemAdapter();
 
         if(dockerize) {
             Boolean useCachedImages = true;
@@ -111,6 +113,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
                         .taskGenerator(taskGen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
                         .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                         .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
+                        .systemSlaveContainer(systemSlave).systemSlaveImageName(DUMMY_SYSTEM_SLAVE_IMAGE_NAME)
                         .systemContainerId(DUMMY_SYSTEM_IMAGE_NAME)
         );
 
@@ -118,7 +121,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
         commandQueueListener.waitForInitialisation();
 
         componentsExecutor.submit(benchmarkController);
-        componentsExecutor.submit(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME);
+        //componentsExecutor.submit(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME);
 
         commandQueueListener.waitForTermination();
         commandQueueListener.terminate();
@@ -140,7 +143,7 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     public JenaKeyValue createSystemParameters(){
         JenaKeyValue kv = new JenaKeyValue();
         kv.setValue(SYSTEM_URI+"systemParam1", 123);
-        kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
+        //kv.setValue(SYSTEM_CONTAINERS_COUNT_KEY, 0);
         return kv;
     }
 

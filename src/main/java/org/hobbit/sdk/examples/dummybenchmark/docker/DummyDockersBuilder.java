@@ -2,6 +2,8 @@ package org.hobbit.sdk.examples.dummybenchmark.docker;
 
 import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
 
+import static org.hobbit.sdk.examples.dummybenchmark.Constants.PROJECT_NAME;
+
 
 /**
  * @author Pavel Smirnov
@@ -11,22 +13,6 @@ import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
 
 //Common dockerizers builder for all components of your project
 public class DummyDockersBuilder extends DynamicDockerFileBuilder {
-
-    //public static final String GIT_REPO_PATH = "git.project-hobbit.eu:4567/smirnp/";
-    public static final String GIT_REPO_PATH = "";
-    public static final String PROJECT_NAME = "dummybenchmark/";
-
-    public static final String DUMMY_BENCHMARK_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"benchmark-controller";
-    public static final String DUMMY_SYSTEM_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"system-adapter";
-
-    //use these constants within BenchmarkController
-    public static final String DUMMY_DATAGEN_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"datagen";
-    public static final String DUMMY_TASKGEN_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"taskgen";
-    public static final String DUMMY_EVAL_STORAGE_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"eval-storage";
-    public static final String DUMMY_EVALMODULE_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"eval-module";
-
-    public static final String BENCHMARK_URI = "http://project-hobbit.eu/"+PROJECT_NAME;
-    public static final String SYSTEM_URI = "http://project-hobbit.eu/"+PROJECT_NAME+"system";
 
     public DummyDockersBuilder(Class runnerClass, String imageName) {
         super("DummyDockersBuilder");

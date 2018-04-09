@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.Constants.*;
 
 
 /**

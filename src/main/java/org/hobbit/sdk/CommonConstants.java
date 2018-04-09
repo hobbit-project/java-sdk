@@ -15,7 +15,7 @@ public class CommonConstants {
 
     public static final String EXPERIMENT_URI = "http://example.com/exp1";
     public static final byte SYSTEM_CONTAINERS_FINISHED = 19;
-    public static final String SYSTEM_CONTAINERS_COUNT_KEY = "SYSTEM_CONTAINERS_COUNT";
+
     public static final String SYSTEM_CONTAINER_ID_KEY = "SYSTEM_CONTAINER_ID_KEY";
 
 }
