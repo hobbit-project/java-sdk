@@ -6,8 +6,8 @@ import org.hobbit.core.Commands;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
-import org.hobbit.sdk.ComponentsExecutor;
-import org.hobbit.sdk.docker.PullBasedDockerizer;
+import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
 import org.junit.Assert;
@@ -19,8 +19,29 @@ import java.nio.ByteBuffer;
 
 public class MultipleCommandsReaction implements CommandReaction {
     private static final Logger logger = LoggerFactory.getLogger(MultipleCommandsReaction.class);
-    private final ComponentsExecutor componentsExecutor;
-    private final CommandQueueListener commandQueueListener;
+
+    private ComponentsExecutor componentsExecutor;
+    private CommandQueueListener commandQueueListener;
+
+    private Component benchmarkController;
+    private Component dataGenerator;
+    private Component taskGenerator;
+    private Component evalStorage;
+    private Component evalModule;
+    private Component systemAdapter;
+
+    private String benchmarkControllerImageName;
+    private String dataGeneratorImageName;
+    private String taskGeneratorImageName;
+    private String evalStorageImageName;
+    private String evalModuleImageName;
+    private String systemAdapterImageName;
+
+    private int dataGeneratorsCount = 0;
+    private int taskGeneratorsCount = 0;
+    private int systemContainersCount = 0;
+
+    private Gson gson = new Gson();
 
     private boolean benchmarkReady = false;
     private boolean dataGenReady = false;
@@ -30,83 +51,27 @@ public class MultipleCommandsReaction implements CommandReaction {
 
     private boolean startBenchmarkCommandSent = false;
 
-    private Component dataGenerator;
-    private Component taskGenerator;
-    private Component evalStorage;
-    private Component evalModule;
+    public MultipleCommandsReaction(Builder builder){
+        this.componentsExecutor = builder.componentsExecutor;
+        this.commandQueueListener = builder.commandQueueListener;
 
-    private String dataGeneratorImageName;
-    private String taskGeneratorImageName;
-    private String evalStorageImageName;
-    private String evalModuleImageName;
+        this.benchmarkController=builder.benchmarkController;
+        this.dataGenerator=builder.dataGenerator;
+        this.taskGenerator=builder.taskGenerator;
+        this.evalStorage=builder.evalStorage;
+        this.evalModule=builder.evalModule;
+        this.systemAdapter=builder.systemAdapter;
 
-//    private String dataGenContainerId;
-//    private String taskGenContainerId;
-    private String systemContainerId;
-//    private String evalModuleContainerId;
-//    private String evalStorageContainerId;
-
-
-    private Gson gson = new Gson();
-
-    public MultipleCommandsReaction(ComponentsExecutor componentsExecutor, CommandQueueListener commandQueueListener){
-        this.componentsExecutor = componentsExecutor;
-        this.commandQueueListener = commandQueueListener;
+        this.benchmarkControllerImageName = builder.benchmarkControllerImageName;
+        this.dataGeneratorImageName = builder.dataGeneratorImageName;
+        this.taskGeneratorImageName = builder.taskGeneratorImageName;
+        this.evalStorageImageName = builder.evalStorageImageName ;
+        this.evalModuleImageName = builder.evalModuleImageName;
+        this.systemAdapterImageName = builder.systemAdapterImageName;
     }
-
-    public MultipleCommandsReaction dataGenerator(Component component){
-        this.dataGenerator = component;
-        return this;
-    }
-
-    public MultipleCommandsReaction dataGeneratorImageName(String value){
-        this.dataGeneratorImageName = value;
-        return this;
-    }
-
-    public MultipleCommandsReaction taskGenerator(Component component){
-        this.taskGenerator = component;
-        return this;
-    }
-
-    public MultipleCommandsReaction taskGeneratorImageName(String value){
-        this.taskGeneratorImageName = value;
-        return this;
-    }
-
-    public MultipleCommandsReaction evalStorage(Component component){
-        this.evalStorage = component;
-        return this;
-    }
-
-    public MultipleCommandsReaction evalStorageImageName(String value){
-        this.evalStorageImageName = value;
-        return this;
-    }
-
-    public MultipleCommandsReaction systemContainerId(String value){
-        this.systemContainerId = value;
-        return this;
-    }
-
-
-    public MultipleCommandsReaction evalModule(Component value){
-        this.evalModule = value;
-        return this;
-    }
-
-    public MultipleCommandsReaction evalModuleImageName(String value){
-        this.evalModuleImageName = value;
-        return this;
-    }
-
-
 
     @Override
     public void handleCmd(Byte command, byte[] bytes, String replyTo) throws Exception {
-        if(systemContainerId==null) {
-            throw new Exception("SystemContainerId not specified. Impossible to continue");
-        }
 
         if (command == Commands.DOCKER_CONTAINER_START){
             String dataString = RabbitMQUtils.readString(bytes);
@@ -117,14 +82,21 @@ public class MultipleCommandsReaction implements CommandReaction {
             Component compToSubmit = null;
             String containerId = null;
 
+            if (benchmarkController!=null && startCommandData.image.equals(benchmarkControllerImageName)) {
+                compToSubmit = benchmarkController;
+                containerId = benchmarkControllerImageName;
+            }
+
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
                 compToSubmit = dataGenerator;
                 containerId = dataGeneratorImageName;
+                dataGeneratorsCount++;
             }
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
                 compToSubmit = taskGenerator;
                 containerId = taskGeneratorImageName;
+                taskGeneratorsCount++;
             }
 
             if(evalStorage!=null && startCommandData.image.equals(evalStorageImageName)){
@@ -135,6 +107,13 @@ public class MultipleCommandsReaction implements CommandReaction {
             if(evalModule!=null && startCommandData.image.equals(evalModuleImageName)) {
                 compToSubmit = evalModule;
                 containerId = evalModuleImageName;
+            }
+
+            if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
+                compToSubmit = systemAdapter;
+                containerId = systemAdapterImageName;
+                //systemContainersCount++;
+                //containerId = systemAdapterImageName+"_"+String.valueOf(systemContainersCount);
             }
 
             if(compToSubmit!=null){
@@ -168,15 +147,30 @@ public class MultipleCommandsReaction implements CommandReaction {
 
             String commandToSend = null;
             //if(containerName.equals(dataGenContainerId))
-            if(containerName.equals(dataGeneratorImageName)) {
-                commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
-                commandToSend = "DATA_GENERATION_FINISHED";
+            if(containerName.equals(dataGeneratorImageName)){
+                dataGeneratorsCount--;
+                if(dataGeneratorsCount==0) {
+                    commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
+                    commandToSend = "DATA_GENERATION_FINISHED";
+                }
             }
 
             //if(containerName.equals(taskGenContainerId))
             if(containerName.equals(taskGeneratorImageName)) {
-                commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
-                commandToSend = "TASK_GENERATION_FINISHED";
+                taskGeneratorsCount--;
+                if(taskGeneratorsCount==0){
+                    commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
+                    commandToSend = "TASK_GENERATION_FINISHED";
+                }
+            }
+
+            if(containerName.equals(systemAdapterImageName)){
+                String abc = "123";
+//                systemContainersCount--;
+//                if(systemContainersCount==0){
+//                    commandSender = new CommandSender(SYSTEM_CONTAINERS_FINISHED);
+//                    commandToSend = "SYSTEM_CONTAINERS_FINISHED";
+//                }
             }
  
 
@@ -238,7 +232,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                 startBenchmarkCommandSent = true;
                 try {
                     logger.debug("sending START_BENCHMARK_SIGNAL");
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemContainerId).send();
+                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemAdapterImageName).send();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                     //Assert.fail(e.getMessage());
@@ -246,5 +240,104 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
         }
 
+    }
+
+    public static class Builder{
+
+        private ComponentsExecutor componentsExecutor;
+        private CommandQueueListener commandQueueListener;
+
+        private Component benchmarkController;
+        private Component dataGenerator;
+        private Component taskGenerator;
+        private Component evalStorage;
+        private Component evalModule;
+        private Component systemAdapter;
+
+        private String benchmarkControllerImageName;
+        private String dataGeneratorImageName;
+        private String taskGeneratorImageName;
+        private String evalStorageImageName;
+        private String evalModuleImageName;
+        private String systemAdapterImageName;
+
+//    private String dataGenContainerId;
+//    private String taskGenContainerId;
+        //private String systemAdapterImageName;
+//    private String evalModuleContainerId;
+//    private String evalStorageContainerId;
+
+        public Builder(ComponentsExecutor componentsExecutor, CommandQueueListener commandQueueListener){
+            this.componentsExecutor = componentsExecutor;
+            this.commandQueueListener = commandQueueListener;
+        }
+
+        public Builder benchmarkController(Component component){
+            this.benchmarkController = component;
+            return this;
+        }
+
+        public Builder benchmarkControllerImageName(String value){
+            this.benchmarkControllerImageName = value;
+            return this;
+        }
+
+        public Builder dataGenerator(Component component){
+            this.dataGenerator = component;
+            return this;
+        }
+
+        public Builder dataGeneratorImageName(String value){
+            this.dataGeneratorImageName = value;
+            return this;
+        }
+
+        public Builder taskGenerator(Component component){
+            this.taskGenerator = component;
+            return this;
+        }
+
+        public Builder taskGeneratorImageName(String value){
+            this.taskGeneratorImageName = value;
+            return this;
+        }
+
+        public Builder evalStorage(Component component){
+            this.evalStorage = component;
+            return this;
+        }
+
+        public Builder evalStorageImageName(String value){
+            this.evalStorageImageName = value;
+            return this;
+        }
+
+        public Builder systemAdapter(Component value){
+            this.systemAdapter = value;
+            return this;
+        }
+
+        public Builder systemAdapterImageName(String value){
+            this.systemAdapterImageName = value;
+            return this;
+        }
+
+
+        public Builder evalModule(Component value){
+            this.evalModule = value;
+            return this;
+        }
+
+        public Builder evalModuleImageName(String value){
+            this.evalModuleImageName = value;
+            return this;
+        }
+
+        public MultipleCommandsReaction build(){
+            if(systemAdapterImageName ==null){
+                logger.warn("SystemAdapter not specified. Nothing will be submitted");
+            }
+            return new MultipleCommandsReaction(this);
+        }
     }
 }

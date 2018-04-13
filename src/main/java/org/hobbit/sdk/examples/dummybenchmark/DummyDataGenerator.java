@@ -15,13 +15,15 @@ import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
  */
 
 public class DummyDataGenerator extends AbstractDataGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(DummyDataGenerator.class);
+    //private static final Logger logger = LoggerFactory.getLogger(DummyDataGenerator.class);
+    private Logger logger;
 
     @Override
     public void init() throws Exception {
         // Always initFileReader the super class first!
         super.init();
-        logger.debug("Init()");
+        logger = LoggerFactory.getLogger(DummyDataGenerator.class.getName()+"_"+getGeneratorId());
+        logger.debug("Init finished");
 
         //FileReader fileReader = new FileReader("data/data.dat");
 
@@ -49,7 +51,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
             data = new String("data_"+String.valueOf(i));
 
             // the data can be sent to the task generator(s) ...
-            logger.debug("sendDataToTaskGenerator()->{}",data);
+            logger.trace("sendDataToTaskGenerator()->{}",data);
             sendDataToTaskGenerator(data.getBytes());
 
             // an to system adapter

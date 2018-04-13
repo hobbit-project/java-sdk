@@ -45,6 +45,9 @@ public class CommandQueueListener extends AbstractCommandReceivingComponent {
         logger.debug("Terminated");
     }
 
+    public String submit(String imageName, String[] envVariables){
+        return this.createContainer(imageName, envVariables);
+    }
 
 //    @Override
     protected void handleCmd(byte[] bytes, String replyTo) {

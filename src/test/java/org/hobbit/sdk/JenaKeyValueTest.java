@@ -9,6 +9,7 @@ import org.junit.Test;
  * @author Roman Katerinenko
  */
 public class JenaKeyValueTest {
+    private static final String MODEL_URI = "http://example.com/model";
     private static final String STRING_URI = "http://example.com/stringParam";
     private static final String STRING_EXPECTED = "paramValue";
     private static final String INT_URI = "http://example.com/intParam";
@@ -18,7 +19,7 @@ public class JenaKeyValueTest {
 
     @Test
     public void checkEncodingDecoding() throws Exception {
-        JenaKeyValue expectedKeyValue = new JenaKeyValue();
+        JenaKeyValue expectedKeyValue = new JenaKeyValue(MODEL_URI);
         expectedKeyValue.setValue(STRING_URI, STRING_EXPECTED);
         expectedKeyValue.setValue(INT_URI, INT_EXPECTED);
         expectedKeyValue.setValue(DOUBLE_URI, DOUBLE_EXPECTED);
