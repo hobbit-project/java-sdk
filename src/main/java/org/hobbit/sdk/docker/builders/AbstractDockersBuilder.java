@@ -41,7 +41,8 @@ public abstract class AbstractDockersBuilder {
     }
 
     public AbstractDockersBuilder addEnvironmentVariable(String key, String value) {
-        environmentVariables.add(AbstractDockerizer.toEnvironmentEntry(key, value));
+        if(environmentVariables.stream().filter(v->v.startsWith(key+"=")).count()==0)
+            environmentVariables.add(AbstractDockerizer.toEnvironmentEntry(key, value));
         return this;
     }
 

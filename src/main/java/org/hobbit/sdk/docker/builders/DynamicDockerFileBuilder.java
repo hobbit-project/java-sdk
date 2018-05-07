@@ -81,7 +81,8 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         if(!jarFilePath.toFile().exists())
             throw new Exception(jarFilePath +" not found. May be you did not packaged it by 'mvn package -DskipTests=true' first");
 
-        List<String> classNames = Arrays.stream(runnerClass).map(c->"\""+c.getCanonicalName()+"\"").collect(Collectors.toList());
+        //List<String> classNames = Arrays.stream(runnerClass).map(c->"\""+c.getCanonicalName()+"\"").collect(Collectors.toList());
+        List<String> classNames = Arrays.stream(runnerClass).map(c->c.getCanonicalName()).collect(Collectors.toList());
         String datasetsStr = "";
 
         for(String dataSetPathStr : filesToAdd){
@@ -127,8 +128,9 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
                         "RUN mkdir -p "+ dockerWorkDir +"\n" +
                         "WORKDIR "+ dockerWorkDir +"\n" +
                          datasetsStr+
-                        "ADD ./"+ jarPathRel +" "+ dockerWorkDir +"\n" +
-                        "CMD [\"java\", \"-cp\", \""+ jarPathRel.getFileName() +"\", "+ String.join(",", classNames) +"]\n"
+                        "ADD "+ jarPathRel +" "+ dockerWorkDir +"\n" +
+                        "CMD java -cp "+ jarPathRel.getFileName() +" "+ String.join(" ", classNames) +"\n"
+                        //"CMD [\"java\", \"-cp\", \""+ jarPathRel.getFileName() +"\", "+ String.join(",", classNames) +"]\n"
                         //"CMD [\"java\", \"-cp\", \""+ jarFilePath +"\", \""+runnerClass.getCanonicalName()+"\"]\n"
                 ;
         dockerFileReader(new StringReader(content));

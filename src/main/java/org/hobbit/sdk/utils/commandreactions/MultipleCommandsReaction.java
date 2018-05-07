@@ -88,13 +88,13 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
-                compToSubmit = dataGenerator;
+                compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
                 containerId = dataGeneratorImageName;
                 dataGeneratorsCount++;
             }
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
-                compToSubmit = taskGenerator;
+                compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
                 containerId = taskGeneratorImageName;
                 taskGeneratorsCount++;
             }
