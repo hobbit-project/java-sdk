@@ -6,6 +6,7 @@ import com.spotify.docker.client.messages.PortBinding;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
 
@@ -47,6 +48,11 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
 
     public BuildBasedDockersBuilder addPortBindings(String containerPort, PortBinding... hostPorts) {
         super.addPortBindings(containerPort, hostPorts);
+        return this;
+    }
+
+    public BuildBasedDockersBuilder EnvironmentVariables(Collection<String> value) {
+        super.environmentVariables(value);
         return this;
     }
 

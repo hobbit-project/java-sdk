@@ -26,7 +26,7 @@ public class EvalStorageDockerBuilder extends BothTypesDockersBuilder {
 
         ret.addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY));
         ret.addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
-        ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
+        //ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
     }
 
     @Override

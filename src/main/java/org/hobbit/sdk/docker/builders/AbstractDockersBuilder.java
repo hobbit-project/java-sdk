@@ -16,9 +16,9 @@ public abstract class AbstractDockersBuilder {
     private Boolean useCachedContainer;
     private Callable onTermination;
 
-    private final Map<String, List<PortBinding>> portBindings = new HashMap<>();
-    private final Collection<String> environmentVariables = new HashSet<>();
-    private final Collection<String> networks = new HashSet<>();
+    private Map<String, List<PortBinding>> portBindings = new HashMap<>();
+    private Collection<String> environmentVariables = new HashSet<>();
+    private Collection<String> networks = new HashSet<>();
 
     private Boolean skipLogsReading;
 
@@ -33,10 +33,25 @@ public abstract class AbstractDockersBuilder {
         return this;
     }
 
+    public AbstractDockersBuilder networks(Collection<String> value) {
+        networks = value;
+        return this;
+    }
+
     public AbstractDockersBuilder addPortBindings(String containerPort, PortBinding... hostPorts) {
         List<PortBinding> hostPortsList = new ArrayList<>();
         hostPortsList.addAll(Arrays.asList(hostPorts));
         portBindings.put(String.valueOf(containerPort), hostPortsList);
+        return this;
+    }
+
+    public AbstractDockersBuilder portBindings(Map<String, List<PortBinding>> value) {
+        portBindings = value;
+        return this;
+    }
+
+    public AbstractDockersBuilder environmentVariables(Collection<String> value) {
+        environmentVariables = value;
         return this;
     }
 

@@ -110,6 +110,18 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
         Files.deleteIfExists(path);
     }
 
+    public Reader getDockerFileReader() {
+        return dockerFileReader;
+    }
+
+    public Path getBuildDirectory() {
+        return buildDirectory;
+    }
+
+    public Boolean getUseCachedImage() {
+        return useCachedImage;
+    }
+
 //    public void pushImage() throws DockerCertificateException, DockerException, InterruptedException {
 //        getDockerClient().push(imageName, RegistryAuth.builder().serverAddress("git.project-hobbit.eu:4567").identityToken("").build());
 //    }

@@ -88,14 +88,24 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
-                compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
-                containerId = dataGeneratorImageName;
+                if(AbstractDockerizer.class.isInstance(dataGenerator)){
+                    compToSubmit = ((AbstractDockerizer)dataGenerator).clone();
+                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                }else {
+                    compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
+                    containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
+                }
                 dataGeneratorsCount++;
             }
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
-                compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
-                containerId = taskGeneratorImageName;
+                if(AbstractDockerizer.class.isInstance(taskGenerator)){
+                    compToSubmit = ((AbstractDockerizer)taskGenerator).clone();
+                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                }else {
+                    compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
+                    containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
+                }
                 taskGeneratorsCount++;
             }
 

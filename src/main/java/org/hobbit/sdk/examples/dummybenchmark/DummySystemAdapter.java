@@ -37,11 +37,11 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
     public void receiveGeneratedTask(String taskId, byte[] data) {
         // handle the incoming task and create a result
         String result = "result_"+taskId;
-        logger.debug("receiveGeneratedTask({})->{}",taskId, new String(data));
+        logger.trace("receiveGeneratedTask({})->{}",taskId, new String(data));
 
         // Send the result to the evaluation storage
         try {
-            logger.debug("sendResultToEvalStorage({})->{}", taskId, result);
+            logger.trace("sendResultToEvalStorage({})->{}", taskId, result);
             sendResultToEvalStorage(taskId, result.getBytes());
         } catch (IOException e) {
             e.printStackTrace();

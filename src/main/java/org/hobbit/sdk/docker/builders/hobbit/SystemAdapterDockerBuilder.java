@@ -37,7 +37,7 @@ public class SystemAdapterDockerBuilder extends BothTypesDockersBuilder {
         ret.addNetworks(HOBBIT_NETWORKS);
 
         ret.addEnvironmentVariable(SYSTEM_PARAMETERS_MODEL_KEY, (String)System.getenv().get(SYSTEM_PARAMETERS_MODEL_KEY));
-        ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
+        //ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
     }
 
     @Override

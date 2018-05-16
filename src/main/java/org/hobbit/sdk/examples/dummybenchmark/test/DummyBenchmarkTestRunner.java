@@ -15,6 +15,7 @@ import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 import org.junit.Assert;
 
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
+import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_COUNT_KEY;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
@@ -88,7 +89,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
         setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
-        setupGeneratorEnvironmentVariables(1,1);
+        //setupGeneratorEnvironmentVariables(1,1);
         setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
         commandQueueListener = new CommandQueueListener();
@@ -106,7 +107,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         if(dockerize) {
             Boolean useCachedImages = true;
             init(useCachedImages);
-            benchmarkController = benchmarkBuilder.build();
+            //benchmarkController = benchmarkBuilder.build();
             dataGen = dataGeneratorBuilder.build();
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();

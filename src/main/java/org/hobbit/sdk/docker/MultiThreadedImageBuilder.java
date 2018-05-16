@@ -2,6 +2,9 @@ package org.hobbit.sdk.docker;
 
 import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
+import org.hobbit.sdk.examples.dummybenchmark.DummyBenchmarkController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class MultiThreadedImageBuilder {
+
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadedImageBuilder.class);
     ExecutorService es;
     List<Callable<String>> tasks = new ArrayList();
 
@@ -23,7 +28,12 @@ public class MultiThreadedImageBuilder {
         tasks.add(new Callable<String>(){
             @Override
             public String call() throws Exception {
-                dockersBuilder.build().prepareImage();
+                try {
+                    dockersBuilder.build().prepareImage();
+                }
+                catch (Exception e){
+                    logger.error(e.getMessage());
+                }
                 return null;
             }
         });

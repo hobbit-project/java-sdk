@@ -11,6 +11,8 @@ import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.DockerRequestException;
 import com.spotify.docker.client.messages.*;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
+import org.hobbit.sdk.docker.builders.PullBasedDockersBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +44,10 @@ public abstract class AbstractDockerizer implements Component {
     public Boolean useCachedContainer;
     public DockerClient dockerClient;
     private Callable onTermination;
+    private int instanceId=1;
 
 
-    protected AbstractDockerizer(AbstractDockersBuilder builder) {
+    protected AbstractDockerizer(AbstractDockersBuilder builder){
         name = builder.getName();
         logger = LoggerFactory.getLogger(name);
         imageName = builder.getImageName();
@@ -116,6 +119,15 @@ public abstract class AbstractDockerizer implements Component {
     public String getName(){
         return name;
     }
+
+    public int getInstanceId(){
+        return instanceId;
+    }
+
+    public void setInstanceId(int value){
+        instanceId = value;
+    }
+
     public String getImageName(){
         return imageName;
     }
@@ -143,6 +155,10 @@ public abstract class AbstractDockerizer implements Component {
     }
 
     public void addEnvironmentVariable(String keyValue){
+        String[] splitted = keyValue.split("=");
+        for(String kv : environmentVariables.toArray(new String[0]))
+            if (kv.startsWith(splitted[0]))
+                environmentVariables.remove(kv);
         this.environmentVariables.add(keyValue);
     }
 
@@ -291,7 +307,7 @@ public abstract class AbstractDockerizer implements Component {
                 .hostConfig(hostConfig)
                 .exposedPorts(getExposedPorts())
                 .image(imageName)
-                .env(getEnvironmentVariables());
+                .env(getEnvironmentVariables().toArray(new String[0]));
 
         ContainerConfig containerConfig = builder .build();
         ContainerCreation creation = getDockerClient().createContainer(containerConfig, containerName);
@@ -364,8 +380,9 @@ public abstract class AbstractDockerizer implements Component {
         return portBindings.keySet();
     }
 
-    private String[] getEnvironmentVariables() {
-        return environmentVariables.toArray(new String[environmentVariables.size()]);
+    private Collection<String> getEnvironmentVariables() {
+        return environmentVariables;
+        //return environmentVariables.toArray(new String[environmentVariables.size()]);
     }
 
     private List<Container> findContainersByName(String containerName, DockerClient.ListContainersParam param) throws
@@ -392,7 +409,7 @@ public abstract class AbstractDockerizer implements Component {
                     containerId = null;
                 } catch (Exception e) {
                     //if(!e.getMessage().contains("not found"))
-                    logger.error("Exception", e);
+                    //    logger.error("Exception", e);
                 }
             }
         }
@@ -446,5 +463,58 @@ public abstract class AbstractDockerizer implements Component {
 //        } catch (DockerCertificateException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    public Map<String,List<PortBinding>> getPortBindings() {
+        return portBindings;
+    }
+
+    public Collection<String> getNetworks() {
+        return networks;
+    }
+
+    public Boolean getSkipLogsReading() {
+        return skipLogsReading;
+    }
+
+    public Boolean getUseCachedContainer() {
+        return useCachedContainer;
+    }
+
+    public Callable getOnTermination() {
+        return onTermination;
+    }
+
+    @Override
+    public AbstractDockerizer clone(){
+        AbstractDockerizer ret = null;
+        AbstractDockersBuilder builder = null;
+
+        if (BuildBasedDockerizer.class.isInstance(this))
+            builder = new BuildBasedDockersBuilder(getName())
+                    .dockerFileReader(((BuildBasedDockerizer)this).getDockerFileReader())
+                    .buildDirectory(((BuildBasedDockerizer)this).getBuildDirectory().toString())
+                    .useCachedImage(((BuildBasedDockerizer)this).getUseCachedImage());
+
+        else
+            builder = new PullBasedDockersBuilder(getImageName());
+
+        try {
+            builder.name(getName()+"_"+instanceId)
+                    .imageName(imageName)
+                    .hostName(hostName)
+                    .containerName(containerName+"_"+instanceId)
+                    .portBindings(portBindings)
+                    .environmentVariables(environmentVariables)
+                    .networks(networks)
+                    .skipLogsReading(skipLogsReading)
+                    .useCachedContainer(useCachedContainer)
+                    .onTermination(onTermination);
+            ret = builder.build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        instanceId++;
+        return ret;
     }
 }

@@ -26,7 +26,7 @@ public class TaskGenDockerBuilder extends BothTypesDockersBuilder {
 
         ret.addEnvironmentVariable(GENERATOR_ID_KEY, (String)System.getenv().get(GENERATOR_ID_KEY));
         ret.addEnvironmentVariable(GENERATOR_COUNT_KEY, (String)System.getenv().get(GENERATOR_COUNT_KEY));
-        ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
+        //ret.addEnvironmentVariable(CONTAINER_NAME_KEY, ret.getContainerName());
     }
 
     @Override
