@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.DUMMY_SYSTEM_IMAGE_NAME;
+
 /**
  * This code is here just for testing and debugging the SDK.
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
@@ -24,6 +26,9 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
 
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
+
+        //createContainer(DUMMY_SYSTEM_IMAGE_NAME+"_1", parameters.mapToArray());
+
         logger.debug("SystemModel: "+parameters.encodeToString());
     }
 

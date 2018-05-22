@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MultipleCommandsReaction implements CommandReaction {
@@ -50,6 +52,8 @@ public class MultipleCommandsReaction implements CommandReaction {
     private boolean systemReady = false;
 
     private boolean startBenchmarkCommandSent = false;
+    private Map<String, Component> customContainers = new HashMap<>();
+    private Map<String, Integer> customContainersRunning = new HashMap<>();
 
     public MultipleCommandsReaction(Builder builder){
         this.componentsExecutor = builder.componentsExecutor;
@@ -68,6 +72,7 @@ public class MultipleCommandsReaction implements CommandReaction {
         this.evalStorageImageName = builder.evalStorageImageName ;
         this.evalModuleImageName = builder.evalModuleImageName;
         this.systemAdapterImageName = builder.systemAdapterImageName;
+        this.customContainers = builder.customContainers;
     }
 
     @Override
@@ -120,10 +125,29 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
-                compToSubmit = systemAdapter;
-                containerId = systemAdapterImageName;
-                //systemContainersCount++;
-                //containerId = systemAdapterImageName+"_"+String.valueOf(systemContainersCount);
+                if(AbstractDockerizer.class.isInstance(systemAdapter)){
+                    compToSubmit = ((AbstractDockerizer)systemAdapter).clone();
+                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                }else {
+                    compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
+                    containerId = systemAdapterImageName+"_"+systemContainersCount;
+                }
+                systemContainersCount++;
+            }
+
+            if(customContainers.containsKey(startCommandData.image)){
+                String imageName = startCommandData.image;
+                Component customComponent = customContainers.get(imageName);
+                int runningCustomContainersCount = (customContainersRunning.containsKey(imageName)? customContainersRunning.get(imageName) :0);
+                if(AbstractDockerizer.class.isInstance(customComponent)){
+                    compToSubmit = ((AbstractDockerizer)customComponent).clone();
+                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                }else {
+                    compToSubmit = customComponent.getClass().getConstructor().newInstance();
+                    containerId = imageName+"_"+runningCustomContainersCount;
+                }
+                runningCustomContainersCount++;
+                customContainersRunning.put(imageName, runningCustomContainersCount);
             }
 
             if(compToSubmit!=null){
@@ -175,14 +199,14 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if(containerName.equals(systemAdapterImageName)){
-                String abc = "123";
-//                systemContainersCount--;
-//                if(systemContainersCount==0){
-//                    commandSender = new CommandSender(SYSTEM_CONTAINERS_FINISHED);
-//                    commandToSend = "SYSTEM_CONTAINERS_FINISHED";
-//                }
+                systemContainersCount--;
+                if(systemContainersCount==0){
+                    //commandSender = new CommandSender(SYSTEM_CONTAINERS_FINISHED);
+                    commandToSend = "SYSTEM_CONTAINERS_FINISHED";
+                }
             }
- 
+
+
 
             synchronized (this){
                 if (commandSender!=null){
@@ -257,6 +281,8 @@ public class MultipleCommandsReaction implements CommandReaction {
         private ComponentsExecutor componentsExecutor;
         private CommandQueueListener commandQueueListener;
 
+        private Map<String, Component> customContainers = new HashMap<>();
+
         private Component benchmarkController;
         private Component dataGenerator;
         private Component taskGenerator;
@@ -329,6 +355,11 @@ public class MultipleCommandsReaction implements CommandReaction {
 
         public Builder systemAdapterImageName(String value){
             this.systemAdapterImageName = value;
+            return this;
+        }
+
+        public Builder customContainerImage(Component component, String imageName){
+            customContainers.put(imageName, component);
             return this;
         }
 

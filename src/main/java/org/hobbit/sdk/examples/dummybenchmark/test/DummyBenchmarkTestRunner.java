@@ -123,8 +123,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                         .taskGenerator(taskGen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
                         .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                         .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
-                        .systemAdapter(systemAdapter)
-                        .systemAdapterImageName(systemImageName)
+                        .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
+                        //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME+"_1")
                         .build()
         );
 
