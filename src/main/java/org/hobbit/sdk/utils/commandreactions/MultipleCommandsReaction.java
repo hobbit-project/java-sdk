@@ -130,7 +130,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
-                    containerId = systemAdapterImageName+"_"+systemContainersCount;
+                    containerId = systemAdapterImageName+(systemContainersCount>0?"_"+systemContainersCount:"");
                 }
                 systemContainersCount++;
             }
@@ -180,45 +180,47 @@ public class MultipleCommandsReaction implements CommandReaction {
             logger.debug("DOCKER_CONTAINER_TERMINATED {} received", containerName);
 
             String commandToSend = null;
-            //if(containerName.equals(dataGenContainerId))
-            if(containerName.equals(dataGeneratorImageName)){
-                dataGeneratorsCount--;
-                if(dataGeneratorsCount==0) {
-                    commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
-                    commandToSend = "DATA_GENERATION_FINISHED";
-                }
-            }
+//            //if(containerName.equals(dataGenContainerId))
+//            if(dataGeneratorImageName!=null && containerName.startsWith(dataGeneratorImageName)){
+//                dataGeneratorsCount--;
+//                if(dataGeneratorsCount==0) {
+//                    //commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
+//                    //commandToSend = "DATA_GENERATION_FINISHED";
+//                }
+//            }
+//
+//            //if(containerName.equals(taskGenContainerId))
+//            if(taskGeneratorImageName!=null && containerName.startsWith(taskGeneratorImageName)) {
+//                taskGeneratorsCount--;
+//                if(taskGeneratorsCount==0){
+//                    //commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
+//                    //commandToSend = "TASK_GENERATION_FINISHED";
+//                }
+//            }
+//
+//            if(containerName.equals(systemAdapterImageName)){
+//                //if(systemContainersCount>0) {
+//                    systemContainersCount--;
+//                    //if (systemContainersCount == 0) {
+//                        //commandSender = new CommandSender(Commands.DOCKER_CONTAINER_TERMINATED, systemAdapterImageName.getBytes());
+//                        //commandToSend = "SYSTEM_CONTAINERS_FINISHED";
+//                    //}
+//                //}
+//            }
 
-            //if(containerName.equals(taskGenContainerId))
-            if(containerName.equals(taskGeneratorImageName)) {
-                taskGeneratorsCount--;
-                if(taskGeneratorsCount==0){
-                    commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
-                    commandToSend = "TASK_GENERATION_FINISHED";
-                }
-            }
-
-            if(containerName.equals(systemAdapterImageName)){
-                systemContainersCount--;
-                if(systemContainersCount==0){
-                    //commandSender = new CommandSender(SYSTEM_CONTAINERS_FINISHED);
-                    commandToSend = "SYSTEM_CONTAINERS_FINISHED";
-                }
-            }
 
 
-
-            synchronized (this){
-                if (commandSender!=null){
-                    try {
-                        logger.debug("Sending "+commandToSend+" signal");
-                        commandSender.send();
-                    } catch (Exception e) {
-                        //Assert.fail(e.getMessage());
-                        logger.error(e.getMessage());
-                    }
-                }
-            }
+//            synchronized (this){
+//                if (commandSender!=null){
+//                    try {
+//                        logger.debug("Sending "+commandToSend+" signal");
+//                        commandSender.send();
+//                    } catch (Exception e) {
+//                        //Assert.fail(e.getMessage());
+//                        logger.error(e.getMessage());
+//                    }
+//                }
+//            }
         }
 
         if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
