@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,7 +96,7 @@ public class MultipleCommandsReaction implements CommandReaction {
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(dataGenerator)){
-                    compToSubmit = ((AbstractDockerizer)dataGenerator).clone();
+                    compToSubmit = ((AbstractDockerizer)dataGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
@@ -105,7 +107,7 @@ public class MultipleCommandsReaction implements CommandReaction {
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(taskGenerator)){
-                    compToSubmit = ((AbstractDockerizer)taskGenerator).clone();
+                    compToSubmit = ((AbstractDockerizer)taskGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
@@ -126,7 +128,7 @@ public class MultipleCommandsReaction implements CommandReaction {
 
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
                 if(AbstractDockerizer.class.isInstance(systemAdapter)){
-                    compToSubmit = ((AbstractDockerizer)systemAdapter).clone();
+                    compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
@@ -140,7 +142,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                 Component customComponent = customContainers.get(imageName);
                 int runningCustomContainersCount = (customContainersRunning.containsKey(imageName)? customContainersRunning.get(imageName) :0);
                 if(AbstractDockerizer.class.isInstance(customComponent)){
-                    compToSubmit = ((AbstractDockerizer)customComponent).clone();
+                    compToSubmit = ((AbstractDockerizer)customComponent).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = customComponent.getClass().getConstructor().newInstance();

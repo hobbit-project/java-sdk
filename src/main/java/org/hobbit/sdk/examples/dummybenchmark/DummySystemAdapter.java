@@ -27,7 +27,7 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
-        //createContainer(DUMMY_SYSTEM_IMAGE_NAME+"_1", parameters.mapToArray());
+        //createContainer(DUMMY_SYSTEM_IMAGE_NAME, parameters.mapToArray());
 
         logger.debug("SystemModel: "+parameters.encodeToString());
     }

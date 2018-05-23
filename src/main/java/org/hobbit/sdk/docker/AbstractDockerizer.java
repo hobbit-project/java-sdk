@@ -485,8 +485,8 @@ public abstract class AbstractDockerizer implements Component {
         return onTermination;
     }
 
-    @Override
-    public AbstractDockerizer clone(){
+    //@Override
+    public AbstractDockerizer clone(Collection<String> newEnvironmentVariables){
         AbstractDockerizer ret = null;
         AbstractDockersBuilder builder = null;
 
@@ -505,7 +505,7 @@ public abstract class AbstractDockerizer implements Component {
                     .hostName(hostName)
                     .containerName(containerName+"_"+instanceId)
                     .portBindings(portBindings)
-                    .environmentVariables(environmentVariables)
+                    .environmentVariables(newEnvironmentVariables)
                     .networks(networks)
                     .skipLogsReading(skipLogsReading)
                     .useCachedContainer(useCachedContainer)
