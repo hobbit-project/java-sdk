@@ -56,6 +56,7 @@ public class MultipleCommandsReaction implements CommandReaction {
     private boolean startBenchmarkCommandSent = false;
     private Map<String, Component> customContainers = new HashMap<>();
     private Map<String, Integer> customContainersRunning = new HashMap<>();
+    private String systemContainerId = null;
 
     public MultipleCommandsReaction(Builder builder){
         this.componentsExecutor = builder.componentsExecutor;
@@ -134,6 +135,8 @@ public class MultipleCommandsReaction implements CommandReaction {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
                     containerId = systemAdapterImageName+(systemContainersCount>0?"_"+systemContainersCount:"");
                 }
+                if(systemContainersCount==0)
+                    systemContainerId = containerId;
                 systemContainersCount++;
             }
 
@@ -270,7 +273,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                 startBenchmarkCommandSent = true;
                 try {
                     logger.debug("sending START_BENCHMARK_SIGNAL");
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemAdapterImageName).send();
+                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemContainerId).send();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                     //Assert.fail(e.getMessage());

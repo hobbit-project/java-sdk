@@ -107,7 +107,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         if(dockerize) {
             Boolean useCachedImages = true;
             init(useCachedImages);
-            //benchmarkController = benchmarkBuilder.build();
+            benchmarkController = benchmarkBuilder.build();
             dataGen = dataGeneratorBuilder.build();
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();
