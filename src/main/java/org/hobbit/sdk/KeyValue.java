@@ -2,7 +2,6 @@ package org.hobbit.sdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.*;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -11,163 +10,163 @@ import java.util.*;
  * @author Roman Katerinenko
  */
 public class KeyValue implements Map{
-    private Map keyValueMap = new LinkedHashMap<>();
+    private Map map = new LinkedHashMap<>();
 
     public KeyValue(){
 
     }
 
     public KeyValue(Map from){
-        keyValueMap = from;
+        map = from;
     }
 
     public String getStringValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
-        Object value = keyValueMap.get(propertyName);
+        Object value = map.get(propertyName);
         if (JsonPrimitive.class.isInstance(value))
             return ((JsonPrimitive)value).getAsString();
 
-        return (String) keyValueMap.get(propertyName);
+        return (String) map.get(propertyName);
     }
 
     public Object getValue(String propertyName) throws Exception {
         checkExistence(propertyName);
-        return keyValueMap.get(propertyName);
+        return map.get(propertyName);
     }
 
     public int getIntValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
 
-        Object value = keyValueMap.get(propertyName);
+        Object value = map.get(propertyName);
         if (JsonPrimitive.class.isInstance(value))
             return ((JsonPrimitive)value).getAsInt();
 
-        return (Integer) keyValueMap.get(propertyName);
+        return (Integer) map.get(propertyName);
     }
 
     public long getLongValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
 
-        Object value = keyValueMap.get(propertyName);
+        Object value = map.get(propertyName);
         if (JsonPrimitive.class.isInstance(value))
             return ((JsonPrimitive)value).getAsLong();
 
-        return (long) keyValueMap.get(propertyName);
+        return (long) map.get(propertyName);
     }
 
     public Double getDoubleValueFor(String propertyName) throws Exception {
         checkExistence(propertyName);
 
-        Object value = keyValueMap.get(propertyName);
+        Object value = map.get(propertyName);
         if (JsonPrimitive.class.isInstance(value))
             return ((JsonPrimitive)value).getAsDouble();
 
-        return (Double) keyValueMap.get(propertyName);
+        return (Double) map.get(propertyName);
     }
 
     public void setValue(String propertyName, String value){
-        keyValueMap.put(propertyName, value);
+        map.put(propertyName, value);
     }
 
     public void setValue(String propertyName, int value){
-        keyValueMap.put(propertyName, value);
+        map.put(propertyName, value);
     }
 
     public void setValue(String propertyName, double value) {
-        keyValueMap.put(propertyName, value);
+        map.put(propertyName, value);
     }
 
     public void setValue(String propertyName, long value) {
-        keyValueMap.put(propertyName, value);
+        map.put(propertyName, value);
     }
 
     public void setValue(String propertyName, Object value) {
-        keyValueMap.put(propertyName, value);
+        map.put(propertyName, value);
     }
 
     public void add(KeyValue keyValue) {
-        keyValueMap.putAll(keyValue.keyValueMap);
+        map.putAll(keyValue.map);
     }
 
     public Set<Map.Entry<Object, Object>> getEntries() {
-        return keyValueMap.entrySet();
+        return map.entrySet();
     }
 
-    public Map<Object, Object> toMap(){ return keyValueMap; }
+    public Map<Object, Object> getMap(){ return map; }
 
     private void checkExistence(String propertyName) throws Exception {
-        if(!keyValueMap.containsKey(propertyName))
+        if(!map.containsKey(propertyName))
             throw new Exception(propertyName+" not exists in data");
     }
 
     @Override
     public String toString() {
-        return keyValueMap.toString();
+        return map.toString();
     }
 
     public String toJSONString(){
-        JSONObject obj = new JSONObject(keyValueMap);
+        JSONObject obj = new JSONObject(map);
         return obj.toJSONString();
     }
 
     @Override
     public int size() {
-        return keyValueMap.size();
+        return map.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return keyValueMap.isEmpty();
+        return map.isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return keyValueMap.containsKey(key);
+        return map.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return keyValueMap.containsValue(value);
+        return map.containsValue(value);
     }
 
     @Override
     public Object get(Object key) {
-        return keyValueMap.get(key);
+        return map.get(key);
     }
 
     @Override
     public Object put(Object key, Object value) {
-        return keyValueMap.put(key, value);
+        return map.put(key, value);
     }
 
     @Override
     public Object remove(Object key) {
-        return keyValueMap.remove(key);
+        return map.remove(key);
     }
 
     @Override
     public void putAll(Map m) {
-        keyValueMap.putAll(m);
+        map.putAll(m);
     }
 
     @Override
     public void clear() {
-        keyValueMap.clear();
+        map.clear();
     }
 
     @Override
     public Set keySet() {
-        return keyValueMap.keySet();
+        return map.keySet();
     }
 
     @Override
     public Collection values() {
-        return keyValueMap.values();
+        return map.values();
     }
 
     @Override
     public Set<Entry> entrySet() {
-        return keyValueMap.entrySet();
+        return map.entrySet();
     }
 
     @Override
@@ -175,13 +174,13 @@ public class KeyValue implements Map{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         KeyValue keyValue = (KeyValue) o;
-        return keyValueMap.equals(keyValue.keyValueMap);
+        return map.equals(keyValue.map);
 
     }
 
     @Override
     public int hashCode() {
-        return keyValueMap.hashCode();
+        return map.hashCode();
     }
 
     public static KeyValue parseFromString(String input) throws JsonProcessingException {

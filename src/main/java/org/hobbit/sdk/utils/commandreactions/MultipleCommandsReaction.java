@@ -56,7 +56,7 @@ public class MultipleCommandsReaction implements CommandReaction {
     private boolean startBenchmarkCommandSent = false;
     private Map<String, Component> customContainers = new HashMap<>();
     private Map<String, Integer> customContainersRunning = new HashMap<>();
-    private String systemContainerId = null;
+    //private String systemContainerId = null;
 
     public MultipleCommandsReaction(Builder builder){
         this.componentsExecutor = builder.componentsExecutor;
@@ -93,7 +93,7 @@ public class MultipleCommandsReaction implements CommandReaction {
             if (benchmarkController!=null && startCommandData.image.equals(benchmarkControllerImageName)) {
                 compToSubmit = benchmarkController;
                 containerId = benchmarkControllerImageName;
-            }
+            }else
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(dataGenerator)){
@@ -104,7 +104,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                     containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
                 }
                 dataGeneratorsCount++;
-            }
+            }else
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(taskGenerator)){
@@ -115,17 +115,17 @@ public class MultipleCommandsReaction implements CommandReaction {
                     containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
                 }
                 taskGeneratorsCount++;
-            }
+            }else
 
             if(evalStorage!=null && startCommandData.image.equals(evalStorageImageName)){
                 compToSubmit = evalStorage;
                 containerId = evalStorageImageName;
-            }
+            }else
 
             if(evalModule!=null && startCommandData.image.equals(evalModuleImageName)) {
                 compToSubmit = evalModule;
                 containerId = evalModuleImageName;
-            }
+            }else
 
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
                 if(AbstractDockerizer.class.isInstance(systemAdapter)){
@@ -133,12 +133,10 @@ public class MultipleCommandsReaction implements CommandReaction {
                     containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
-                    containerId = systemAdapterImageName+(systemContainersCount>0?"_"+systemContainersCount:"");
+                    containerId = systemAdapterImageName+"_"+systemContainersCount;
                 }
-                if(systemContainersCount==0)
-                    systemContainerId = containerId;
                 systemContainersCount++;
-            }
+            }else
 
             if(customContainers.containsKey(startCommandData.image)){
                 String imageName = startCommandData.image;
@@ -273,7 +271,8 @@ public class MultipleCommandsReaction implements CommandReaction {
                 startBenchmarkCommandSent = true;
                 try {
                     logger.debug("sending START_BENCHMARK_SIGNAL");
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemContainerId).send();
+
+                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemAdapterImageName+"_0").send();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                     //Assert.fail(e.getMessage());

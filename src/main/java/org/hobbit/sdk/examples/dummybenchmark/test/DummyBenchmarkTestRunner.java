@@ -90,7 +90,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
         setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
         //setupGeneratorEnvironmentVariables(1,1);
-        setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
+        //setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
         commandQueueListener = new CommandQueueListener();
         componentsExecutor = new ComponentsExecutor();
@@ -124,15 +124,15 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                         .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                         .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
                         .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
-                        //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME+"_1")
+                        .customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
                         .build()
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        commandQueueListener.submit(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ System.getenv().get(Constants.BENCHMARK_PARAMETERS_MODEL_KEY ) });
-        commandQueueListener.submit(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ System.getenv().get(Constants.SYSTEM_PARAMETERS_MODEL_KEY ) });
+        commandQueueListener.submit(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        commandQueueListener.submit(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
 
         commandQueueListener.waitForTermination();
         commandQueueListener.terminate();
@@ -144,18 +144,18 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     }
 
 
-    public JenaKeyValue createBenchmarkParameters(){
+    public String createBenchmarkParameters(){
         JenaKeyValue kv = new JenaKeyValue();
         kv.setValue(BENCHMARK_URI+"benchmarkParam1", 123);
         kv.setValue(BENCHMARK_URI+"benchmarkParam2", 456);
-        return kv;
+        return kv.encodeToString();
     }
 
-    public JenaKeyValue createSystemParameters(){
+    public String createSystemParameters(){
         JenaKeyValue kv = new JenaKeyValue();
         kv.setValue(SYSTEM_URI+"systemParam1", 123);
         //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
-        return kv;
+        return kv.encodeToString();
     }
 
 

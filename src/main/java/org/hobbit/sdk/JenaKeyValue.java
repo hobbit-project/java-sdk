@@ -4,6 +4,7 @@ import org.apache.jena.rdf.model.*;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,11 @@ public class JenaKeyValue extends KeyValue {
         this.URI = DEFAULT_URI;
     }
 
+    public JenaKeyValue(JenaKeyValue source) {
+        super(new HashMap(source.getMap()));
+        this.URI = source.URI;
+    }
+
     public String getURI(){
         return URI;
     }
@@ -34,7 +40,7 @@ public class JenaKeyValue extends KeyValue {
 
     public String[] mapToArray(){
         List<String> ret= new ArrayList<String>();
-        Map map = toMap();
+        Map map = getMap();
         for(Object key: map.keySet()){
             ret.add(key+"="+map.get(key).toString());
         }

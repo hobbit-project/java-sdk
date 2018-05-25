@@ -33,19 +33,6 @@ public class ComponentsExecutor {
                 new SynchronousQueue<>());
     }
 
-//    public ComponentsExecutor(EnvironmentVariables environmentVariables){
-//        this.environmentVariables = environmentVariables;
-//    }
-
-//    public void submit(Object object) throws Exception {
-//        if(Runnable.class.isInstance(object))
-//            submit((Runnable) object);
-//        else if(Component.class.isInstance(object))
-//            submit((Component) object);
-//        else
-//            throw new Exception("Type is not supported!");
-//    }
-
 
 
     public void submit(Runnable runnable) {

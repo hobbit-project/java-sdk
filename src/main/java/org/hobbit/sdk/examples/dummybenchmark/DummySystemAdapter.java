@@ -1,5 +1,6 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
+import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractSystemAdapter;
 import org.hobbit.sdk.JenaKeyValue;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.BENCHMARK_URI;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.DUMMY_SYSTEM_IMAGE_NAME;
 
 /**
@@ -15,7 +17,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.
  */
 
 public class DummySystemAdapter extends AbstractSystemAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);
+    private Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);;
     private static JenaKeyValue parameters;
 
     @Override
@@ -27,7 +29,13 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
-        //createContainer(DUMMY_SYSTEM_IMAGE_NAME, parameters.mapToArray());
+        if(!parameters.containsKey(BENCHMARK_URI+"#slaveNode")) {
+            JenaKeyValue slaveParameters = new JenaKeyValue(parameters);
+            slaveParameters.put(BENCHMARK_URI+"#slaveNode", "TRUE");
+            createContainer(DUMMY_SYSTEM_IMAGE_NAME, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ slaveParameters.encodeToString() });
+        }else
+            logger = LoggerFactory.getLogger(DummySystemAdapter.class+"_slave");
+
 
         logger.debug("SystemModel: "+parameters.encodeToString());
     }

@@ -45,7 +45,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
         logger.debug("generateData()");
         String data;
         int i=0;
-        while(i<60){
+        while(i<1000){
             i++;
             // Create your data here
             data = new String("data_"+String.valueOf(i));
