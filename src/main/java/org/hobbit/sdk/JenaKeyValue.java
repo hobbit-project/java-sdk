@@ -90,6 +90,8 @@ public class JenaKeyValue extends KeyValue {
                     keyValue.setValue(propertyUri, value);
                 }
             }
+            if(keyValue==null)
+                keyValue = new JenaKeyValue();
             return keyValue;
         }
     }

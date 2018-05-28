@@ -130,11 +130,12 @@ public class MultipleCommandsReaction implements CommandReaction {
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
                 if(AbstractDockerizer.class.isInstance(systemAdapter)){
                     compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                    //containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
-                    containerId = systemAdapterImageName+"_"+systemContainersCount;
+                    //containerId = systemAdapterImageName+"_"+systemContainersCount;
                 }
+                containerId = systemAdapterImageName+"_"+systemContainersCount;
                 systemContainersCount++;
             }else
 
