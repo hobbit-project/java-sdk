@@ -2,6 +2,7 @@ package org.hobbit.sdk.utils;
 
 import com.rabbitmq.client.AMQP;
 import org.hobbit.core.Commands;
+import org.hobbit.core.components.AbstractPlatformConnectorComponent;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.utils.commandreactions.CommandReaction;
 import org.hobbit.core.Constants;
@@ -17,7 +18,7 @@ import java.util.concurrent.Semaphore;
 /**
  * @author Roman Katerinenko
  */
-public class CommandQueueListener extends AbstractCommandReceivingComponent {
+public class CommandQueueListener extends AbstractPlatformConnectorComponent {
     private static final Logger logger = LoggerFactory.getLogger(CommandQueueListener.class);
 
     private final Semaphore blockingSemaphore = new Semaphore(0, true);
@@ -46,7 +47,11 @@ public class CommandQueueListener extends AbstractCommandReceivingComponent {
     }
 
     public String submit(String imageName, String[] envVariables){
-        return this.createContainer(imageName, envVariables);
+        return super.createContainer(imageName, envVariables);
+    }
+
+    public String createContainer(String imageName, String[] envVariables){
+        return super.createContainer(imageName, envVariables);
     }
 
 //    @Override

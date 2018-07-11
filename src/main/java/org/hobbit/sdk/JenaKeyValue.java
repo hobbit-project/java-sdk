@@ -38,14 +38,6 @@ public class JenaKeyValue extends KeyValue {
         return RabbitMQUtils.writeModel2String(toModel());
     }
 
-    public String[] mapToArray(){
-        List<String> ret= new ArrayList<String>();
-        Map map = getMap();
-        for(Object key: map.keySet()){
-            ret.add(key+"="+map.get(key).toString());
-        }
-        return ret.toArray(new String[0]);
-    }
 
     public byte[] toBytes() {
         return RabbitMQUtils.writeModel(toModel());
