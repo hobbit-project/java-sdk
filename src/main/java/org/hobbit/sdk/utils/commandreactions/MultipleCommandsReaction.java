@@ -212,19 +212,22 @@ public class MultipleCommandsReaction implements CommandReaction {
 //                //}
 //            }
 
+            if(containerName.equals(benchmarkControllerImageName)){
+                commandSender = new CommandSender(Commands.BENCHMARK_FINISHED_SIGNAL);
+                commandToSend = "BENCHMARK_FINISHED_SIGNAL";
+            }
 
-
-//            synchronized (this){
-//                if (commandSender!=null){
-//                    try {
-//                        logger.debug("Sending "+commandToSend+" signal");
-//                        commandSender.send();
-//                    } catch (Exception e) {
-//                        //Assert.fail(e.getMessage());
-//                        logger.error(e.getMessage());
-//                    }
-//                }
-//            }
+            synchronized (this){
+                if (commandSender!=null){
+                    try {
+                        logger.debug("Sending "+commandToSend+" signal");
+                        commandSender.send();
+                    } catch (Exception e) {
+                        //Assert.fail(e.getMessage());
+                        logger.error(e.getMessage());
+                    }
+                }
+            }
         }
 
         if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
