@@ -54,6 +54,10 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
         return super.createContainer(imageName, envVariables);
     }
 
+    public String createContainer(String imageName, String containerType, String[] envVariables){
+        return super.createContainer(imageName, containerType, envVariables);
+    }
+
 //    @Override
     protected void handleCmd(byte[] bytes, String replyTo) {
         this.replyTo = replyTo;
