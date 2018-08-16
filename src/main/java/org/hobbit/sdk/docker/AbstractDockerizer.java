@@ -79,7 +79,7 @@ public abstract class AbstractDockerizer implements Component {
             }
 
         }catch (DockerRequestException e){
-            logger.error("Exception: {}", e.getResponseBody());
+            logger.error("Exception: {}", e);
             exception = e;
         }
         catch (Exception e){
