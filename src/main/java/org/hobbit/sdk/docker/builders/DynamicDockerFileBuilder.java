@@ -26,6 +26,7 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
     public DynamicDockerFileBuilder(String dockerizerName){
         super(dockerizerName);
         filesToAdd = new ArrayList<>();
+
    }
 
     public DynamicDockerFileBuilder runnerClass(Class... values) {
@@ -141,6 +142,7 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
     public BuildBasedDockerizer build() throws Exception {
         if(getDockerFileReader()==null)
             initFileReader();
+        containerName(runnerClass[runnerClass.length-1].getSimpleName());
         return super.build();
     }
 }

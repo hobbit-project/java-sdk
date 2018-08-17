@@ -40,7 +40,7 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
         createDataGenerators(DUMMY_DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
 
         logger.debug("createTaskGenerators()");
-        int numberOfTaskGenerators = 1;
+        int numberOfTaskGenerators = 2;
 
         createTaskGenerators(DUMMY_TASKGEN_IMAGE_NAME, numberOfTaskGenerators, envVariables);
 

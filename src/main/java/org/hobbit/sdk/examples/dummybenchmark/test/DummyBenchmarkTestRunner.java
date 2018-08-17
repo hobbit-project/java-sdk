@@ -22,7 +22,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.
 
 /**
  * @author Pavel Smirnov
- * This code here is just for testing and debugging SDK.
+ * This code is here just for testing and debugging SDK.
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
@@ -88,11 +88,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
-        //environmentVariables.set("DOCKER_HOST", "tcp://remote:2376");
-        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
-        //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
-        //setupGeneratorEnvironmentVariables(1,1);
-        //setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
+        environmentVariables.set(Constants.RABBIT_MQ_HOST_NAME_KEY, rabbitMqDockerizer.getHostName());
+        environmentVariables.set(Constants.HOBBIT_SESSION_ID_KEY, "session_"+String.valueOf(new Date().getTime()));
 
         commandQueueListener = new CommandQueueListener();
         componentsExecutor = new ComponentsExecutor();

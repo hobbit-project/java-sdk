@@ -38,7 +38,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
 
     @Override
     public void run() throws Exception {
-        logger.debug("Initialized. Waiting commands from the queue");
+        logger.debug("Initialized. SessionID: {}", getHobbitSessionId());
         countDownLatch.countDown();
         terminationSemaphore.acquire();
         logger.debug("Got termination signal. Terminating...");

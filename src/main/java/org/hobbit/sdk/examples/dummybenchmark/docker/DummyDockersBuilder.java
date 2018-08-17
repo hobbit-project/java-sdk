@@ -34,7 +34,7 @@ public class DummyDockersBuilder extends DynamicDockerFileBuilder {
         buildDirectory(".");
         jarFilePath(System.getProperty("sdkJarFilePath"));
         dockerWorkDir("/usr/src/"+PROJECT_NAME);
-        containerName(runnerClass.getSimpleName());
+        //containerName(runnerClass.getSimpleName());
         runnerClass(org.hobbit.sdk.utils.ComponentStarter.class, runnerClass);
     }
 
