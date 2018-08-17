@@ -86,6 +86,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
+        environmentVariables.set("DOCKER_HOST", "tcp://remote:2376");
         //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
         setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
         setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
@@ -124,21 +125,21 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                         .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                         .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
                         .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
-                        .customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
+                        //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
                         .build()
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        commandQueueListener.submit(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
-        commandQueueListener.submit(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+        commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        commandQueueListener.createContainer(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
 
         commandQueueListener.waitForTermination();
         commandQueueListener.terminate();
         componentsExecutor.shutdown();
 
-        rabbitMqDockerizer.stop();
+        //rabbitMqDockerizer.stop();
 
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }
