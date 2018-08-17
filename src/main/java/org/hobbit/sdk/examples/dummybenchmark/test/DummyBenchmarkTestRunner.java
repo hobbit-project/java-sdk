@@ -14,6 +14,9 @@ import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
 import org.junit.Assert;
 
+import java.util.Date;
+
+import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
 import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_COUNT_KEY;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
@@ -86,10 +89,9 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
-        environmentVariables.set("DOCKER_HOST", "tcp://remote:2376");
-        //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
-        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
-        setupBenchmarkEnvironmentVariables(EXPERIMENT_URI, createBenchmarkParameters());
+        //environmentVariables.set("DOCKER_HOST", "tcp://remote:2376");
+        setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), "session_"+String.valueOf(new Date().getTime()));
+        //setupCommunicationEnvironmentVariables(rabbitMqDockerizer.getHostName(), sessionId);
         //setupGeneratorEnvironmentVariables(1,1);
         //setupSystemEnvironmentVariables(SYSTEM_URI, createSystemParameters());
 
@@ -132,7 +134,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI, Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
         commandQueueListener.createContainer(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
 
         commandQueueListener.waitForTermination();

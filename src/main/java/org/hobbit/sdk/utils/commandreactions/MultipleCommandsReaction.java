@@ -155,7 +155,6 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
 
             if(compToSubmit!=null){
-
                 componentsExecutor.submit(compToSubmit, containerId, startCommandData.getEnvironmentVariables());
                 synchronized (this) {
                     if (containerId!=null){
@@ -170,8 +169,7 @@ public class MultipleCommandsReaction implements CommandReaction {
                     }
                 }
             }else{
-                throw new Exception("No component to start as imageName="+startCommandData.image);
-
+                logger.warn("No component to submit for the imageName="+startCommandData.image);
             }
         }
 

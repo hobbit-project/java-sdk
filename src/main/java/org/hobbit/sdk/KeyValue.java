@@ -89,7 +89,7 @@ public class KeyValue implements Map{
         map.put(propertyName, value);
     }
 
-    public void setValue(String propertyName, Object value) {
+    public void setValue(String propertyName, Object value){
         map.put(propertyName, value);
     }
 
@@ -113,7 +113,11 @@ public class KeyValue implements Map{
         return map.toString();
     }
 
-    public String toJSONString(){
+    public String toJSONString() throws Exception {
+        for(Object value : map.values())
+            if (value.getClass().isArray())
+                throw new Exception("Arrays are not serializable by KeyValue object. Please use list instead");
+
         JSONObject obj = new JSONObject(map);
         return obj.toJSONString();
     }
@@ -219,16 +223,18 @@ public class KeyValue implements Map{
 
     private static Object parseFromJsonArray(JsonArray array) throws JsonProcessingException {
         List<Object> ret = new ArrayList<>();
-        for (Object obj : array) {
+        for (Object obj : array){
             Object value = obj;
             if(JsonArray.class.isInstance(value))
                 value = parseFromJsonArray((JsonArray)obj);
 
             if(JsonObject.class.isInstance(value))
                     ret.add(parseFromObject((JsonObject)value));
+            else if(JsonPrimitive.class.isInstance(value))
+                ret.add(((JsonPrimitive)value).getAsString());
             else
                 ret.add(value);
         }
-        return ret.toArray();
+        return ret;
     }
 }
