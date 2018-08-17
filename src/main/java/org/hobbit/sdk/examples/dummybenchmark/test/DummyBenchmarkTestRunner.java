@@ -11,14 +11,13 @@ import org.hobbit.sdk.docker.builders.hobbit.*;
 import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.examples.dummybenchmark.docker.*;
 import org.hobbit.sdk.utils.CommandQueueListener;
-import org.hobbit.sdk.utils.commandreactions.MultipleCommandsReaction;
+import org.hobbit.sdk.utils.commandreactions.CommandReactionsBuilder;
 import org.junit.Assert;
 
 import java.util.Date;
 
 import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
-import static org.hobbit.sdk.CommonConstants.SYSTEM_CONTAINERS_COUNT_KEY;
 import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
 
 /**
@@ -118,17 +117,20 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
             systemAdapter = systemAdapterBuilder.build();
         }
 
+        CommandReactionsBuilder commandReactionsBuilder = new CommandReactionsBuilder(componentsExecutor, commandQueueListener)
+                                                                .benchmarkController(benchmarkController).benchmarkControllerImageName(DUMMY_BENCHMARK_IMAGE_NAME)
+                                                                .dataGenerator(dataGen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
+                                                                .taskGenerator(taskGen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
+                                                                .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
+                                                                .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
+                                                                .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
+                                                                //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
+                                                                ;
+
         //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
         commandQueueListener.setCommandReactions(
-                new MultipleCommandsReaction.Builder(componentsExecutor, commandQueueListener)
-                        .benchmarkController(benchmarkController).benchmarkControllerImageName(DUMMY_BENCHMARK_IMAGE_NAME)
-                        .dataGenerator(dataGen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
-                        .taskGenerator(taskGen).taskGeneratorImageName(DUMMY_TASKGEN_IMAGE_NAME)
-                        .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
-                        .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
-                        .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
-                        //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
-                        .build()
+                commandReactionsBuilder.buildDockerCommandsReaction(),
+                commandReactionsBuilder.buildPlatformCommandsReaction()
         );
 
         componentsExecutor.submit(commandQueueListener);

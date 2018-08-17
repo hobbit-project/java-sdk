@@ -25,7 +25,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
     private final Semaphore terminationSemaphore = new Semaphore(0, true);
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    private CommandReaction[] commandReactions = new CommandReaction[0];
+    private CommandReaction[] commandReactions=new CommandReaction[0];
     private String replyTo;
 
 
@@ -38,7 +38,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
 
     @Override
     public void run() throws Exception {
-        logger.debug("Initialized. Waiting for termination signal");
+        logger.debug("Initialized. Waiting commands from the queue");
         countDownLatch.countDown();
         terminationSemaphore.acquire();
         logger.debug("Got termination signal. Terminating...");

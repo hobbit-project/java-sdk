@@ -7,9 +7,9 @@ import org.hobbit.core.components.Component;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
-import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
+import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class MultipleCommandsReaction implements CommandReaction {
-    private static final Logger logger = LoggerFactory.getLogger(MultipleCommandsReaction.class);
+public class DockerCommandsReaction implements CommandReaction {
+    private static final Logger logger = LoggerFactory.getLogger(PlatformCommandsReaction.class);
 
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
@@ -47,18 +46,11 @@ public class MultipleCommandsReaction implements CommandReaction {
 
     private Gson gson = new Gson();
 
-    private boolean benchmarkReady = false;
-    private boolean dataGenReady = false;
-    private boolean taskGenReady = false;
-    private boolean evalStorageReady = false;
-    private boolean systemReady = false;
-
-    private boolean startBenchmarkCommandSent = false;
     private Map<String, Component> customContainers = new HashMap<>();
     private Map<String, Integer> customContainersRunning = new HashMap<>();
     //private String systemContainerId = null;
 
-    public MultipleCommandsReaction(Builder builder){
+    public DockerCommandsReaction(CommandReactionsBuilder builder){
         this.componentsExecutor = builder.componentsExecutor;
         this.commandQueueListener = builder.commandQueueListener;
 
@@ -173,7 +165,6 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
         }
 
-
         if(command==Commands.DOCKER_CONTAINER_TERMINATED){
             CommandSender commandSender = null;
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
@@ -228,165 +219,8 @@ public class MultipleCommandsReaction implements CommandReaction {
             }
         }
 
-        if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
-            logger.debug("BENCHMARK_FINISHED_SIGNAL received");
-            try {
-                commandQueueListener.terminate();
-                componentsExecutor.shutdown();
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-                //Assert.fail(e.getMessage());
-            }
-        }
-
-        if (command == Commands.BENCHMARK_READY_SIGNAL) {
-            benchmarkReady = true;
-            logger.debug("BENCHMARK_READY_SIGNAL signal received");
-        }
-
-        if (command == Commands.DATA_GENERATOR_READY_SIGNAL) {
-            dataGenReady = true;
-            logger.debug("DATA_GENERATOR_READY_SIGNAL signal received");
-        }
-
-        if (command == Commands.TASK_GENERATOR_READY_SIGNAL) {
-            taskGenReady = true;
-            logger.debug("TASK_GENERATOR_READY_SIGNAL signal received");
-        }
-
-        if (command == Commands.EVAL_STORAGE_READY_SIGNAL) {
-            evalStorageReady = true;
-            logger.debug("EVAL_STORAGE_READY_SIGNAL signal received");
-        }
-
-        if (command == Commands.SYSTEM_READY_SIGNAL) {
-            systemReady = true;
-            logger.debug("SYSTEM_READY_SIGNAL signal received");
-        }
-
-        synchronized (this){
-            if (benchmarkReady &&
-                    (dataGenerator==null || dataGenReady) &&
-                    (taskGenerator==null || taskGenReady) &&
-                    (evalStorage==null || evalStorageReady) &&
-                    systemReady && !startBenchmarkCommandSent) {
-                startBenchmarkCommandSent = true;
-                try {
-                    logger.debug("sending START_BENCHMARK_SIGNAL");
-
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemAdapterImageName+"_0").send();
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    //Assert.fail(e.getMessage());
-                }
-            }
-        }
 
     }
 
-    public static class Builder{
 
-        private ComponentsExecutor componentsExecutor;
-        private CommandQueueListener commandQueueListener;
-
-        private Map<String, Component> customContainers = new HashMap<>();
-
-        private Component benchmarkController;
-        private Component dataGenerator;
-        private Component taskGenerator;
-        private Component evalStorage;
-        private Component evalModule;
-        private Component systemAdapter;
-
-        private String benchmarkControllerImageName;
-        private String dataGeneratorImageName;
-        private String taskGeneratorImageName;
-        private String evalStorageImageName;
-        private String evalModuleImageName;
-        private String systemAdapterImageName;
-
-//    private String dataGenContainerId;
-//    private String taskGenContainerId;
-        //private String systemAdapterImageName;
-//    private String evalModuleContainerId;
-//    private String evalStorageContainerId;
-
-        public Builder(ComponentsExecutor componentsExecutor, CommandQueueListener commandQueueListener){
-            this.componentsExecutor = componentsExecutor;
-            this.commandQueueListener = commandQueueListener;
-        }
-
-        public Builder benchmarkController(Component component){
-            this.benchmarkController = component;
-            return this;
-        }
-
-        public Builder benchmarkControllerImageName(String value){
-            this.benchmarkControllerImageName = value;
-            return this;
-        }
-
-        public Builder dataGenerator(Component component){
-            this.dataGenerator = component;
-            return this;
-        }
-
-        public Builder dataGeneratorImageName(String value){
-            this.dataGeneratorImageName = value;
-            return this;
-        }
-
-        public Builder taskGenerator(Component component){
-            this.taskGenerator = component;
-            return this;
-        }
-
-        public Builder taskGeneratorImageName(String value){
-            this.taskGeneratorImageName = value;
-            return this;
-        }
-
-        public Builder evalStorage(Component component){
-            this.evalStorage = component;
-            return this;
-        }
-
-        public Builder evalStorageImageName(String value){
-            this.evalStorageImageName = value;
-            return this;
-        }
-
-        public Builder systemAdapter(Component value){
-            this.systemAdapter = value;
-            return this;
-        }
-
-        public Builder systemAdapterImageName(String value){
-            this.systemAdapterImageName = value;
-            return this;
-        }
-
-        public Builder customContainerImage(Component component, String imageName){
-            customContainers.put(imageName, component);
-            return this;
-        }
-
-
-        public Builder evalModule(Component value){
-            this.evalModule = value;
-            return this;
-        }
-
-        public Builder evalModuleImageName(String value){
-            this.evalModuleImageName = value;
-            return this;
-        }
-
-        public MultipleCommandsReaction build(){
-            if(systemAdapterImageName ==null){
-                logger.warn("SystemAdapter not specified. Nothing will be submitted");
-            }
-            return new MultipleCommandsReaction(this);
-        }
-    }
 }

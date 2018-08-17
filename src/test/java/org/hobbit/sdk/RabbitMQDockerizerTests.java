@@ -20,7 +20,7 @@ public class RabbitMQDockerizerTests {
 //    @Test
 //    @Ignore
 //    public void checkHealthCached(){
-//        PullBasedDockerizer dockerizer = PullBasedDockerizer.builder().build();
+//        PullBasedDockerizer dockerizer = PullBasedDockerizer.builder().buildPlatformCommandsReaction();
 //
 //        dockerizer.run();
 //
