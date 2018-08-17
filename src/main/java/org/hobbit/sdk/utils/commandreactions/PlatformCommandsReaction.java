@@ -73,7 +73,6 @@ public class PlatformCommandsReaction implements CommandReaction {
     @Override
     public void handleCmd(Byte command, byte[] bytes, String replyTo) throws Exception {
 
-
         if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
             logger.debug("BENCHMARK_FINISHED_SIGNAL received");
             try {
@@ -108,6 +107,8 @@ public class PlatformCommandsReaction implements CommandReaction {
         if (command == Commands.SYSTEM_READY_SIGNAL) {
             systemReady = true;
             logger.debug("SYSTEM_READY_SIGNAL signal received");
+            if(!System.getenv().containsKey("SYSTEM_CONTAINER_ID"))
+                throw new Exception("SYSTEM_CONTAINER_ID is not specified as env variable. Specify it where you submit system/create system container in checkHealth");
         }
 
         synchronized (this){
@@ -120,7 +121,7 @@ public class PlatformCommandsReaction implements CommandReaction {
                 try {
                     logger.debug("sending START_BENCHMARK_SIGNAL");
 
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, systemAdapterImageName+"_0").send();
+                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, System.getenv().get("SYSTEM_CONTAINER_ID")).send();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                     //Assert.fail(e.getMessage());

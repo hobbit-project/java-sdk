@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DockerCommandsReaction implements CommandReaction {
+public class StartContainerCommandReaction implements CommandReaction {
     private static final Logger logger = LoggerFactory.getLogger(PlatformCommandsReaction.class);
 
     private ComponentsExecutor componentsExecutor;
@@ -50,7 +50,7 @@ public class DockerCommandsReaction implements CommandReaction {
     private Map<String, Integer> customContainersRunning = new HashMap<>();
     //private String systemContainerId = null;
 
-    public DockerCommandsReaction(CommandReactionsBuilder builder){
+    public StartContainerCommandReaction(CommandReactionsBuilder builder){
         this.componentsExecutor = builder.componentsExecutor;
         this.commandQueueListener = builder.commandQueueListener;
 

@@ -126,15 +126,19 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
         commandQueueListener.setCommandReactions(
-                commandReactionsBuilder.buildDockerCommandsReaction(),
+                commandReactionsBuilder.buildStartCommandsReaction(),
+                commandReactionsBuilder.buildTerminateCommandsReaction(),
                 commandReactionsBuilder.buildPlatformCommandsReaction()
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI, Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
-        commandQueueListener.createContainer(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+        String benchmarkContainerId = commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI, Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        String systemContainerId = commandQueueListener.createContainer(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+
+        environmentVariables.set("BENCHMARK_CONTAINER_ID", benchmarkContainerId);
+        environmentVariables.set("SYSTEM_CONTAINER_ID", systemContainerId);
 
         commandQueueListener.waitForTermination();
         commandQueueListener.terminate();

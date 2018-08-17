@@ -105,8 +105,12 @@ public class CommandReactionsBuilder{
         return this;
     }
 
-    public DockerCommandsReaction buildDockerCommandsReaction(){
-        return new DockerCommandsReaction(this);
+    public StartContainerCommandReaction buildStartCommandsReaction(){
+        return new StartContainerCommandReaction(this);
+    }
+
+    public TerminateContainerCommandReaction buildTerminateCommandsReaction(){
+        return new TerminateContainerCommandReaction(this);
     }
 
     public PlatformCommandsReaction buildPlatformCommandsReaction(){
