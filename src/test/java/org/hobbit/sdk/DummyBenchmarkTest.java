@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov

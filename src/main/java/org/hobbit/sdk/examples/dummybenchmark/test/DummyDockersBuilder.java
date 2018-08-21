@@ -1,4 +1,4 @@
-package org.hobbit.sdk.examples.dummybenchmark.docker;
+package org.hobbit.sdk.examples.dummybenchmark.test;
 
 import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
 

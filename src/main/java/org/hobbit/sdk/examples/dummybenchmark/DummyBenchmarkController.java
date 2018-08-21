@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.*;
+import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 
 /**
@@ -50,13 +50,9 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
         this.createEvaluationStorage(DUMMY_EVAL_STORAGE_IMAGE_NAME, envVariables);
 
         // Wait for all components to finish their initialization
-        waitForComponentsInit();
+        waitForComponentsToInitialize();
     }
 
-    private void waitForComponentsInit() {
-        logger.debug("waitForComponentsInit()");
-        //throw new NotImplementedException();
-    }
 
     @Override
     protected void executeBenchmark() throws Exception {

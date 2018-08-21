@@ -9,4 +9,5 @@ build-benchmark-image:
 
 test-dockerized-benchmark:
 	make package-benchmark
+	make build-benchmark-image
 	mvn -Dtest=DummyBenchmarkTest#checkHealthDockerized test

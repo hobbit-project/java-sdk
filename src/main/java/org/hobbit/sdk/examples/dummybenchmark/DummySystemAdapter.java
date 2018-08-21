@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.BENCHMARK_URI;
-import static org.hobbit.sdk.examples.dummybenchmark.docker.DummyDockersBuilder.DUMMY_SYSTEM_IMAGE_NAME;
+import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.BENCHMARK_URI;
+import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.DUMMY_SYSTEM_IMAGE_NAME;
 
 /**
  * This code is here just for testing and debugging the SDK.
