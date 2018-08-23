@@ -15,7 +15,9 @@ import org.junit.Assert;
 
 import java.util.Date;
 
+import static org.hobbit.core.Constants.BENCHMARK_PARAMETERS_MODEL_KEY;
 import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
+import static org.hobbit.core.Constants.SYSTEM_PARAMETERS_MODEL_KEY;
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
 import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
@@ -85,10 +87,14 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
     private void checkHealth(Boolean dockerize) throws Exception {
 
+        Boolean useCachedImages = true;
+        init(useCachedImages);
+
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
         environmentVariables.set(Constants.RABBIT_MQ_HOST_NAME_KEY, rabbitMqDockerizer.getHostName());
         environmentVariables.set(Constants.HOBBIT_SESSION_ID_KEY, "session_"+String.valueOf(new Date().getTime()));
+        //environmentVariables.set("DOCKER_HOST", "tcp://localhost:2376");
 
         commandQueueListener = new CommandQueueListener();
         componentsExecutor = new ComponentsExecutor();
@@ -103,8 +109,6 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Component systemAdapter = new DummySystemAdapter();
 
         if(dockerize) {
-            Boolean useCachedImages = true;
-            init(useCachedImages);
             benchmarkController = benchmarkBuilder.build();
             dataGen = dataGeneratorBuilder.build();
             taskGen = taskGeneratorBuilder.build();
@@ -128,13 +132,17 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                 commandReactionsBuilder.buildStartCommandsReaction(),
                 commandReactionsBuilder.buildTerminateCommandsReaction(),
                 commandReactionsBuilder.buildPlatformCommandsReaction()
+                //commandReactionsBuilder.buildServiceLogsReaderReaction()
         );
 
         componentsExecutor.submit(commandQueueListener);
         commandQueueListener.waitForInitialisation();
 
-        String benchmarkContainerId = commandQueueListener.createContainer(DUMMY_BENCHMARK_IMAGE_NAME, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI, Constants.BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
-        String systemContainerId = commandQueueListener.createContainer(systemImageName, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+        String benchmarkContainerId = "benchmark";
+        String systemContainerId = "system";
+
+        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
 
         environmentVariables.set("BENCHMARK_CONTAINER_ID", benchmarkContainerId);
         environmentVariables.set("SYSTEM_CONTAINER_ID", systemContainerId);

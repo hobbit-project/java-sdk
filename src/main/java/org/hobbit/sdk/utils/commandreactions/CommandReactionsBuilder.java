@@ -116,4 +116,10 @@ public class CommandReactionsBuilder{
     public PlatformCommandsReaction buildPlatformCommandsReaction(){
         return new PlatformCommandsReaction(this);
     }
+
+    public ServiceLogsReaderReaction buildServiceLogsReaderReaction(){
+        return  new ServiceLogsReaderReaction(this.componentsExecutor);
+    }
+
+
 }

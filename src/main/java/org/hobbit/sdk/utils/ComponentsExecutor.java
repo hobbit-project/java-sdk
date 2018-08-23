@@ -2,6 +2,8 @@ package org.hobbit.sdk.utils;
 
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.docker.ServiceLogsReader;
+import org.hobbit.sdk.utils.commandreactions.CommandReaction;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,8 @@ public class ComponentsExecutor {
                 if (envVariables!=null)
                     for (String pair : envVariables)
                         ((AbstractDockerizer)component).addEnvironmentVariable(pair);
+            }else if(ServiceLogsReader.class.isInstance(component)){
+                componentName = ((ServiceLogsReader)component).getName();
             }else{
                 if (envVariables!=null)
                     for (String pair : envVariables){
@@ -67,10 +71,10 @@ public class ComponentsExecutor {
             }
             int exitCode = 0;
             try {
-                logger.debug("Initing "+componentName /*+" "+component.hashCode()*/);
+                logger.debug("Starting "+componentName /*+" "+component.hashCode()*/);
                 component.init();
-                logger.debug("Running "+componentName /*+" "+component.hashCode() */ );
                 component.run();
+                component.close();
             } catch (Throwable e) {
                 String message = componentName+" error: "+ e.getMessage();
                 logger.error(message);

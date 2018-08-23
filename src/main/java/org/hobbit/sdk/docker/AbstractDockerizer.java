@@ -75,7 +75,7 @@ public abstract class AbstractDockerizer implements Component {
             if(requiresStart) {
                 int readLogsSince = (int) (System.currentTimeMillis() / 1000L);
                 startContainer();
-                startMonitoringAndLogsReading(readLogsSince);
+                startMonitoringAndLogsReading(containerId, readLogsSince);
             }
 
         }catch (DockerRequestException e){
@@ -200,7 +200,7 @@ public abstract class AbstractDockerizer implements Component {
         logger.debug("Container started (imageName={}, containerId={})", imageName, containerId);
     }
 
-    public void startMonitoringAndLogsReading(int since) throws Exception {
+    public void startMonitoringAndLogsReading(String containerId, int since) throws Exception {
         logger.debug("Starting monitoring & logs reading for container (imageName={})", imageName);
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -351,11 +351,11 @@ public abstract class AbstractDockerizer implements Component {
     private void connectContainerToNetworks(Collection<String> networks) throws DockerException, InterruptedException, DockerCertificateException {
         logger.debug("Connecting container to networks (imageName={})", imageName);
 
-//        ContainerInfo info = getContainerInfo(dockerClient);
-//        Map<String, AttachedNetwork> prev_networks = info.networkSettings().networks();
-//        for (String networkName : prev_networks.keySet()) {
-//            getDockerClient().disconnectFromNetwork(containerId, networkName);
-//        }
+        ContainerInfo info = getContainerInfo(dockerClient);
+        Map<String, AttachedNetwork> prev_networks = info.networkSettings().networks();
+        for (String networkName : prev_networks.keySet()) {
+            getDockerClient().disconnectFromNetwork(containerId, networkName);
+        }
 
         for (String network : networks) {
             String networkId = createDockerNetworkIfNeeded(dockerClient, network);

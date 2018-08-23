@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hobbit</groupId>
     <artifactId>hobbit-java-sdk</artifactId>
-    <version>1.1.12</version>
+    <version>1.1.13-SNAPHSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -46,6 +46,13 @@
             <version>1.1.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.0</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.log4mongo</groupId>-->
             <!--<artifactId>log4mongo-java</artifactId>-->
@@ -59,7 +66,7 @@
         <dependency>
             <groupId>com.spotify</groupId>
             <artifactId>docker-client</artifactId>
-            <version>8.8.3</version>
+            <version>8.11.7</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
