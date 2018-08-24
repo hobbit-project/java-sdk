@@ -118,7 +118,11 @@ public class CommandReactionsBuilder{
     }
 
     public ServiceLogsReaderReaction buildServiceLogsReaderReaction(){
-        return  new ServiceLogsReaderReaction(this.componentsExecutor);
+        return  new ServiceLogsReaderReaction(this);
+    }
+
+    public ServiceLogsReaderReaction buildServiceLogsReaderReaction(String[] imagesToListen){
+        return  new ServiceLogsReaderReaction(this, imagesToListen);
     }
 
 

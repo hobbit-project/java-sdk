@@ -11,16 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class ServiceLogsReader implements Component {
 
-    private static Logger logger;
+    private Logger logger;
 
     private DockerClient dockerClient;
-    private String serviceId;
+    //private String serviceId;
     private String name;
     private String imageName;
     int readLogsSince;
@@ -29,9 +31,8 @@ public class ServiceLogsReader implements Component {
     public ServiceLogsReader(String imageName){
         this.imageName = imageName;
         String[] splitted = imageName.split("/");
-        this.name = splitted[splitted.length-1]+"_logsreader";
-
-         logger = LoggerFactory.getLogger(this.name);
+        this.name = splitted[splitted.length-1];
+        logger = LoggerFactory.getLogger(this.name);
     }
 
 
@@ -39,6 +40,8 @@ public class ServiceLogsReader implements Component {
     public void init() throws Exception {
         readLogsSince = (int) (System.currentTimeMillis() / 1000L);
     }
+
+
 
     public DockerClient getDockerClient() throws DockerCertificateException {
         if(dockerClient==null)
@@ -60,48 +63,52 @@ public class ServiceLogsReader implements Component {
             LogStream logStream = null;
 
             String logs = "";
-            String prevLogs = "";
+            Map<String, String> prevLogs = new HashMap<>();
             Boolean finished = false;
             try {
                 while (!finished) {
 
-                    if (serviceId == null) {
-                        List<Service> serviceList = getDockerClient().listServices().stream().filter(s ->
-                                s.spec().taskTemplate().containerSpec().image().equals(imageName)
-                                && s.createdAt().getTime()>readLogsSince
-                                        //&& (s.spec().mode().replicated()!=null && s.spec().mode().replicated().replicas().intValue() > 0)
-                        ).collect(Collectors.toList());
-                        if (!serviceList.isEmpty())
-                            serviceId = serviceList.get(0).id();
-                    } else {
-                        try {
-                            logStream = getDockerClient().serviceLogs(serviceId,
-                                    DockerClient.LogsParam.stderr(),
-                                    DockerClient.LogsParam.stdout(),
-                                    DockerClient.LogsParam.since(readLogsSince)
-                            );
-                            logs = logStream.readFully();
-                        }catch (ServiceNotFoundException e) {
-                            serviceId=null;
-                        }
-                        catch (Exception e) {
-                            logger.debug(String.format("No service logs are available (imageName=%s):", imageName), e);
-                        } finally {
-                            if (logStream != null) {
-                                logStream.close();
-                            }
-                        }
 
-                        if (logs.length() > prevLogs.length()) {
-                            String logsToPrint = logs.substring(prevLogs.length());
-                            if (logsToPrint.contains(" ERROR "))
-                                logger.error(logsToPrint);
-                            else
-                                logger.debug(logsToPrint);
-                            prevLogs = logs;
+                        List<String> serviceIds = getDockerClient().listServices().stream().filter(s ->
+                                        s.spec().taskTemplate().containerSpec().image().equals(imageName)
+                                                && s.createdAt().getTime()>readLogsSince
+                                //&& (s.spec().mode().replicated()!=null && s.spec().mode().replicated().replicas().intValue() > 0)
+                        ).map(s -> s.id()).collect(Collectors.toList());
+
+
+                        for(String serviceId: serviceIds) {
+                            String loggerName = this.name+"-"+serviceId;
+                                logs="";
+                                try {
+                                    logStream = getDockerClient().serviceLogs(serviceId,
+                                            DockerClient.LogsParam.stderr(),
+                                            DockerClient.LogsParam.stdout(),
+                                            DockerClient.LogsParam.since(readLogsSince)
+                                    );
+                                    logs = logStream.readFully();
+                                } catch (ServiceNotFoundException e) {
+                                    logger.warn("Service not found {}", loggerName, e);
+                                } catch (Exception e) {
+                                    logger.warn("No service logs are available {}", loggerName, e);
+                                } finally {
+                                    if (logStream != null) {
+                                        logStream.close();
+                                    }
+                                }
+
+                                int prevLogsLength = (prevLogs.containsKey(serviceId)?prevLogs.get(serviceId).length():0);
+                                if (logs.length() > prevLogsLength) {
+                                    logger = LoggerFactory.getLogger(loggerName);
+                                    String logsToPrint = logs.substring(prevLogsLength);
+                                    if (logsToPrint.contains(" ERROR "))
+                                        logger.error(logsToPrint);
+                                    else
+                                        logger.debug(logsToPrint);
+                                    prevLogs.put(serviceId, logs);
+                                }
+                                //finished = getDockerClient().inspectService(serviceId).spec().mode().replicated().replicas().intValue() == 0;
+
                         }
-                        finished = getDockerClient().inspectService(serviceId).spec().mode().replicated().replicas().intValue() == 0;
-                    }
                     Thread.sleep(1000);
                 }
             }

@@ -90,7 +90,7 @@ public class StartContainerCommandReaction implements CommandReaction {
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(dataGenerator)){
                     compToSubmit = ((AbstractDockerizer)dataGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
                 }else {
                     compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
                     containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
@@ -101,7 +101,7 @@ public class StartContainerCommandReaction implements CommandReaction {
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(taskGenerator)){
                     compToSubmit = ((AbstractDockerizer)taskGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
                 }else {
                     compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
                     containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
@@ -122,7 +122,7 @@ public class StartContainerCommandReaction implements CommandReaction {
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
                 if(AbstractDockerizer.class.isInstance(systemAdapter)){
                     compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    //containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
                     //containerId = systemAdapterImageName+"_"+systemContainersCount;
@@ -137,7 +137,7 @@ public class StartContainerCommandReaction implements CommandReaction {
                 int runningCustomContainersCount = (customContainersRunning.containsKey(imageName)? customContainersRunning.get(imageName) :0);
                 if(AbstractDockerizer.class.isInstance(customComponent)){
                     compToSubmit = ((AbstractDockerizer)customComponent).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).getContainerName();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
                 }else {
                     compToSubmit = customComponent.getClass().getConstructor().newInstance();
                     containerId = imageName+"_"+runningCustomContainersCount;

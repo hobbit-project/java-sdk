@@ -11,13 +11,32 @@ import org.hobbit.sdk.docker.PullBasedDockerizer;
 import org.hobbit.sdk.docker.ServiceLogsReader;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class ServiceLogsReaderReaction implements CommandReaction {
 
     private Gson gson = new Gson();
     private ComponentsExecutor componentsExecutor;
+    List<String> imagesToListen;
+    Map<String, ServiceLogsReader> submittedReaders;
 
-    public ServiceLogsReaderReaction(ComponentsExecutor componentsExecutor){
-        this.componentsExecutor = componentsExecutor;
+    public ServiceLogsReaderReaction(CommandReactionsBuilder builder){
+        this.componentsExecutor = builder.componentsExecutor;
+        this.imagesToListen = Arrays.asList(new String[]{
+                builder.benchmarkControllerImageName,
+                builder.dataGeneratorImageName,
+                builder.taskGeneratorImageName,
+                builder.systemAdapterImageName,
+                builder.evalStorageImageName,
+                builder.evalModuleImageName,
+        });
+        submittedReaders = new HashMap<>();
+    }
+
+    public ServiceLogsReaderReaction(CommandReactionsBuilder builder, String [] imagesToListen){
+        this(builder);
+        this.imagesToListen = Arrays.asList(imagesToListen);
     }
 
     @Override
@@ -26,9 +45,12 @@ public class ServiceLogsReaderReaction implements CommandReaction {
 
             String dataString = RabbitMQUtils.readString(bytes);
             StartCommandData startCommandData = gson.fromJson(dataString, StartCommandData.class);
-
-            ServiceLogsReader reader = new ServiceLogsReader(startCommandData.image);
-            componentsExecutor.submit(reader);
+            if(!submittedReaders.containsKey(startCommandData.image))
+                if(imagesToListen==null || imagesToListen.contains(startCommandData.image)) {
+                    ServiceLogsReader reader = new ServiceLogsReader(startCommandData.image);
+                    componentsExecutor.submit(reader);
+                    submittedReaders.put(startCommandData.image, reader);
+                }
         }
     }
 }

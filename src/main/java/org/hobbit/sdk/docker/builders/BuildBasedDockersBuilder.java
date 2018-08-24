@@ -110,7 +110,8 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     public BuildBasedDockerizer build() throws Exception {
 
         if(buildDirectory==null)
-            throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
+            buildDirectory(".");
+            //throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
 
         if(dockerFileReader==null)
             throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+". You can initialize it by the calling the initFileReader()");

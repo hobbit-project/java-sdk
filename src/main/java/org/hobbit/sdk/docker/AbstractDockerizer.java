@@ -71,7 +71,14 @@ public abstract class AbstractDockerizer implements Component {
     public void run() {
         try {
             stop(true);
-            Boolean requiresStart = createContainerIfNotExists();
+            this.containerId = createContainerIfNotExists();
+
+            List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
+            Boolean requiresStart = true;
+            for(Container container : results)
+                if(container.state().equals("running"))
+                    requiresStart = false;
+
             if(requiresStart) {
                 int readLogsSince = (int) (System.currentTimeMillis() / 1000L);
                 startContainer();
@@ -104,7 +111,7 @@ public abstract class AbstractDockerizer implements Component {
                 if(!onstart)
                    stopContainer();
             }else if(onstart)
-                removeAllSameNamedContainers();
+                removeAllSameContainersWithSameImage();
         }
         catch (Exception e){
             logger.error("Exception", e);
@@ -137,10 +144,10 @@ public abstract class AbstractDockerizer implements Component {
 
     public String getHostName(){ return hostName;}
 
-    public void removeAllSameNamedContainers(){
+    public void removeAllSameContainersWithSameImage(){
         logger.debug("Removing containers (imageName={})", imageName);
         try {
-            removeAllSameNamedContainers(containerName);
+            removeAllSameContainersWithSameImage(imageName);
         }
         catch (Exception e){
             logger.error("Exception", e);
@@ -169,26 +176,21 @@ public abstract class AbstractDockerizer implements Component {
     public abstract void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException;
 
 
-    public Boolean createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public String createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
         if(containerId!=null)
-            return true;
+            return containerId;
 
-        Boolean requiresToBeStarted = false;
         List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
-        if(results.size()==0){
-            containerId = createContainer();
-            requiresToBeStarted = true;
-        }else{
-            for(Container container : results)
-                if(container.state().equals("running"))
-                    containerId = results.get(0).id();
+        for(Container container : results)
+            if(container.state().equals("running"))
+                containerId = container.id();
+            else
+                getDockerClient().removeContainer(container.id(), DockerClient.RemoveContainerParam.forceKill());
 
-            if(containerId==null) {
-                containerId = results.get(0).id();
-                requiresToBeStarted = true;
-            }
-        }
-        return requiresToBeStarted;
+        if(containerId==null)
+            containerId = createContainer();
+
+        return containerId;
     }
 
     public void startContainer() throws Exception {
@@ -398,9 +400,22 @@ public abstract class AbstractDockerizer implements Component {
         return ret;
     }
 
-    private void removeAllSameNamedContainers(String containerName) throws
+    private List<Container> findContainersByImageName(String imageName, DockerClient.ListContainersParam param) throws
             DockerException, InterruptedException, DockerCertificateException {
-        for(Container container : findContainersByName(containerName, DockerClient.ListContainersParam.allContainers())) {
+        List<Container> ret = new ArrayList<>();
+        for(Container container : getDockerClient().listContainers(param)) {
+            if (container.image().equals(imageName))
+                ret.add(container);
+        }
+
+        return ret;
+    }
+
+    private void removeAllSameContainersWithSameImage(String imageName) throws
+            DockerException, InterruptedException, DockerCertificateException {
+        //for(Container container : findContainersByName(containerName, DockerClient.ListContainersParam.allContainers())) {
+        for(Container container : findContainersByImageName(imageName, DockerClient.ListContainersParam.allContainers())) {
+
             boolean removed = false;
             while (!removed) {
                 try {

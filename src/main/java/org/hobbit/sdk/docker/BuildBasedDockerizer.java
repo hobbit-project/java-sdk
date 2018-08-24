@@ -46,7 +46,21 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
 
     @Override
     public void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException {
-        buildImage(imageName);
+        logger.debug("Building image (imageName={})", imageName);
+
+        Path filePath = createTempDockerFile();
+        fillDockerFile(filePath);
+
+        imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
+
+        });
+
+        if (imageId == null) {
+            IllegalStateException exception = new IllegalStateException(format("Unable to create image %s", imageName));
+            logger.error("Exception", exception);
+            throw exception;
+        }
+        removeTempDockerFile(filePath);
     }
 
     @Override
@@ -63,24 +77,11 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
         }
     }
 
-    private void buildImage(String imageName) throws
-            InterruptedException, DockerException, IOException, IllegalStateException, DockerCertificateException {
-
-        logger.debug("Building image (imageName={})", imageName);
-        Path filePath = createTempDockerFile();
-        fillDockerFile(filePath);
-
-        imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
-
-        });
-
-        if (imageId == null) {
-            IllegalStateException exception = new IllegalStateException(format("Unable to create image %s", imageName));
-            logger.error("Exception", exception);
-            throw exception;
-        }
-        removeTempDockerFile(filePath);
-    }
+//    private void buildImage(String imageName) throws
+//            InterruptedException, DockerException, IOException, IllegalStateException, DockerCertificateException {
+//
+//
+//    }
 
     private Path createTempDockerFile() throws IOException {
         File file = File.createTempFile("Dockerfile", ".tmp", buildDirectory.toFile());

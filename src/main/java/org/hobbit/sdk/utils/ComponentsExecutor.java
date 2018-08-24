@@ -74,7 +74,7 @@ public class ComponentsExecutor {
                 logger.debug("Starting "+componentName /*+" "+component.hashCode()*/);
                 component.init();
                 component.run();
-                component.close();
+                //component.close();
             } catch (Throwable e) {
                 String message = componentName+" error: "+ e.getMessage();
                 logger.error(message);
@@ -85,13 +85,14 @@ public class ComponentsExecutor {
                         if (AbstractDockerizer.class.isInstance(component)) {
                             final String finalContainerName = componentName;
                             final int finalExitCode = exitCode;
-                            ((AbstractDockerizer) component).setOnTermination(new Callable() {
+                            ((AbstractDockerizer) component).setOnTermination(new Callable(){
                                 @Override
                                 public Object call() throws Exception {
                                     CommandSender.sendContainerTerminatedCommand(containerId, (byte) finalExitCode);
                                     return finalContainerName;
                                 }
                             });
+                            //component.close();
                         } else
                             //if (!CommandQueueListener.class.isInstance(component)){
                             try {
