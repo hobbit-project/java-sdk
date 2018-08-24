@@ -39,6 +39,21 @@ public class MultiThreadedImageBuilder {
         });
     }
 
+    public void addTask(AbstractDockersBuilder dockersBuilder){
+        tasks.add(new Callable<String>(){
+            @Override
+            public String call() throws Exception {
+                try {
+                    dockersBuilder.build().prepareImage();
+                }
+                catch (Exception e){
+                    logger.error(e.getMessage());
+                }
+                return null;
+            }
+        });
+    }
+
     public void build() throws InterruptedException {
 
         long started = new Date().getTime();

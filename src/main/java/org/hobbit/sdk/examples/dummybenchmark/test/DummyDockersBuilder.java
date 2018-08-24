@@ -1,6 +1,6 @@
 package org.hobbit.sdk.examples.dummybenchmark.test;
 
-import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
+import org.hobbit.sdk.docker.builders.DockerFileBasedBuilder;
 
 
 /**
@@ -10,7 +10,7 @@ import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
  */
 
 //Common dockerizers builder for all components of your project
-public class DummyDockersBuilder extends DynamicDockerFileBuilder {
+public class DummyDockersBuilder extends DockerFileBasedBuilder {
 
     //public static final String GIT_REPO_PATH = "git.project-hobbit.eu:4567/smirnp/";
     public static final String GIT_REPO_PATH = "";

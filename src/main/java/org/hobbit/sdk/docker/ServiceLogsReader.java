@@ -100,7 +100,7 @@ public class ServiceLogsReader implements Component {
                                 logger.debug(logsToPrint);
                             prevLogs = logs;
                         }
-                        //finished = getDockerClient().inspectService(serviceId).spec().mode().replicated().replicas().intValue() == 0;
+                        finished = getDockerClient().inspectService(serviceId).spec().mode().replicated().replicas().intValue() == 0;
                     }
                     Thread.sleep(1000);
                 }
