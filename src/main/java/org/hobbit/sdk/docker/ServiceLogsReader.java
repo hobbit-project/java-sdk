@@ -100,10 +100,12 @@ public class ServiceLogsReader implements Component {
                                 if (logs.length() > prevLogsLength) {
                                     logger = LoggerFactory.getLogger(loggerName);
                                     String logsToPrint = logs.substring(prevLogsLength);
-                                    if (logsToPrint.contains(" ERROR "))
-                                        logger.error(logsToPrint);
-                                    else
-                                        logger.debug(logsToPrint);
+                                    String[] splitted = logsToPrint.split("\n");
+                                    for(String line : splitted) {
+                                        System.out.println(line+" -- " + loggerName);
+
+                                    }
+                                        //logger.debug(logsToPrint);
                                     prevLogs.put(serviceId, logs);
                                 }
                                 //finished = getDockerClient().inspectService(serviceId).spec().mode().replicated().replicas().intValue() == 0;

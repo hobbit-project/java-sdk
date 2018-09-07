@@ -16,60 +16,60 @@ import java.util.stream.Collectors;
  * @author Pavel Smirnov
  */
 
-public class DockerFileBasedBuilder extends BuildBasedDockersBuilder {
+public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
 
     private Class[] runnerClass;
     private Path dockerWorkDir;
     private Path jarFilePath;
     private List<String> filesToAdd;
 
-    public DockerFileBasedBuilder(String dockerizerName){
+    public DynamicDockerFileBuilder(String dockerizerName){
         super(dockerizerName);
         filesToAdd = new ArrayList<>();
 
    }
 
-    public DockerFileBasedBuilder runnerClass(Class... values) {
+    public DynamicDockerFileBuilder runnerClass(Class... values) {
         this.runnerClass = values;
         return this;
     }
 
-    public DockerFileBasedBuilder dockerWorkDir(String value) {
+    public DynamicDockerFileBuilder dockerWorkDir(String value) {
         this.dockerWorkDir = Paths.get(value);
         return this;
     }
 
-    public DockerFileBasedBuilder jarFilePath(String value) {
+    public DynamicDockerFileBuilder jarFilePath(String value) {
         this.jarFilePath = Paths.get(value).toAbsolutePath();
         return this;
     }
 
-    public DockerFileBasedBuilder useCachedImage(Boolean value) {
+    public DynamicDockerFileBuilder useCachedImage(Boolean value) {
         super.useCachedImage(value);
         return this;
     }
 
-    public DockerFileBasedBuilder useCachedContainer(Boolean value) {
+    public DynamicDockerFileBuilder useCachedContainer(Boolean value) {
         super.useCachedContainer(value);
         return this;
     }
 
-    public DockerFileBasedBuilder customDockerFileReader(Reader value) {
+    public DynamicDockerFileBuilder customDockerFileReader(Reader value) {
         super.dockerFileReader(value);
         return this;
     }
 
-    public DockerFileBasedBuilder imageName(String value) {
+    public DynamicDockerFileBuilder imageName(String value) {
         super.imageName(value);
         return this;
     }
 
-    public DockerFileBasedBuilder addFileOrFolder(String path) {
+    public DynamicDockerFileBuilder addFileOrFolder(String path) {
         filesToAdd.add(path);
         return this;
     }
 
-    private DockerFileBasedBuilder initFileReader() throws Exception {
+    private DynamicDockerFileBuilder initFileReader() throws Exception {
         if(runnerClass==null)
             throw new Exception("Runner class is not specified for "+this.getClass().getSimpleName());
 
