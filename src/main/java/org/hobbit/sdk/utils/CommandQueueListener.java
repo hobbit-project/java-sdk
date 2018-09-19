@@ -1,8 +1,10 @@
 package org.hobbit.sdk.utils;
 
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.QueueingConsumer;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractPlatformConnectorComponent;
+import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.utils.commandreactions.CommandReaction;
 import org.hobbit.core.Constants;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -55,8 +59,13 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
     }
 
     public String createContainer(String imageName, String containerType, String[] envVariables){
-        return super.createContainer(imageName, containerType, envVariables);
+        String originalRabbitHostName = rabbitMQHostName;
+        rabbitMQHostName = "rabbit";
+        String ret = super.createContainer(imageName, containerType, envVariables);
+        rabbitMQHostName = originalRabbitHostName;
+        return ret;
     }
+
 
 //    @Override
     protected void handleCmd(byte[] bytes, String replyTo) {
