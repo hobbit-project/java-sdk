@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class MultiThreadedImageBuilder {
 
@@ -54,10 +51,16 @@ public class MultiThreadedImageBuilder {
         });
     }
 
-    public void build() throws InterruptedException {
+    public void build() throws Exception {
 
         long started = new Date().getTime();
-        es.invokeAll(tasks);
+        List res = es.invokeAll(tasks);
+        for(Object task : res){
+            FutureTask t = ((FutureTask)task);
+            if(!t.isDone())
+                throw new Exception("Task "+t.get().toString()+" not finished");
+        }
+
 
         long took = (new Date().getTime()-started)/1000;
         System.out.println("Building took "+took+" seconds");

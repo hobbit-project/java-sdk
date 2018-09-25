@@ -60,6 +60,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     public void buildImages() throws Exception {
 
         init(false);
+
+
         MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(5);
         builder.addTask(benchmarkBuilder);
         builder.addTask(dataGeneratorBuilder);

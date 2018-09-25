@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author Pavel Smirnov. smirnp@gmail.com
+ */
+
 public class ServiceLogsReader implements Component {
 
     private Logger logger;

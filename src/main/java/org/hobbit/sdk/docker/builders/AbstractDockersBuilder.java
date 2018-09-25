@@ -3,6 +3,7 @@ package org.hobbit.sdk.docker.builders;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import com.spotify.docker.client.messages.PortBinding;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
@@ -41,6 +42,24 @@ public abstract class AbstractDockersBuilder {
     public AbstractDockersBuilder addPortBindings(String containerPort, PortBinding... hostPorts) {
         List<PortBinding> hostPortsList = new ArrayList<>();
         hostPortsList.addAll(Arrays.asList(hostPorts));
+        portBindings.put(String.valueOf(containerPort), hostPortsList);
+        return this;
+    }
+
+    public AbstractDockersBuilder addPortBindings(String containerPort, String hostIp, String hostPort) {
+        List<PortBinding> hostPortsList = new ArrayList<>();
+        hostPortsList.add(new PortBinding() {
+            @Nullable
+            @Override
+            public String hostIp() {
+                return hostIp;
+            }
+
+            @Override
+            public String hostPort() {
+                return hostPort;
+            }
+        });
         portBindings.put(String.valueOf(containerPort), hostPortsList);
         return this;
     }

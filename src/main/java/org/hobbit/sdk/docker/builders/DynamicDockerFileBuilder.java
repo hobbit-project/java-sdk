@@ -22,6 +22,7 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
     private Path dockerWorkDir;
     private Path jarFilePath;
     private List<String> filesToAdd;
+    private String dockerfilePath;
 
     public DynamicDockerFileBuilder(String dockerizerName){
         super(dockerizerName);
@@ -54,8 +55,8 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         return this;
     }
 
-    public DynamicDockerFileBuilder customDockerFileReader(Reader value) {
-        super.dockerFileReader(value);
+    public DynamicDockerFileBuilder dockerfilePath(String value){
+        dockerfilePath = value;
         return this;
     }
 
@@ -140,6 +141,11 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
 
     @Override
     public BuildBasedDockerizer build() throws Exception {
+        if(dockerfilePath!=null) {
+            byte[] bytes = Files.readAllBytes(Paths.get(dockerfilePath));
+            dockerFileReader(new StringReader(new String(bytes)));
+        }
+
         if(getDockerFileReader()==null)
             initFileReader();
         containerName(runnerClass[runnerClass.length-1].getSimpleName());

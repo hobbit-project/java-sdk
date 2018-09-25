@@ -182,7 +182,7 @@ public abstract class AbstractDockerizer implements Component {
 
         List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
         for(Container container : results)
-            if(container.state().equals("running"))
+            if(container.state().equals("running") && useCachedContainer!=null)
                 containerId = container.id();
             else
                 getDockerClient().removeContainer(container.id(), DockerClient.RemoveContainerParam.forceKill());
