@@ -105,16 +105,16 @@ public class CommandReactionsBuilder{
         return this;
     }
 
-    public StartContainerCommandReaction buildStartCommandsReaction(){
+    public StartContainerCommandReaction startCommandsReaction(){
         return new StartContainerCommandReaction(this);
     }
 
-    public TerminateContainerCommandReaction buildTerminateCommandsReaction(){
+    public TerminateContainerCommandReaction terminateCommandsReaction(){
         return new TerminateContainerCommandReaction(this);
     }
 
-    public PlatformCommandsReaction buildPlatformCommandsReaction(){
-        return new PlatformCommandsReaction(this);
+    public BenchmarkSignalsReaction platformCommandsReaction(){
+        return new BenchmarkSignalsReaction(this);
     }
 
     public ServiceLogsReaderReaction buildServiceLogsReaderReaction(){

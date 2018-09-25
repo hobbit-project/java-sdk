@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class PlatformCommandsReaction implements CommandReaction {
-    private static final Logger logger = LoggerFactory.getLogger(PlatformCommandsReaction.class);
+public class BenchmarkSignalsReaction implements CommandReaction {
+    private static final Logger logger = LoggerFactory.getLogger(BenchmarkSignalsReaction.class);
 
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
@@ -50,7 +50,7 @@ public class PlatformCommandsReaction implements CommandReaction {
     private Map<String, Integer> customContainersRunning = new HashMap<>();
     //private String systemContainerId = null;
 
-    public PlatformCommandsReaction(CommandReactionsBuilder builder){
+    public BenchmarkSignalsReaction(CommandReactionsBuilder builder){
         this.componentsExecutor = builder.componentsExecutor;
         this.commandQueueListener = builder.commandQueueListener;
 

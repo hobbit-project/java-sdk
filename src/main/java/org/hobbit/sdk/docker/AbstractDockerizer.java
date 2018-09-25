@@ -70,8 +70,11 @@ public abstract class AbstractDockerizer implements Component {
     @Override
     public void run() {
         try {
-            stop(true);
-            this.containerId = createContainerIfNotExists();
+
+            if(containerId==null){
+                stop(true);
+                containerId = createContainerIfNotExists();
+            }
 
             List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
             Boolean requiresStart = true;
@@ -82,7 +85,7 @@ public abstract class AbstractDockerizer implements Component {
             if(requiresStart) {
                 int readLogsSince = (int) (System.currentTimeMillis() / 1000L);
                 startContainer();
-                startMonitoringAndLogsReading(containerId, readLogsSince);
+                startMonitoringAndLogsReading(readLogsSince);
             }
 
         }catch (DockerRequestException e){
@@ -111,7 +114,7 @@ public abstract class AbstractDockerizer implements Component {
                 if(!onstart)
                    stopContainer();
             }else if(onstart)
-                removeAllSameContainersWithSameImage();
+                removeAllContainersWithSameImage();
         }
         catch (Exception e){
             logger.error("Exception", e);
@@ -144,10 +147,10 @@ public abstract class AbstractDockerizer implements Component {
 
     public String getHostName(){ return hostName;}
 
-    public void removeAllSameContainersWithSameImage(){
+    public void removeAllContainersWithSameImage(){
         logger.debug("Removing containers (imageName={})", imageName);
         try {
-            removeAllSameContainersWithSameImage(imageName);
+            removeAllContainersWithSameImage(imageName);
         }
         catch (Exception e){
             logger.error("Exception", e);
@@ -175,6 +178,12 @@ public abstract class AbstractDockerizer implements Component {
 
     public abstract void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException;
 
+    public String createContainerWithRemoveAllPrevs() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+        removeAllSameNamesContainers();
+        containerId = createContainer();
+
+        return containerId;
+    }
 
     public String createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
         if(containerId!=null)
@@ -202,7 +211,7 @@ public abstract class AbstractDockerizer implements Component {
         logger.debug("Container started (imageName={}, containerId={})", imageName, containerId);
     }
 
-    public void startMonitoringAndLogsReading(String containerId, int since) throws Exception {
+    public void startMonitoringAndLogsReading(int since) throws Exception {
         logger.debug("Starting monitoring & logs reading for container (imageName={})", imageName);
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -214,32 +223,46 @@ public abstract class AbstractDockerizer implements Component {
             String logs="";
             String prevLogs="";
             Boolean running = true;
+            String containerId=null;
+
             while(running){
                 if (skipLogsReading==null || !skipLogsReading){
-                    try {
-                        logStream = getDockerClient().logs(containerId,
-                                DockerClient.LogsParam.stderr(),
-                                DockerClient.LogsParam.stdout(),
-                                DockerClient.LogsParam.since(since)
-                        );
-                        logs = logStream.readFully();
-                    } catch (Exception e) {
-                        logger.debug(String.format("No logs are available (imageName=%s):", imageName), e);
-                    } finally {
-                        if (logStream != null) {
-                            logStream.close();
+                    if(containerId==null) {
+                        List<Container> results = findContainersByName(containerName, DockerClient.ListContainersParam.allContainers());
+                        for(Container container : results)
+                            if(container.state().equals("running"))
+                                containerId = container.id();
+                    }
+                    if(containerId!=null){
+                        try {
+                            logStream = getDockerClient().logs(containerId,
+                                    DockerClient.LogsParam.stderr(),
+                                    DockerClient.LogsParam.stdout(),
+                                    DockerClient.LogsParam.since(since)
+                            );
+                            logs = logStream.readFully();
+                        } catch (Exception e) {
+                            logger.warn("No logs are available (containerId={}, imageName={}): {}", containerId, imageName, e.getLocalizedMessage().replace("\n",""));
+                            containerId = null;
+                        } finally {
+                            if (logStream != null) {
+                                logStream.close();
+                            }
                         }
-                    }
 
-                    if (logs.length() > prevLogs.length()) {
-                        String logsToPrint = logs.substring(prevLogs.length());
-                        if (logsToPrint.contains(" ERROR "))
-                            logger.error(logsToPrint);
-                        else
-                            logger.debug(logsToPrint);
-                        prevLogs = logs;
+                        if(containerId==null)
+                            continue;
+
+                        if (logs.length() > prevLogs.length()) {
+                            String logsToPrint = logs.substring(prevLogs.length());
+                            if (logsToPrint.contains(" ERROR "))
+                                logger.error(logsToPrint);
+                            else
+                                logger.debug(logsToPrint);
+                            prevLogs = logs;
+                        }
+                        running = getDockerClient().inspectContainer(containerId).state().running();
                     }
-                    running = getDockerClient().inspectContainer(containerId).state().running();
                 }
                 Thread.sleep(1000);
             }
@@ -291,7 +314,7 @@ public abstract class AbstractDockerizer implements Component {
     }
 
 
-    private String createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public String createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
 
         if(findImagesByName(imageName).size()==0)
             prepareImage(imageName);
@@ -411,7 +434,9 @@ public abstract class AbstractDockerizer implements Component {
         return ret;
     }
 
-    private void removeAllSameContainersWithSameImage(String imageName) throws
+
+
+    private void removeAllContainersWithSameImage(String imageName) throws
             DockerException, InterruptedException, DockerCertificateException {
         //for(Container container : findContainersByName(containerName, DockerClient.ListContainersParam.allContainers())) {
         for(Container container : findContainersByImageName(imageName, DockerClient.ListContainersParam.allContainers())) {
@@ -453,6 +478,24 @@ public abstract class AbstractDockerizer implements Component {
         boolean dontDeleteUntaggedParents = false;
         for (String id : findImagesByName(imageName)){
             getDockerClient().removeImage(id, force, dontDeleteUntaggedParents);
+        }
+    }
+
+    private void removeAllSameNamesContainers() throws InterruptedException, DockerException, DockerCertificateException {
+        logger.debug("Removing all containers with the same name ({})", containerName);
+        for(Container container : findContainersByName(containerName, DockerClient.ListContainersParam.allContainers())) {
+
+            boolean removed = false;
+            while (!removed) {
+                try {
+                    getDockerClient().removeContainer(container.id(), DockerClient.RemoveContainerParam.forceKill());
+                    removed = true;
+                    containerId = null;
+                } catch (Exception e) {
+                    //if(!e.getMessage().contains("not found"))
+                    //    logger.error("Exception", e);
+                }
+            }
         }
     }
 
@@ -531,5 +574,9 @@ public abstract class AbstractDockerizer implements Component {
         }
         instanceId++;
         return ret;
+    }
+
+    public String getContainerId() {
+        return containerId;
     }
 }

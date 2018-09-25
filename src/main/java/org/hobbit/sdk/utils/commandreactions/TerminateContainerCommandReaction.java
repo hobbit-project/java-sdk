@@ -21,20 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 
     public class TerminateContainerCommandReaction implements CommandReaction {
-        private static final Logger logger = LoggerFactory.getLogger(PlatformCommandsReaction.class);
+        private static final Logger logger = LoggerFactory.getLogger(TerminateContainerCommandReaction.class);
 
 
 
         public TerminateContainerCommandReaction(CommandReactionsBuilder builder){
-
-//
 
 
         }
 
         @Override
         public void handleCmd(Byte command, byte[] bytes, String replyTo) throws Exception {
-
 
             if(command==Commands.DOCKER_CONTAINER_TERMINATED){
                 CommandSender commandSender = null;

@@ -29,12 +29,12 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
-        if(!parameters.containsKey(BENCHMARK_URI+"#slaveNode")) {
-            JenaKeyValue slaveParameters = new JenaKeyValue(parameters);
-            slaveParameters.put(BENCHMARK_URI+"#slaveNode", "TRUE");
-            createContainer(DUMMY_SYSTEM_IMAGE_NAME, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ slaveParameters.encodeToString() });
-        }else
-            logger = LoggerFactory.getLogger(DummySystemAdapter.class+"_slave");
+//        if(!parameters.containsKey(BENCHMARK_URI+"#slaveNode")) {
+//            JenaKeyValue slaveParameters = new JenaKeyValue(parameters);
+//            slaveParameters.put(BENCHMARK_URI+"#slaveNode", "TRUE");
+//            createContainer(DUMMY_SYSTEM_IMAGE_NAME, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ slaveParameters.encodeToString() });
+//        }else
+//            logger = LoggerFactory.getLogger(DummySystemAdapter.class+"_slave");
 
 
         logger.debug("SystemModel: "+parameters.encodeToString());

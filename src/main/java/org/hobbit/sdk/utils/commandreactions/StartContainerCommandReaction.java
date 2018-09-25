@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StartContainerCommandReaction implements CommandReaction {
-    private static final Logger logger = LoggerFactory.getLogger(PlatformCommandsReaction.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartContainerCommandReaction.class);
 
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
@@ -90,7 +90,7 @@ public class StartContainerCommandReaction implements CommandReaction {
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(dataGenerator)){
                     compToSubmit = ((AbstractDockerizer)dataGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
                 }else {
                     compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
                     containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
@@ -101,7 +101,7 @@ public class StartContainerCommandReaction implements CommandReaction {
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
                 if(AbstractDockerizer.class.isInstance(taskGenerator)){
                     compToSubmit = ((AbstractDockerizer)taskGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
                 }else {
                     compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
                     containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
@@ -111,23 +111,30 @@ public class StartContainerCommandReaction implements CommandReaction {
 
             if(evalStorage!=null && startCommandData.image.equals(evalStorageImageName)){
                 compToSubmit = evalStorage;
-                containerId = evalStorageImageName;
+                if(AbstractDockerizer.class.isInstance(compToSubmit))
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
+                else
+                    containerId = evalStorageImageName;
+
             }else
 
             if(evalModule!=null && startCommandData.image.equals(evalModuleImageName)) {
                 compToSubmit = evalModule;
-                containerId = evalModuleImageName;
+                if(AbstractDockerizer.class.isInstance(compToSubmit))
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
+                else
+                    containerId = evalModuleImageName;
             }else
 
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
                 if(AbstractDockerizer.class.isInstance(systemAdapter)){
                     compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
                 }else {
                     compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
-                    //containerId = systemAdapterImageName+"_"+systemContainersCount;
+                    containerId = systemAdapterImageName+"_"+systemContainersCount;
                 }
-                containerId = systemAdapterImageName+"_"+systemContainersCount;
+                //containerId = systemAdapterImageName+"_"+systemContainersCount;
                 systemContainersCount++;
             }else
 
@@ -137,7 +144,7 @@ public class StartContainerCommandReaction implements CommandReaction {
                 int runningCustomContainersCount = (customContainersRunning.containsKey(imageName)? customContainersRunning.get(imageName) :0);
                 if(AbstractDockerizer.class.isInstance(customComponent)){
                     compToSubmit = ((AbstractDockerizer)customComponent).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerIfNotExists();
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs();
                 }else {
                     compToSubmit = customComponent.getClass().getConstructor().newInstance();
                     containerId = imageName+"_"+runningCustomContainersCount;
@@ -162,60 +169,6 @@ public class StartContainerCommandReaction implements CommandReaction {
                 }
             }else{
                 logger.warn("No component to submit for the imageName="+startCommandData.image);
-            }
-        }
-
-        if(command==Commands.DOCKER_CONTAINER_TERMINATED){
-            CommandSender commandSender = null;
-            ByteBuffer buffer = ByteBuffer.wrap(bytes);
-            String containerName = RabbitMQUtils.readString(buffer);
-
-            logger.debug("DOCKER_CONTAINER_TERMINATED {} received", containerName);
-
-            String commandToSend = null;
-//            //if(containerName.equals(dataGenContainerId))
-//            if(dataGeneratorImageName!=null && containerName.startsWith(dataGeneratorImageName)){
-//                dataGeneratorsCount--;
-//                if(dataGeneratorsCount==0) {
-//                    //commandSender = new CommandSender(Commands.DATA_GENERATION_FINISHED);
-//                    //commandToSend = "DATA_GENERATION_FINISHED";
-//                }
-//            }
-//
-//            //if(containerName.equals(taskGenContainerId))
-//            if(taskGeneratorImageName!=null && containerName.startsWith(taskGeneratorImageName)) {
-//                taskGeneratorsCount--;
-//                if(taskGeneratorsCount==0){
-//                    //commandSender = new CommandSender(Commands.TASK_GENERATION_FINISHED);
-//                    //commandToSend = "TASK_GENERATION_FINISHED";
-//                }
-//            }
-//
-//            if(containerName.equals(systemAdapterImageName)){
-//                //if(systemContainersCount>0) {
-//                    systemContainersCount--;
-//                    //if (systemContainersCount == 0) {
-//                        //commandSender = new CommandSender(Commands.DOCKER_CONTAINER_TERMINATED, systemAdapterImageName.getBytes());
-//                        //commandToSend = "SYSTEM_CONTAINERS_FINISHED";
-//                    //}
-//                //}
-//            }
-
-            if(containerName.equals(benchmarkControllerImageName)){
-                commandSender = new CommandSender(Commands.BENCHMARK_FINISHED_SIGNAL);
-                commandToSend = "BENCHMARK_FINISHED_SIGNAL";
-            }
-
-            synchronized (this){
-                if (commandSender!=null){
-                    try {
-                        logger.debug("Sending "+commandToSend+" signal");
-                        commandSender.send();
-                    } catch (Exception e) {
-                        //Assert.fail(e.getMessage());
-                        logger.error(e.getMessage());
-                    }
-                }
             }
         }
 

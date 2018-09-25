@@ -71,7 +71,7 @@ public class ComponentsExecutor {
             }
             int exitCode = 0;
             try {
-                logger.debug("Starting "+componentName /*+" "+component.hashCode()*/);
+                logger.debug("Processing "+componentName /*+" "+component.hashCode()*/);
                 component.init();
                 component.run();
                 //component.close();
@@ -81,19 +81,19 @@ public class ComponentsExecutor {
                 exceptions.add(new Exception(message));
                 exitCode = 1;
             } finally {
-                    if (containerId!=null){
                         if (AbstractDockerizer.class.isInstance(component)) {
-                            final String finalContainerName = componentName;
+                            String finalContainerId = ((AbstractDockerizer)component).getContainerId();
+
                             final int finalExitCode = exitCode;
                             ((AbstractDockerizer) component).setOnTermination(new Callable(){
                                 @Override
                                 public Object call() throws Exception {
-                                    CommandSender.sendContainerTerminatedCommand(containerId, (byte) finalExitCode);
-                                    return finalContainerName;
+                                    CommandSender.sendContainerTerminatedCommand(finalContainerId, (byte) finalExitCode);
+                                    return finalContainerId;
                                 }
                             });
                             //component.close();
-                        } else
+                        } else if (containerId!=null){
                             //if (!CommandQueueListener.class.isInstance(component)){
                             try {
                                 CommandSender.sendContainerTerminatedCommand(containerId, (byte) exitCode);
@@ -101,8 +101,8 @@ public class ComponentsExecutor {
                             } catch (Exception e) {
                                 exceptions.add(e);
                             }
-                        //}
-                    }
+                        }
+
               }
         });
     }

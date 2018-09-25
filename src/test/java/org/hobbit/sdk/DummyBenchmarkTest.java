@@ -25,7 +25,6 @@ public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
     }
 
     @Test
-    @Ignore
     public void buildImages() throws Exception {
         sampleSystemTestRunner.buildImages();
     }

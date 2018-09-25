@@ -17,6 +17,7 @@ import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
 public class DummyDataGenerator extends AbstractDataGenerator {
     //private static final Logger logger = LoggerFactory.getLogger(DummyDataGenerator.class);
     private Logger logger;
+    int messages = 1000;
 
     @Override
     public void init() throws Exception {
@@ -25,10 +26,11 @@ public class DummyDataGenerator extends AbstractDataGenerator {
         logger = LoggerFactory.getLogger(DummyDataGenerator.class.getName()+"_"+getGeneratorId());
         logger.debug("Init finished");
 
+
         //FileReader fileReader = new FileReader("data/data.dat");
 
-        if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
-            String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
+        if(System.getenv().containsKey(EXPERIMENT_URI+"#messages")){
+            messages = Integer.parseInt(System.getenv().get(EXPERIMENT_URI+"#messages"));
         }
 
         // Your initialization code comes here...
@@ -45,7 +47,7 @@ public class DummyDataGenerator extends AbstractDataGenerator {
         logger.debug("generateData()");
         String data;
         int i=0;
-        while(i<1000){
+        while(i<messages){
             i++;
             // Create your data here
             data = new String("data_"+String.valueOf(i));

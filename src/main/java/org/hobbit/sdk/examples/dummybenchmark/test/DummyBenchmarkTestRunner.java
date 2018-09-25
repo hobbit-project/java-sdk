@@ -68,6 +68,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         builder.addTask(taskGeneratorBuilder);
         builder.addTask(evalStorageBuilder);
         builder.addTask(systemAdapterBuilder);
+        builder.addTask(evalModuleBuilder);
         builder.build();
 
     }
@@ -107,16 +108,16 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Component dataGen = new DummyDataGenerator();
         Component taskGen = new DummyTaskGenerator();
         Component evalStorage  = new DummyEvalStorage();
-        Component evalModule = new DummyEvalModule();
         Component systemAdapter = new DummySystemAdapter();
+        Component evalModule = new DummyEvalModule();
 
         if(dockerize) {
             benchmarkController = benchmarkBuilder.build();
             dataGen = dataGeneratorBuilder.build();
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();
-            evalModule = evalModuleBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
+            evalModule = evalModuleBuilder.build();
         }
 
         CommandReactionsBuilder commandReactionsBuilder = new CommandReactionsBuilder(componentsExecutor, commandQueueListener)
@@ -131,9 +132,9 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
         commandQueueListener.setCommandReactions(
-                commandReactionsBuilder.buildStartCommandsReaction(),
-                commandReactionsBuilder.buildTerminateCommandsReaction(),
-                commandReactionsBuilder.buildPlatformCommandsReaction()
+                commandReactionsBuilder.startCommandsReaction(),
+                commandReactionsBuilder.terminateCommandsReaction(),
+                commandReactionsBuilder.platformCommandsReaction()
                 //commandReactionsBuilder.buildServiceLogsReaderReaction()
         );
 
@@ -145,6 +146,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
         systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+        //componentsExecutor.submit(benchmarkController, benchmarkContainerId, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
+        //componentsExecutor.submit(systemAdapter, systemContainerId, new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
 
         environmentVariables.set("BENCHMARK_CONTAINER_ID", benchmarkContainerId);
         environmentVariables.set("SYSTEM_CONTAINER_ID", systemContainerId);
@@ -161,7 +164,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
     public String createBenchmarkParameters(){
         JenaKeyValue kv = new JenaKeyValue();
-        kv.setValue(BENCHMARK_URI+"benchmarkParam1", 123);
+        kv.setValue(BENCHMARK_URI+"#messages", 100000);
         kv.setValue(BENCHMARK_URI+"benchmarkParam2", 456);
         return kv.encodeToString();
     }

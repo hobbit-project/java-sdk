@@ -40,14 +40,14 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
         createDataGenerators(DUMMY_DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
 
         logger.debug("createTaskGenerators()");
-        int numberOfTaskGenerators = 2;
+        int numberOfTaskGenerators = 1;
 
         createTaskGenerators(DUMMY_TASKGEN_IMAGE_NAME, numberOfTaskGenerators, envVariables);
 
         // Create evaluation storage
         logger.debug("createEvaluationStorage()");
         envVariables = (String[])ArrayUtils.add(DEFAULT_EVAL_STORAGE_PARAMETERS, "HOBBIT_RABBIT_HOST=" + this.rabbitMQHostName);
-        this.createEvaluationStorage(DUMMY_EVAL_STORAGE_IMAGE_NAME, envVariables);
+        createEvaluationStorage(DUMMY_EVAL_STORAGE_IMAGE_NAME, envVariables);
 
         // Wait for all components to finish their initialization
         waitForComponentsToInitialize();
