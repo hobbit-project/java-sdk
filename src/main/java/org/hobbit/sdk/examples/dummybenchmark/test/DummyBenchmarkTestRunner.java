@@ -120,6 +120,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
             evalModule = evalModuleBuilder.build();
         }
 
+        //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
         CommandReactionsBuilder commandReactionsBuilder = new CommandReactionsBuilder(componentsExecutor, commandQueueListener)
                                                                 .benchmarkController(benchmarkController).benchmarkControllerImageName(DUMMY_BENCHMARK_IMAGE_NAME)
                                                                 .dataGenerator(dataGen).dataGeneratorImageName(DUMMY_DATAGEN_IMAGE_NAME)
@@ -130,7 +131,6 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                                                                 //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
                                                                 ;
 
-        //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
         commandQueueListener.setCommandReactions(
                 commandReactionsBuilder.startCommandsReaction(),
                 commandReactionsBuilder.terminateCommandsReaction(),
