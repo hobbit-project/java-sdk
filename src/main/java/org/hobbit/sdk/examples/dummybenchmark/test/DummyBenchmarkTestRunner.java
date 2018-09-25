@@ -132,10 +132,10 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                                                                 ;
 
         commandQueueListener.setCommandReactions(
-                commandReactionsBuilder.startCommandsReaction(),
-                commandReactionsBuilder.terminateCommandsReaction(),
-                commandReactionsBuilder.platformCommandsReaction()
-                //commandReactionsBuilder.buildServiceLogsReaderReaction()
+                commandReactionsBuilder.startContainersReaction(),
+                commandReactionsBuilder.terminateContainersReaction(),
+                commandReactionsBuilder.benchmarkSignalsReaction()
+                //commandReactionsBuilder.serviceLogsReaderReaction()
         );
 
         componentsExecutor.submit(commandQueueListener);

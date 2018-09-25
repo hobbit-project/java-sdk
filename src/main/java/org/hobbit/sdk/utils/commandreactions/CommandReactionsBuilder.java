@@ -105,23 +105,23 @@ public class CommandReactionsBuilder{
         return this;
     }
 
-    public StartContainerCommandReaction startCommandsReaction(){
+    public StartContainerCommandReaction startContainersReaction(){
         return new StartContainerCommandReaction(this);
     }
 
-    public TerminateContainerCommandReaction terminateCommandsReaction(){
+    public TerminateContainerCommandReaction terminateContainersReaction(){
         return new TerminateContainerCommandReaction(this);
     }
 
-    public BenchmarkSignalsReaction platformCommandsReaction(){
+    public BenchmarkSignalsReaction benchmarkSignalsReaction(){
         return new BenchmarkSignalsReaction(this);
     }
 
-    public ServiceLogsReaderReaction buildServiceLogsReaderReaction(){
+    public ServiceLogsReaderReaction serviceLogsReaderReaction(){
         return  new ServiceLogsReaderReaction(this);
     }
 
-    public ServiceLogsReaderReaction buildServiceLogsReaderReaction(String[] imagesToListen){
+    public ServiceLogsReaderReaction serviceLogsReaderReaction(String[] imagesToListen){
         return  new ServiceLogsReaderReaction(this, imagesToListen);
     }
 

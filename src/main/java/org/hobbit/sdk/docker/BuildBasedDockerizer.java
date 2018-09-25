@@ -124,7 +124,7 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
     }
 
 //    public void pushImage() throws DockerCertificateException, DockerException, InterruptedException {
-//        getDockerClient().push(imageName, RegistryAuth.builder().serverAddress("git.project-hobbit.eu:4567").identityToken("").platformCommandsReaction());
+//        getDockerClient().push(imageName, RegistryAuth.builder().serverAddress("git.project-hobbit.eu:4567").identityToken("").benchmarkSignalsReaction());
 //    }
 
 }

@@ -13,7 +13,7 @@ public class CommonConstants {
 
     public static final String[] HOBBIT_NETWORKS = new String[]{
             CommonConstants.HOBBIT_NETWORK_NAME,
-            //CommonConstants.HOBBIT_CORE_NETWORK_NAME
+            CommonConstants.HOBBIT_CORE_NETWORK_NAME
 
     };
 
