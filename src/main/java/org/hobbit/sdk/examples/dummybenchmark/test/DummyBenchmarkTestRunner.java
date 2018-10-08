@@ -5,7 +5,7 @@ import org.hobbit.core.components.Component;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.EnvironmentVariablesWrapper;
 import org.hobbit.sdk.JenaKeyValue;
-import org.hobbit.sdk.docker.MultiThreadedImageBuilder;
+import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.hobbit.*;
 import org.hobbit.sdk.examples.dummybenchmark.*;

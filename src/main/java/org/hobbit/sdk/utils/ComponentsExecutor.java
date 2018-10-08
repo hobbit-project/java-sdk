@@ -78,6 +78,7 @@ public class ComponentsExecutor {
             } catch (Throwable e) {
                 String message = componentName+" error: "+ e.getMessage();
                 logger.error(message);
+                e.printStackTrace();
                 exceptions.add(new Exception(message));
                 exitCode = 1;
             } finally {

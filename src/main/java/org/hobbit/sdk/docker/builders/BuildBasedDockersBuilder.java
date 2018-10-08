@@ -4,6 +4,8 @@ import org.hobbit.sdk.docker.BuildBasedDockerizer;
 import com.spotify.docker.client.messages.PortBinding;
 
 import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -14,6 +16,7 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     private Path buildDirectory;
     private Reader dockerFileReader;
     private Boolean useCachedImage;
+    private String dockerfilePath;
 
     public BuildBasedDockersBuilder(String dockerizerName){
         super(dockerizerName);
@@ -31,10 +34,6 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
-//    public BuildBasedDockersBuilder imageNamePrefix(String value){
-//        this.imageNamePrefix = value;
-//        return this;
-//    }
 
     public BuildBasedDockersBuilder useCachedImage() {
         this.useCachedImage = true;
@@ -102,6 +101,11 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
+    public BuildBasedDockersBuilder dockerfilePath(String value){
+        dockerfilePath = value;
+        return this;
+    }
+
     public Path getBuildDirectory(){ return buildDirectory; }
     public Reader getDockerFileReader(){ return dockerFileReader; }
     public Boolean getUseCachedImage(){ return useCachedImage;}
@@ -113,8 +117,13 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
             buildDirectory(".");
             //throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
 
+        if(dockerfilePath!=null){
+            byte[] bytes = Files.readAllBytes(Paths.get(dockerfilePath));
+            dockerFileReader(new StringReader(new String(bytes)));
+        }
+
         if(dockerFileReader==null)
-            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+". You can initialize it by the calling the initFileReader()");
+            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+".");
 
         BuildBasedDockerizer ret = new BuildBasedDockerizer(this);
         return ret;

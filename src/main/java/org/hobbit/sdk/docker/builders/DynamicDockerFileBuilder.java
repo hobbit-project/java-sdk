@@ -55,10 +55,6 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         return this;
     }
 
-    public DynamicDockerFileBuilder dockerfilePath(String value){
-        dockerfilePath = value;
-        return this;
-    }
 
     public DynamicDockerFileBuilder imageName(String value) {
         super.imageName(value);
@@ -141,14 +137,12 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
 
     @Override
     public BuildBasedDockerizer build() throws Exception {
-        if(dockerfilePath!=null) {
-            byte[] bytes = Files.readAllBytes(Paths.get(dockerfilePath));
-            dockerFileReader(new StringReader(new String(bytes)));
-        }
 
-        if(getDockerFileReader()==null)
+        if(dockerfilePath==null)
             initFileReader();
+
         containerName(runnerClass[runnerClass.length-1].getSimpleName());
+
         return super.build();
     }
 }

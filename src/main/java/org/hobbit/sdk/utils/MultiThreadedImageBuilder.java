@@ -1,8 +1,8 @@
-package org.hobbit.sdk.docker;
+package org.hobbit.sdk.utils;
 
+import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
-import org.hobbit.sdk.examples.dummybenchmark.DummyBenchmarkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,33 +22,39 @@ public class MultiThreadedImageBuilder {
     }
 
     public void addTask(BothTypesDockersBuilder dockersBuilder){
-        tasks.add(new Callable<String>(){
-            @Override
-            public String call() throws Exception {
-                try {
-                    dockersBuilder.build().prepareImage();
-                }
-                catch (Exception e){
-                    logger.error(e.getMessage());
-                }
-                return null;
-            }
-        });
+        AbstractDockerizer dockerizer = null;
+        try {
+            dockerizer = dockersBuilder.build();
+            tasks.add(createTask(dockerizer));
+        } catch (Exception e) {
+            logger.error("Failed to build dockerizer {}: {}", dockersBuilder.getName(), e.getMessage());
+        }
     }
 
     public void addTask(AbstractDockersBuilder dockersBuilder){
-        tasks.add(new Callable<String>(){
+        AbstractDockerizer dockerizer = null;
+        try {
+            dockerizer = dockersBuilder.build();
+            tasks.add(createTask(dockerizer));
+        } catch (Exception e) {
+            logger.error("Failed to build dockerizer {}: {}", dockersBuilder.getName(), e.getMessage());
+        }
+    }
+
+    public Callable<String> createTask(AbstractDockerizer dockerizer){
+       return new Callable<String>(){
             @Override
             public String call() throws Exception {
                 try {
-                    dockersBuilder.build().prepareImage();
+                    dockerizer.prepareImage();
                 }
                 catch (Exception e){
-                    logger.error(e.getMessage());
+                    logger.error("Failed to build image {}: {}", dockerizer.getName(), e.getMessage());
                 }
                 return null;
             }
-        });
+        };
+
     }
 
     public void build() throws Exception {
