@@ -254,11 +254,14 @@ public abstract class AbstractDockerizer implements Component {
                             continue;
 
                         if (logs.length() > prevLogs.length()) {
-                            String logsToPrint = logs.substring(prevLogs.length());
-                            if (logsToPrint.contains(" ERROR "))
-                                logger.error(logsToPrint);
-                            else
-                                logger.debug(logsToPrint);
+                            String[] logsToPrint = logs.substring(prevLogs.length()).split("\n");
+                            for(String line : logsToPrint){
+                                System.out.println(line);
+//                                if (line.contains(" ERROR "))
+//                                    logger.error(line);
+//                                else
+//                                    logger.debug(line);
+                            }
                             prevLogs = logs;
                         }
                         running = getDockerClient().inspectContainer(containerId).state().running();

@@ -15,7 +15,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
-public class DummyBenchmarkTest extends EnvironmentVariablesWrapper {
+public class BenchmarkTest extends EnvironmentVariablesWrapper {
 
     DummyBenchmarkTestRunner sampleSystemTestRunner;
 

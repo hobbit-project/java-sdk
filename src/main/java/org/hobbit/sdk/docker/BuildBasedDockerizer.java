@@ -51,16 +51,19 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
         Path filePath = createTempDockerFile();
         fillDockerFile(filePath);
 
-        imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
+        try {
+            imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
 
-        });
+            });
 
-        if (imageId == null) {
-            IllegalStateException exception = new IllegalStateException(format("Unable to create image %s", imageName));
-            logger.error("Exception", exception);
-            throw exception;
         }
-        removeTempDockerFile(filePath);
+        catch (Exception e){
+            InterruptedException e2 = new InterruptedException("Failed to build image " + imageName +" from "+ filePath+": "+e.getLocalizedMessage());
+            logger.error(e2.getLocalizedMessage());
+            e.printStackTrace();
+            throw e2;        }
+
+
     }
 
     @Override
