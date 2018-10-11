@@ -98,7 +98,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
             try {
                 commandReaction.handleCmd(command, data, replyTo);
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("Failed to handle command with {}: {}",commandReaction.toString(), e.getMessage());
             }
         }
     }

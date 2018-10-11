@@ -9,7 +9,9 @@ import org.hobbit.sdk.utils.CommandSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -112,18 +114,26 @@ public class BenchmarkSignalsReaction implements CommandReaction {
         }
 
         synchronized (this){
-            if (benchmarkReady &&
-                    (dataGenerator==null || dataGenReady) &&
-                    (taskGenerator==null || taskGenReady) &&
-                    (evalStorage==null || evalStorageReady) &&
-                    systemReady && !startBenchmarkCommandSent) {
-                startBenchmarkCommandSent = true;
+            List<String> waitForComponents = new ArrayList<>();
+            if(!benchmarkReady)
+                waitForComponents.add("benchmarkController");
+            if(dataGenerator!=null && !dataGenReady)
+                waitForComponents.add("dataGenerator");
+            if(taskGenerator!=null && !taskGenReady)
+                waitForComponents.add("taskGenerator");
+            if(evalStorage!=null && !evalStorageReady)
+                waitForComponents.add("evalStorage");
+            if(!systemReady)
+                waitForComponents.add("systemAdapter");
+            if(waitForComponents.size()>0)
+                logger.info("Waiting ready signals for {}", String.join(", ", waitForComponents));
+            else if (!startBenchmarkCommandSent){
+                logger.debug("sending START_BENCHMARK_SIGNAL");
                 try {
-                    logger.debug("sending START_BENCHMARK_SIGNAL");
-
                     new CommandSender(Commands.START_BENCHMARK_SIGNAL, System.getenv().get("SYSTEM_CONTAINER_ID")).send();
+                    startBenchmarkCommandSent = true;
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error("Failed to send START_BENCHMARK_SIGNAL: {}", e.getMessage());
                     //Assert.fail(e.getMessage());
                 }
             }

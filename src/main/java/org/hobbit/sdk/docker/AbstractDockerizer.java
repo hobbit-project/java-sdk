@@ -416,7 +416,7 @@ public abstract class AbstractDockerizer implements Component {
         List<Container> ret = new ArrayList<>();
         for(Container container : getDockerClient().listContainers(param)) {
             for(String name : container.names()){
-                if (name.equals(dockerizeContainerName(containerName)))
+                if (name.endsWith(dockerizeContainerName(containerName)))
                     ret.add(container);
             }
         }
