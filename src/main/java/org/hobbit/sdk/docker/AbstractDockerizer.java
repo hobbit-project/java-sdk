@@ -167,7 +167,7 @@ public abstract class AbstractDockerizer implements Component {
     public void addEnvironmentVariable(String keyValue){
         String[] splitted = keyValue.split("=");
         for(String existingVarKey : environmentVariables.toArray(new String[0]))
-            if (keyValue.equals(splitted[0]))
+            if (existingVarKey.startsWith(splitted[0]+"="))
                 environmentVariables.remove(existingVarKey);
         this.environmentVariables.add(keyValue);
     }
