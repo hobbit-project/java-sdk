@@ -57,9 +57,9 @@ public class ComponentsExecutor {
             String componentName = component.getClass().getSimpleName();
             if(AbstractDockerizer.class.isInstance(component)) {
                 componentName = ((AbstractDockerizer) component).getName();
-                if (envVariables!=null)
-                    for (String pair : envVariables)
-                        ((AbstractDockerizer)component).addEnvironmentVariable(pair);
+//                if (envVariables!=null)
+//                    for (String pair : envVariables)
+//                        ((AbstractDockerizer)component).addEnvironmentVariable(pair);
             }else if(ServiceLogsReader.class.isInstance(component)){
                 componentName = ((ServiceLogsReader)component).getName();
             }else{
