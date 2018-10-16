@@ -1,5 +1,6 @@
 package org.hobbit.sdk.examples.dummybenchmark.test;
 
+import org.hobbit.core.run.ComponentStarter;
 import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;
 
 
@@ -35,7 +36,7 @@ public class DummyDockersBuilder extends DynamicDockerFileBuilder {
         jarFilePath(System.getProperty("sdkJarFilePath"));
         dockerWorkDir("/usr/src/"+PROJECT_NAME);
         //containerName(runnerClass.getSimpleName());
-        runnerClass(org.hobbit.sdk.utils.ComponentStarter.class, runnerClass);
+        runnerClass(ComponentStarter.class, runnerClass);
     }
 
 

@@ -126,7 +126,7 @@ public class BenchmarkSignalsReaction implements CommandReaction {
             if(!systemReady)
                 waitForComponents.add("systemAdapter");
             if(waitForComponents.size()>0)
-                logger.info("Waiting ready signals for {}", String.join(", ", waitForComponents));
+                logger.debug("Waiting ready signals for {}", String.join(", ", waitForComponents));
             else if (!startBenchmarkCommandSent){
                 logger.debug("sending START_BENCHMARK_SIGNAL");
                 try {
