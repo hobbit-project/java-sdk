@@ -15,9 +15,7 @@ import org.junit.Assert;
 
 import java.util.Date;
 
-import static org.hobbit.core.Constants.BENCHMARK_PARAMETERS_MODEL_KEY;
-import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
-import static org.hobbit.core.Constants.SYSTEM_PARAMETERS_MODEL_KEY;
+import static org.hobbit.core.Constants.*;
 import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
 import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
@@ -111,12 +109,12 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Component evalModule = new DummyEvalModule();
 
         if(dockerize) {
-            benchmarkController = benchmarkBuilder.build();
-            dataGen = dataGeneratorBuilder.build();
-            taskGen = taskGeneratorBuilder.build();
-            evalStorage = evalStorageBuilder.build();
+//            benchmarkController = benchmarkBuilder.build();
+//            dataGen = dataGeneratorBuilder.build();
+//            taskGen = taskGeneratorBuilder.build();
+//            evalStorage = evalStorageBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
-            evalModule = evalModuleBuilder.build();
+//            evalModule = evalModuleBuilder.build();
         }
 
         //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
@@ -131,8 +129,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
                                                                 ;
 
         commandQueueListener.setCommandReactions(
-                commandReactionsBuilder.startContainersReaction(),
-                commandReactionsBuilder.terminateContainersReaction(),
+                commandReactionsBuilder.containerCommandsReaction(),
                 commandReactionsBuilder.benchmarkSignalsReaction()
                 //commandReactionsBuilder.serviceLogsReaderReaction()
         );
@@ -163,14 +160,14 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
 
     public String createBenchmarkParameters(){
-        JenaKeyValue kv = new JenaKeyValue();
+        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
         kv.setValue(BENCHMARK_URI+"#messages", 100000);
         kv.setValue(BENCHMARK_URI+"benchmarkParam2", 456);
         return kv.encodeToString();
     }
 
     public String createSystemParameters(){
-        JenaKeyValue kv = new JenaKeyValue();
+        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
         kv.setValue(SYSTEM_URI+"systemParam1", 123);
         //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
         return kv.encodeToString();

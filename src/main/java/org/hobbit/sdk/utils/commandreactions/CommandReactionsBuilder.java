@@ -105,12 +105,8 @@ public class CommandReactionsBuilder{
         return this;
     }
 
-    public StartContainerCommandReaction startContainersReaction(){
-        return new StartContainerCommandReaction(this);
-    }
-
-    public TerminateContainerCommandReaction terminateContainersReaction(){
-        return new TerminateContainerCommandReaction(this);
+    public ContainerCommandsReaction containerCommandsReaction(){
+        return new ContainerCommandsReaction(this);
     }
 
     public BenchmarkSignalsReaction benchmarkSignalsReaction(){

@@ -1,11 +1,12 @@
 package org.hobbit.sdk.utils;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.MessageProperties;
+import com.rabbitmq.client.*;
 import org.hobbit.core.Commands;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractCommandReceivingComponent;
 import org.hobbit.core.rabbit.RabbitMQUtils;
+import org.hobbit.core.rabbit.RabbitQueueFactoryImpl;
+import org.hobbit.utils.EnvVariables;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,6 +21,12 @@ public class CommandSender extends AbstractCommandReceivingComponent {
     private String replyTo;
     private byte[] data;
     private AMQP.BasicProperties properties;
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+
+    }
 
     public static void sendContainerTerminatedCommand(String finishedContainerName, byte exitCode) throws Exception {
         //String address = Constants.HOBBIT_SESSION_ID_FOR_BROADCASTS;
@@ -64,11 +71,6 @@ public class CommandSender extends AbstractCommandReceivingComponent {
         this.replyTo = replyTo;
         this.data = data;
         this.properties = properties;
-    }
-
-
-    @Override
-    public void init() throws Exception {
     }
 
     @Override

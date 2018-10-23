@@ -19,6 +19,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.DU
 public class DummySystemAdapter extends AbstractSystemAdapter {
     private Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);;
     private static JenaKeyValue parameters;
+    private String containerId;
 
     @Override
     public void init() throws Exception {
@@ -29,13 +30,17 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
+       //containerId = createContainer("apiwise/allegrograph", new String[]{});
+        //String ret = execAsyncCommand(containerId, new String[]{"/bin/bash","/share/load.sh","/share/datasets/social_network_activity_0_0.ttl.gz","http://graph.version.0"});
+//        String containerId = "6da41d318ce3";
+//
+
 //        if(!parameters.containsKey(BENCHMARK_URI+"#slaveNode")) {
 //            JenaKeyValue slaveParameters = new JenaKeyValue(parameters);
 //            slaveParameters.put(BENCHMARK_URI+"#slaveNode", "TRUE");
 //            createContainer(DUMMY_SYSTEM_IMAGE_NAME, new String[]{ Constants.SYSTEM_PARAMETERS_MODEL_KEY+"="+ slaveParameters.encodeToString() });
 //        }else
 //            logger = LoggerFactory.getLogger(DummySystemAdapter.class+"_slave");
-
 
         logger.debug("SystemModel: "+parameters.encodeToString());
     }
@@ -51,6 +56,9 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // handle the incoming task and create a result
         String result = "result_"+taskId;
         logger.trace("receiveGeneratedTask({})->{}",taskId, new String(data));
+
+
+        //Boolean succeed = execAsyncCommand(containerId, new String[]{"/usr/bin/date >> /share/result.log"});
 
         // Send the result to the evaluation storage
         try {

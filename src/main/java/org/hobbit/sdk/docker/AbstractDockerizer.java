@@ -17,10 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 
 import static java.lang.String.format;
+import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
+import static org.hobbit.core.Constants.HOBBIT_SESSION_ID_KEY;
 
 /**
  * @author Roman Katerinenko
@@ -120,6 +125,29 @@ public abstract class AbstractDockerizer implements Component {
             logger.error("Exception", e);
             exception = e;
         }
+    }
+
+    public boolean execAsyncCommand(String containerId, String[] command){
+        logger.debug("Executing command {}", String.join(" ", command));
+        String execOutput=null;
+        int attempt=0;
+        //while(execOutput==null && attempt<5){
+
+            try {
+                DockerClient dedicatedDockerClient = DefaultDockerClient.fromEnv().build();
+                //ExecCreation execCreation = dedicatedDockerClient.execCreate(containerId, command, DockerClient.ExecCreateParam.attachStdout(), DockerClient.ExecCreateParam.attachStderr());
+                ExecCreation execCreation = dedicatedDockerClient.execCreate(containerId, command, DockerClient.ExecCreateParam.detach());
+                LogStream stream = dedicatedDockerClient.execStart((execCreation.id()));
+                //execOutput = stream.readFully();
+                dedicatedDockerClient.close();
+                return true;
+            }
+            catch (Exception e){
+                logger.warn("Failed to get command result: {}", e.getLocalizedMessage());
+            }
+            //attempt++;
+        //}
+        return false;
     }
 
     public void setOnTermination(Callable value){
@@ -326,16 +354,31 @@ public abstract class AbstractDockerizer implements Component {
 
         logger.debug("Creating container (imageName={})", imageName);
         boolean removeContainerWhenItExits = false;
+
+
+        String folder = (System.getenv().containsKey(HOBBIT_SESSION_ID_KEY)? System.getenv(HOBBIT_SESSION_ID_KEY):"java_sdk");
+
+        Path destFolderPath = Paths.get("/tmp", folder);
+        if(!Files.exists(destFolderPath)) {
+            Files.createDirectory(destFolderPath);
+        }
+
+        logger.debug("Attaching {} volume to /share", destFolderPath);
+
         HostConfig hostConfig = HostConfig.builder()
                 .autoRemove(removeContainerWhenItExits)
                 .portBindings(portBindings)
+
+                .appendBinds(destFolderPath.toString()+":/share")
                 .build();
 
         ContainerConfig.Builder builder = ContainerConfig.builder()
                 .hostConfig(hostConfig)
                 .exposedPorts(getExposedPorts())
                 .image(imageName)
-                .env(getEnvironmentVariables().toArray(new String[0]));
+                .env(getEnvironmentVariables().toArray(new String[0]))
+                .addVolume(destFolderPath.toString())
+                ;
 
         ContainerConfig containerConfig = builder .build();
         ContainerCreation creation = getDockerClient().createContainer(containerConfig, containerName);
@@ -346,7 +389,7 @@ public abstract class AbstractDockerizer implements Component {
             throw exception;
         }
 
-        return contId;
+        return contId.substring(0, 12);
     }
 
     private static void awaitRunning(final DockerClient client, final String containerId)
