@@ -158,7 +158,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
     public static JenaKeyValue createBenchmarkParameters(){
         JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-        kv.setValue(BENCHMARK_URI+"#messages", 5000);
+        kv.setValue(BENCHMARK_URI+"#messages", 1000);
         return kv;
     }
 

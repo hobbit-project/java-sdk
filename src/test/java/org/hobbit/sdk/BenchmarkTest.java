@@ -1,18 +1,12 @@
 package org.hobbit.sdk;
 
 import org.hobbit.sdk.examples.dummybenchmark.test.DummyBenchmarkTestRunner;
-//import org.hobbit.sdk.utils.QueueClient;
-import org.hobbit.sdk.utils.QueueClient;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
 
-import static org.hobbit.sdk.Constants.BENCHMARK_URI;
 import static org.hobbit.sdk.Constants.DUMMY_SYSTEM_IMAGE_NAME;
-import static org.hobbit.sdk.Constants.SYSTEM_URI;
-import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
@@ -48,19 +42,6 @@ public class BenchmarkTest extends EnvironmentVariablesWrapper {
         sampleSystemTestRunner.checkHealthDockerized();
     }
 
-    @Test
-    @Ignore
-    public void flushQueue(){
-        QueueClient queueClient = new QueueClient("smirnp");
-        queueClient.flushQueue();
-    }
 
-    @Test
-    @Ignore
-    public void submitToQueue() throws Exception {
-        QueueClient queueClient = new QueueClient("smirnp");
-        queueClient.submitToQueue(BENCHMARK_URI, SYSTEM_URI, DummyBenchmarkTestRunner.createBenchmarkParameters());
-
-    }
 
 }

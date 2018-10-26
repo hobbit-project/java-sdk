@@ -369,8 +369,7 @@ public abstract class AbstractDockerizer implements Component {
         HostConfig hostConfig = HostConfig.builder()
                 .autoRemove(removeContainerWhenItExits)
                 .portBindings(portBindings)
-
-                //.appendBinds(destFolderPath.toString()+":/share")
+                .appendBinds(destFolderPath.toString()+":/share")
                 .build();
 
         ContainerConfig.Builder builder = ContainerConfig.builder()
@@ -378,7 +377,7 @@ public abstract class AbstractDockerizer implements Component {
                 .exposedPorts(getExposedPorts())
                 .image(imageName)
                 .env(getEnvironmentVariables().toArray(new String[0]))
-                //.addVolume(destFolderPath.toString())
+                .addVolume(destFolderPath.toString())
                 ;
 
         ContainerConfig containerConfig = builder .build();

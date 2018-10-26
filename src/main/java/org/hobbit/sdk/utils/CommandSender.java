@@ -6,7 +6,6 @@ import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractCommandReceivingComponent;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.core.rabbit.RabbitQueueFactoryImpl;
-import org.hobbit.utils.EnvVariables;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
