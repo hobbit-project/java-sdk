@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
+import static org.hobbit.sdk.Constants.HOBBIT_NETWORKS;
 
 /**
  * Note! Requires Docker to be installed

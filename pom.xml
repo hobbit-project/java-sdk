@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hobbit</groupId>
     <artifactId>hobbit-java-sdk</artifactId>
-    <version>1.1.13-SNAPHSHOT</version>
+    <version>1.1.14-SNAPHSHOT</version>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -60,11 +61,6 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>23.0</version>
-        </dependency>
 
         <!--<dependency>-->
             <!--<groupId>org.log4mongo</groupId>-->
@@ -76,6 +72,40 @@
             <groupId>org.hobbit</groupId>
             <artifactId>core</artifactId>
             <version>1.0.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-core</artifactId>-->
+            <!--<version>2.9.6</version>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>com.google.guava</groupId>-->
+        <!--<artifactId>guava</artifactId>-->
+        <!--<version>23.0</version>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>org.hobbit</groupId>
+            <artifactId>platform-controller</artifactId>
+            <version>2.0.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -84,11 +114,20 @@
             <version>1.9</version>
         </dependency>
 
+        <!--Docker clinet requires apache httpclient-->
         <dependency>
             <groupId>com.spotify</groupId>
             <artifactId>docker-client</artifactId>
             <version>8.11.7</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5</version>
+        </dependency>
+        <!--/Docker clinet requires apache httpclient-->
 
         <dependency>
             <groupId>junit</groupId>
@@ -97,12 +136,6 @@
             <!--<scope>test</scope>-->
         </dependency>
 
-        <dependency>
-            <groupId>org.hobbit</groupId>
-            <artifactId>platform-controller</artifactId>
-            <version>2.0.5</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>
@@ -117,7 +150,6 @@
             <artifactId>doxia-site-renderer</artifactId>
             <version>1.8.1</version>
         </dependency>
-
 
 
 

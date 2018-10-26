@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
+import static org.hobbit.sdk.Constants.*;
 
 /**
  * This code is here just for testing and debugging the SDK.
@@ -25,9 +25,9 @@ public class DummyTaskGenerator extends AbstractTaskGenerator {
         logger = LoggerFactory.getLogger(this.getClass().getName()+"_"+getGeneratorId());
         logger.debug("Init finished");
 
-        if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
-            String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
-        }
+//        if(System.getenv().containsKey(EXPERIMENT_URI+"/benchmarkParam1")){
+//            String param1 = System.getenv().get(EXPERIMENT_URI+"/benchmarkParam1");
+//        }
 
         // Your initialization code comes here...
     }

@@ -18,7 +18,8 @@ public class MultiThreadedImageBuilder {
     List<Callable<String>> tasks = new ArrayList();
 
     public MultiThreadedImageBuilder(int numThreads){
-        es = Executors.newFixedThreadPool(numThreads);
+        if(numThreads>1)
+            es = Executors.newFixedThreadPool(numThreads);
     }
 
     public void addTask(BothTypesDockersBuilder dockersBuilder){
@@ -60,12 +61,16 @@ public class MultiThreadedImageBuilder {
     public void build() throws Exception {
 
         long started = new Date().getTime();
-        List res = es.invokeAll(tasks);
-        for(Object task : res){
-            FutureTask t = ((FutureTask)task);
-            if(!t.isDone())
-                throw new Exception("Task "+t.get().toString()+" not finished");
-        }
+        if(es!=null){
+            List res = es.invokeAll(tasks);
+            for(Object task : res){
+                FutureTask t = ((FutureTask)task);
+                if(!t.isDone())
+                    throw new Exception("Task "+t.get().toString()+" not finished");
+            }
+        }else
+            for(Callable task : tasks)
+                task.call();
 
 
         long took = (new Date().getTime()-started)/1000;

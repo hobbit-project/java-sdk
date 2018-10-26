@@ -5,6 +5,8 @@ import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+
 /**
  * @author Roman Katerinenko
  */
@@ -63,4 +65,10 @@ public class JenaKeyValueTest {
         Model model = RabbitMQUtils.readModel(str);
         Assert.assertNotNull(model);
     }
+
+//    @Test
+//    public void tempTest2() {
+//        JenaKeyValue kv = new JenaKeyValue.Builder().buildFrom(new File("benchmark.ttl"));
+//        Assert.assertNotNull(kv);
+//    }
 }

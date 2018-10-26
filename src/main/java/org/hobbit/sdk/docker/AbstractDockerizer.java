@@ -234,7 +234,8 @@ public abstract class AbstractDockerizer implements Component {
 
     public void startContainer() throws Exception {
         logger.debug("Starting container (imageName={}, containerId={})", imageName, containerId);
-        getDockerClient().restartContainer(containerId);
+        //getDockerClient().restartContainer(containerId);
+        getDockerClient().startContainer(containerId);
         connectContainerToNetworks(networks);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
@@ -369,7 +370,7 @@ public abstract class AbstractDockerizer implements Component {
                 .autoRemove(removeContainerWhenItExits)
                 .portBindings(portBindings)
 
-                .appendBinds(destFolderPath.toString()+":/share")
+                //.appendBinds(destFolderPath.toString()+":/share")
                 .build();
 
         ContainerConfig.Builder builder = ContainerConfig.builder()
@@ -377,7 +378,7 @@ public abstract class AbstractDockerizer implements Component {
                 .exposedPorts(getExposedPorts())
                 .image(imageName)
                 .env(getEnvironmentVariables().toArray(new String[0]))
-                .addVolume(destFolderPath.toString())
+                //.addVolume(destFolderPath.toString())
                 ;
 
         ContainerConfig containerConfig = builder .build();

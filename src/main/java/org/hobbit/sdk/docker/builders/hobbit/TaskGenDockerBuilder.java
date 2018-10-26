@@ -4,7 +4,7 @@ import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
 
 import static org.hobbit.core.Constants.*;
-import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
+import static org.hobbit.sdk.Constants.HOBBIT_NETWORKS;
 
 
 /**

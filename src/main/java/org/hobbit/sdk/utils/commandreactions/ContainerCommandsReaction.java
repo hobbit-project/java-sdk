@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static org.hobbit.sdk.CommonConstants.HOBBIT_NETWORKS;
+import static org.hobbit.sdk.Constants.HOBBIT_NETWORKS;
 
 public class ContainerCommandsReaction implements CommandReaction {
     private static final Logger logger = LoggerFactory.getLogger(ContainerCommandsReaction.class);
@@ -91,52 +91,53 @@ public class ContainerCommandsReaction implements CommandReaction {
             }else
 
             if (dataGenerator!=null && startCommandData.image.equals(dataGeneratorImageName)) {
-                if(AbstractDockerizer.class.isInstance(dataGenerator)){
-                    compToSubmit = ((AbstractDockerizer)dataGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
-                }else {
-                    compToSubmit = dataGenerator.getClass().getConstructor().newInstance();
-                    containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
-                }
+                compToSubmit = dataGenerator;
+                containerId = dataGeneratorImageName+"_"+dataGeneratorsCount;
                 dataGeneratorsCount++;
             }else
 
             if(taskGenerator!=null && startCommandData.image.equals(taskGeneratorImageName)) {
-                if(AbstractDockerizer.class.isInstance(taskGenerator)){
-                    compToSubmit = ((AbstractDockerizer)taskGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
-                }else {
-                    compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
-                    containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
-                }
+                compToSubmit = taskGenerator;
+                containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
+//                if(AbstractDockerizer.class.isInstance(taskGenerator)){
+//                    compToSubmit = ((AbstractDockerizer)taskGenerator).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
+//                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
+//                }else {
+//                    compToSubmit = taskGenerator.getClass().getConstructor().newInstance();
+//                    containerId = taskGeneratorImageName+"_"+taskGeneratorsCount;
+//                }
                 taskGeneratorsCount++;
             }else
 
             if(evalStorage!=null && startCommandData.image.equals(evalStorageImageName)){
                 compToSubmit = evalStorage;
-                if(AbstractDockerizer.class.isInstance(compToSubmit))
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
-                else
-                    containerId = evalStorageImageName;
+                containerId = evalStorageImageName;
+//                if(AbstractDockerizer.class.isInstance(compToSubmit))
+//                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
+//                else
+//                    containerId = evalStorageImageName;
 
             }else
 
             if(evalModule!=null && startCommandData.image.equals(evalModuleImageName)) {
                 compToSubmit = evalModule;
-                if(AbstractDockerizer.class.isInstance(compToSubmit))
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
-                else
-                    containerId = evalModuleImageName;
+                containerId = evalModuleImageName;
+//                if(AbstractDockerizer.class.isInstance(compToSubmit))
+//                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
+//                else
+//                    containerId = evalModuleImageName;
             }else
 
             if(systemAdapter !=null && startCommandData.image.equals(systemAdapterImageName)) {
-                if(AbstractDockerizer.class.isInstance(systemAdapter)){
-                    compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
-                }else {
-                    compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
-                    containerId = systemAdapterImageName+"_"+systemContainersCount;
-                }
+                compToSubmit = systemAdapter;
+                containerId = systemAdapterImageName+"_"+systemContainersCount;
+//                if(AbstractDockerizer.class.isInstance(systemAdapter)){
+//                    compToSubmit = ((AbstractDockerizer)systemAdapter).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
+//                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
+//                }else {
+//                    compToSubmit = systemAdapter.getClass().getConstructor().newInstance();
+//                    containerId = systemAdapterImageName+"_"+systemContainersCount;
+//                }
                 //containerId = systemAdapterImageName+"_"+systemContainersCount;
                 systemContainersCount++;
             }else if(customContainers.containsKey(startCommandData.image)){
@@ -145,7 +146,6 @@ public class ContainerCommandsReaction implements CommandReaction {
                 int runningCustomContainersCount = (customContainersRunning.containsKey(imageName)? customContainersRunning.get(imageName) :0);
 
                 if(AbstractDockerizer.class.isInstance(customComponent)){
-
                     List<String> envVars = new ArrayList(Arrays.asList(startCommandData.environmentVariables));
                     compToSubmit = ((AbstractDockerizer)customComponent).clone(envVars);
                     containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(envVars.toArray(new String[0]));
@@ -162,6 +162,13 @@ public class ContainerCommandsReaction implements CommandReaction {
             }
 
             if(compToSubmit!=null){
+
+                if(AbstractDockerizer.class.isInstance(compToSubmit)){
+                    compToSubmit = ((AbstractDockerizer)compToSubmit).clone(new ArrayList(Arrays.asList(startCommandData.environmentVariables)));
+                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
+                }else {
+                    compToSubmit = compToSubmit.getClass().getConstructor().newInstance();
+                }
 
                 componentsExecutor.submit(compToSubmit, containerId, startCommandData.getEnvironmentVariables());
                 runningComponents.put(containerId, compToSubmit);

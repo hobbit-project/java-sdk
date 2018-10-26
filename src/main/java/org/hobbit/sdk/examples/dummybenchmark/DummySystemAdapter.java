@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.BENCHMARK_URI;
-import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.DUMMY_SYSTEM_IMAGE_NAME;
 
 /**
  * This code is here just for testing and debugging the SDK.
@@ -55,14 +53,14 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
     public void receiveGeneratedTask(String taskId, byte[] data) {
         // handle the incoming task and create a result
         String result = "result_"+taskId;
-        logger.trace("receiveGeneratedTask({})->{}",taskId, new String(data));
+        logger.debug("receiveGeneratedTask({})->{}",taskId, new String(data));
 
 
         //Boolean succeed = execAsyncCommand(containerId, new String[]{"/usr/bin/date >> /share/result.log"});
 
         // Send the result to the evaluation storage
         try {
-            logger.trace("sendResultToEvalStorage({})->{}", taskId, result);
+            logger.debug("sendResultToEvalStorage({})->{}", taskId, result);
             sendResultToEvalStorage(taskId, result.getBytes());
         } catch (IOException e) {
             e.printStackTrace();

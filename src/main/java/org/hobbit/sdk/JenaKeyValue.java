@@ -3,6 +3,7 @@ import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.*;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,13 @@ public class JenaKeyValue extends KeyValue {
     }
 
     public static class Builder {
+
+        public JenaKeyValue buildFrom(File file) {
+            Model model = ModelFactory.createDefaultModel();
+            model.read(file.getAbsolutePath());
+            return buildFrom(model);
+        }
+
         public JenaKeyValue buildFrom(String string) {
             Model model = RabbitMQUtils.readModel(string);
             return buildFrom(model);
@@ -65,7 +73,7 @@ public class JenaKeyValue extends KeyValue {
             return buildFrom(model);
         }
 
-        public JenaKeyValue buildFrom(Model model) {
+        public JenaKeyValue buildFrom(Model model){
             JenaKeyValue keyValue = null;
             StmtIterator iterator = model.listStatements(null, null, (RDFNode) null);
             while (iterator.hasNext()){

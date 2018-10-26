@@ -16,7 +16,7 @@ import org.junit.Assert;
 import java.util.Date;
 
 import static org.hobbit.core.Constants.*;
-import static org.hobbit.sdk.CommonConstants.EXPERIMENT_URI;
+import static org.hobbit.sdk.Constants.*;
 import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 /**
@@ -59,7 +59,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         init(false);
 
-        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(5);
+        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(6);
         builder.addTask(benchmarkBuilder);
         builder.addTask(dataGeneratorBuilder);
         builder.addTask(taskGeneratorBuilder);
@@ -92,9 +92,6 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
         rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
 
-        environmentVariables.set(Constants.RABBIT_MQ_HOST_NAME_KEY, rabbitMqDockerizer.getHostName());
-        environmentVariables.set(Constants.HOBBIT_SESSION_ID_KEY, "session_"+String.valueOf(new Date().getTime()));
-        //environmentVariables.set("DOCKER_HOST", "tcp://localhost:2376");
 
         commandQueueListener = new CommandQueueListener();
         componentsExecutor = new ComponentsExecutor();
@@ -109,12 +106,12 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Component evalModule = new DummyEvalModule();
 
         if(dockerize) {
-//            benchmarkController = benchmarkBuilder.build();
-//            dataGen = dataGeneratorBuilder.build();
-//            taskGen = taskGeneratorBuilder.build();
-//            evalStorage = evalStorageBuilder.build();
+            benchmarkController = benchmarkBuilder.build();
+            dataGen = dataGeneratorBuilder.build();
+            taskGen = taskGeneratorBuilder.build();
+            evalStorage = evalStorageBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
-//            evalModule = evalModuleBuilder.build();
+            evalModule = evalModuleBuilder.build();
         }
 
         //comment the .systemAdapter(systemAdapter) line below to use the code for running from python
@@ -140,8 +137,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         String benchmarkContainerId = "benchmark";
         String systemContainerId = "system";
 
-        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
-        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
+        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+NEW_EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters().encodeToString() });
+        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters().encodeToString() });
 
         //componentsExecutor.submit(benchmarkController, benchmarkContainerId, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
         //componentsExecutor.submit(systemAdapter, systemContainerId, new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
@@ -159,18 +156,17 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     }
 
 
-    public String createBenchmarkParameters(){
+    public static JenaKeyValue createBenchmarkParameters(){
         JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-        kv.setValue(BENCHMARK_URI+"#messages", 100000);
-        kv.setValue(BENCHMARK_URI+"benchmarkParam2", 456);
-        return kv.encodeToString();
+        kv.setValue(BENCHMARK_URI+"#messages", 5000);
+        return kv;
     }
 
-    public String createSystemParameters(){
+    public static JenaKeyValue createSystemParameters(){
         JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
         kv.setValue(SYSTEM_URI+"systemParam1", 123);
         //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
-        return kv.encodeToString();
+        return kv;
     }
 
 

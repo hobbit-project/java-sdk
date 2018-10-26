@@ -1,0 +1,24 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix hobbit: <http://w3id.org/hobbit/vocab#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://project-hobbit.eu/sdk-example-benchmark/benchmark> a hobbit:Benchmark;
+    rdfs:label "SDK Example Benchmark"@en;
+    rdfs:comment    "Created out of https://github.com/hobbit-project/java-sdk-example"@en;
+    hobbit:imageName    "git.project-hobbit.eu:4567/sdk-example-benchmark/sdk-examples/benchmark-controller";
+    hobbit:version "v1.0"@en;
+    hobbit:hasParameter	<http://project-hobbit.eu/sdk-example-benchmark/param1>	;
+    hobbit:measuresKPI	<http://project-hobbit.eu/sdk-example-benchmark/kpi1> ;
+    hobbit:hasAPI <http://project-hobbit.eu/sdk-example-benchmark/API> .
+
+<http://project-hobbit.eu/sdk-example-benchmark/param1>		a	hobbit:Parameter, hobbit:FeatureParameter, hobbit:ConfigurableParameter;
+    rdfs:label	"Scale factor"@en;
+    rdfs:comment	"The size of dataset"@en;
+    rdfs:domain	hobbit:Experiment, hobbit:Challenge;
+    rdfs:range	xsd:unsignedInt;
+    hobbit:defaultValue	"1"^^xsd:unsignedInt .
+
+<http://project-hobbit.eu/sdk-example-benchmark/kpi1>		a 	hobbit:KPI;
+    rdfs:label 	"Average Query Execution Time"@en;
+    rdfs:comment    "Average Query Execution Time in ms"@en;
+    rdfs:range    	xsd:double .

@@ -1,12 +1,7 @@
 package org.hobbit.sdk;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.hobbit.core.Constants;
-import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 //import org.junit.Rule;
-import static org.hobbit.sdk.CommonConstants.*;
 
 
 /**

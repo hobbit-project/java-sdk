@@ -55,7 +55,7 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
             imageId = getDockerClient().build(buildDirectory, imageName, filePath.getFileName().toString(), message -> {
 
             });
-
+            Files.delete(filePath);
         }
         catch (Exception e){
             InterruptedException e2 = new InterruptedException("Failed to build image " + imageName +" from "+ filePath+": "+e.getLocalizedMessage());
