@@ -156,8 +156,11 @@ public class ContainerCommandsReaction implements CommandReaction {
                 runningCustomContainersCount++;
                 customContainersRunning.put(imageName, runningCustomContainersCount);
             }else{
-                logger.info("Trying to create container with imageName="+startCommandData.image);
-                compToSubmit = new PullBasedDockersBuilder(startCommandData.image).addNetworks(HOBBIT_NETWORKS).build();
+                String imgName = startCommandData.image;
+                if(!imgName.endsWith(":latest"))
+                    imgName+=":latest";
+                logger.info("Trying to create container with imageName="+imgName);
+                compToSubmit = new PullBasedDockersBuilder(imgName).addNetworks(HOBBIT_NETWORKS).build();
                 containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
             }
 

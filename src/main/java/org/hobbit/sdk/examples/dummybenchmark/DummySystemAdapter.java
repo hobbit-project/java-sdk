@@ -29,6 +29,8 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
        //containerId = createContainer("apiwise/allegrograph", new String[]{});
+        containerId = createContainer("nginx", new String[]{});
+
         //String ret = execAsyncCommand(containerId, new String[]{"/bin/bash","/share/load.sh","/share/datasets/social_network_activity_0_0.ttl.gz","http://graph.version.0"});
 //        String containerId = "6da41d318ce3";
 //
