@@ -65,13 +65,20 @@
         <dependency>
             <groupId>org.hobbit</groupId>
             <artifactId>core</artifactId>
-            <version>1.0.13</version>
+            <version>1.0.12</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hobbit</groupId>
+            <artifactId>platform-controller</artifactId>
+            <version>2.0.5</version>
+            <scope>test</scope>
         </dependency>
 
         <!--<dependency>-->
@@ -85,7 +92,6 @@
         <!--<artifactId>guava</artifactId>-->
         <!--<version>23.0</version>-->
         <!--</dependency>-->
-
 
         <dependency>
             <groupId>org.apache.commons</groupId>

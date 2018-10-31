@@ -13,6 +13,8 @@ public class Constants {
 
     };
 
+    public static String GIT_USERNAME = "smirnp";
+
     //public static final String GIT_REPO_PATH = "git.project-hobbit.eu:4567/smirnp/";
     public static final String GIT_REPO_PATH = "";
     public static final String PROJECT_NAME = "dummybenchmark/";
