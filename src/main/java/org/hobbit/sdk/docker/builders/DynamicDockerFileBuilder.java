@@ -20,7 +20,7 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
 
     private Class[] runnerClass;
     private Path dockerWorkDir;
-    private Path jarFilePath;
+
     private List<String> filesToAdd;
     private String dockerfilePath;
 
@@ -76,8 +76,6 @@ public class DynamicDockerFileBuilder extends BuildBasedDockersBuilder {
         if(jarFilePath ==null)
             throw new Exception("JarFileName class is not specified for "+this.getClass().getSimpleName());
 
-        if(!jarFilePath.toFile().exists())
-            throw new Exception(jarFilePath +" not found. May be you did not packaged it by 'mvn package -DskipTests=true' first");
 
         //List<String> classNames = Arrays.stream(runnerClass).map(c->"\""+c.getCanonicalName()+"\"").collect(Collectors.toList());
         List<String> classNames = Arrays.stream(runnerClass).map(c->c.getCanonicalName()).collect(Collectors.toList());

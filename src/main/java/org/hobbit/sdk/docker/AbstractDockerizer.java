@@ -200,13 +200,13 @@ public abstract class AbstractDockerizer implements Component {
         this.environmentVariables.add(keyValue);
     }
 
-    public void prepareImage() throws InterruptedException, DockerException, DockerCertificateException, IOException{
+    public void prepareImage() throws Exception{
         prepareImage(imageName);
     };
 
-    public abstract void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException;
+    public abstract void prepareImage(String imageName) throws Exception;
 
-    public String createContainerWithRemoveAllPrevs(String[] envVars) throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public String createContainerWithRemoveAllPrevs(String[] envVars) throws Exception {
         removeAllSameNamesContainers();
 
         this.environmentVariables = Arrays.asList(envVars);
@@ -215,7 +215,7 @@ public abstract class AbstractDockerizer implements Component {
         return containerId;
     }
 
-    public String createContainerIfNotExists() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public String createContainerIfNotExists() throws Exception {
         if(containerId!=null)
             return containerId;
 
@@ -348,7 +348,7 @@ public abstract class AbstractDockerizer implements Component {
     }
 
 
-    public String createContainer() throws DockerException, InterruptedException, DockerCertificateException, IOException {
+    public String createContainer() throws Exception {
 
         if(findImagesByName(imageName).size()==0)
             prepareImage(imageName);

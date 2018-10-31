@@ -5,6 +5,7 @@ import com.spotify.docker.client.exceptions.DockerCertificateException;
 import com.spotify.docker.client.exceptions.DockerException;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,12 +25,13 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
 
     private final String imageName;
     private final String containerName;
-    private final Path buildDirectory;
-    private final Reader dockerFileReader;
     private final Boolean useCachedImage;
-
+    private Path buildDirectory;
+    private Reader dockerFileReader;
 
     private String imageId;
+    private Path jarFilePath;
+    //private String dockerfilePath;
     //private String tempDockerFileName;
 
 
@@ -41,12 +43,19 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
         buildDirectory = builder.getBuildDirectory();
         dockerFileReader = builder.getDockerFileReader();
         useCachedImage = builder.getUseCachedImage();
+        jarFilePath = builder.getJarFilePath();
 
     }
 
     @Override
-    public void prepareImage(String imageName) throws InterruptedException, DockerException, DockerCertificateException, IOException {
+    public void prepareImage(String imageName) throws Exception {
         logger.debug("Building image (imageName={})", imageName);
+
+        if(jarFilePath!=null && !jarFilePath.toFile().exists())
+            throw new Exception(jarFilePath +" not found. Package it by 'make package or mvn package -DskipTests=true'");
+
+        if(dockerFileReader==null)
+            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+".");
 
         Path filePath = createTempDockerFile();
         fillDockerFile(filePath);

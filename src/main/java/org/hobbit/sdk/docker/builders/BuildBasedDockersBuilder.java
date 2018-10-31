@@ -17,6 +17,7 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
     private Reader dockerFileReader;
     private Boolean useCachedImage;
     private String dockerfilePath;
+    protected Path jarFilePath;
 
     public BuildBasedDockersBuilder(String dockerizerName){
         super(dockerizerName);
@@ -106,26 +107,26 @@ public class BuildBasedDockersBuilder extends AbstractDockersBuilder {
         return this;
     }
 
+
     public Path getBuildDirectory(){ return buildDirectory; }
     public Reader getDockerFileReader(){ return dockerFileReader; }
     public Boolean getUseCachedImage(){ return useCachedImage;}
+    public Path getJarFilePath() { return jarFilePath; }
 
     @Override
     public BuildBasedDockerizer build() throws Exception {
 
         if(buildDirectory==null)
-            buildDirectory(".");
-            //throw new Exception("Build directory is not specified for "+this.getClass().getSimpleName());
+            buildDirectory=Paths.get(".");
 
         if(dockerfilePath!=null){
             byte[] bytes = Files.readAllBytes(Paths.get(dockerfilePath));
-            dockerFileReader(new StringReader(new String(bytes)));
+            dockerFileReader = new StringReader(new String(bytes));
         }
-
-        if(dockerFileReader==null)
-            throw new Exception("dockerFile reader is not specified for "+this.getClass().getSimpleName()+".");
 
         BuildBasedDockerizer ret = new BuildBasedDockerizer(this);
         return ret;
     }
+
+
 }
