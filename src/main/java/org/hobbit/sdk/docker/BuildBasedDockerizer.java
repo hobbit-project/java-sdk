@@ -22,7 +22,6 @@ public class BuildBasedDockerizer extends AbstractDockerizer {
 
     private static final Charset charset = Charset.forName("UTF-8");
 
-
     private final String imageName;
     private final String containerName;
     private final Boolean useCachedImage;

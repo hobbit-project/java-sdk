@@ -12,8 +12,10 @@ import java.io.IOException;
 
 public class PullBasedDockerizer extends AbstractDockerizer {
 
-    public PullBasedDockerizer(PullBasedDockersBuilder builder) {
+    public PullBasedDockerizer(PullBasedDockersBuilder builder)
+    {
         super(builder);
+
     }
 
 
