@@ -1,10 +1,15 @@
 package org.hobbit.sdk.examples.dummybenchmark.test;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
+import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.EnvironmentVariablesWrapper;
 import org.hobbit.sdk.JenaKeyValue;
+import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
 import org.hobbit.sdk.docker.builders.hobbit.*;
@@ -13,6 +18,8 @@ import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.CommandReactionsBuilder;
 import org.junit.Assert;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import static org.hobbit.core.Constants.*;
@@ -137,8 +144,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         String benchmarkContainerId = "benchmark";
         String systemContainerId = "system";
 
-        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+NEW_EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters().encodeToString() });
-        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters().encodeToString() });
+        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+NEW_EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(createBenchmarkParameters()) });
+        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(createSystemParameters()) });
 
         //componentsExecutor.submit(benchmarkController, benchmarkContainerId, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
         //componentsExecutor.submit(systemAdapter, systemContainerId, new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
@@ -155,19 +162,43 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }
 
+    public static Model createBenchmarkParameters() throws IOException {
+        byte[] bytes = FileUtils.readFileToByteArray(new File("benchmark.ttl"));
+        Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
 
-    public static JenaKeyValue createBenchmarkParameters(){
-        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-        kv.setValue(BENCHMARK_URI+"#messages", 1000);
-        return kv;
+        Resource experimentResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
+
+        int houses_count = 10000;
+        //model.add(benchmarkInstanceResource, model.createProperty(BENCHMARK_URI+"#SPARQL_ENDPOINT_URL"), "http://172.17.0.2:8890/sparql");
+        model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#messages"), model.createTypedLiteral("100", "xsd:unsignedInt"));
+
+        ModelsHandler.fillTheInstanceWithDefaultModelValues(model, experimentResource, BENCHMARK_URI);
+
+        return model;
+
     }
 
-    public static JenaKeyValue createSystemParameters(){
-        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-        kv.setValue(SYSTEM_URI+"systemParam1", 123);
-        //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
-        return kv;
+    public static Model createSystemParameters() throws IOException {
+        byte[] bytes = FileUtils.readFileToByteArray(new File("system.ttl"));
+        Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
+
+        Resource experimentInstanceResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
+        //model.add(benchmarkInstanceResource, model.createProperty(BENCHMARK_URI+"#neptuneInstanceType"), model.createTypedLiteral("db.r4.2xlarge", "xsd:string"));
+        return model;
     }
+
+//    public static JenaKeyValue createBenchmarkParameters(){
+//        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
+//        kv.setValue(BENCHMARK_URI+"#messages", 1000);
+//        return kv;
+//    }
+//
+//    public static JenaKeyValue createSystemParameters(){
+//        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
+//        kv.setValue(SYSTEM_URI+"systemParam1", 123);
+//        //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
+//        return kv;
+//    }
 
 
 }

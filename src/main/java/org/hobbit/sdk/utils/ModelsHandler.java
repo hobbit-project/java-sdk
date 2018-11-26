@@ -1,16 +1,51 @@
 package org.hobbit.sdk.utils;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.hobbit.vocab.HOBBIT;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Pavel Smirnov. (psmirnov@agtinternational.com / smirnp@gmail.com)
  */
 public class ModelsHandler {
+
+    public static Model byteArrayToModel(byte data[], String lang) {
+        Model m = ModelFactory.createDefaultModel();
+        m.read(new ByteArrayInputStream(data), null, lang);
+        return m;
+    }
+
+    public static void fillTheInstanceWithDefaultModelValues(Model model, Resource benchmarkInstanceResource, String namespaceUri){
+        Property parameter;
+        NodeIterator objIterator;
+        ResIterator iterator = model.listResourcesWithProperty(RDF.type, HOBBIT.Parameter);
+        Property defaultValProperty = model.getProperty("http://w3id.org/hobbit/vocab#defaultValue");
+        while (iterator.hasNext()) {
+            try{
+                parameter = model.getProperty(iterator.next().getURI());
+                if(benchmarkInstanceResource.getProperty(parameter)==null){
+                    objIterator = model.listObjectsOfProperty(parameter, defaultValProperty);
+                    while (objIterator.hasNext()) {
+                        Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
+                        model.add(benchmarkInstanceResource, parameter, String.valueOf(valueLiteral.getValue()));
+                        //model.add(benchmarkInstanceResource, parameter, model.createTypedLiteral(valueL));
+                        //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
+                    }
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public static Model addParameters(Model model, Resource benchmarkInstanceResource, Map<String, Object> params) throws Exception {
         //Property valueProperty = model.getProperty("http://w3id.org/hobbit/vocab#defaultValue");
 //        Property valueProperty = model.getProperty("hobbit:defaultValue");
