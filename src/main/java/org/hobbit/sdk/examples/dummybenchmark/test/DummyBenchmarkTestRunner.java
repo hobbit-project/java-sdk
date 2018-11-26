@@ -167,11 +167,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
 
         Resource experimentResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
-
-        int houses_count = 10000;
-        //model.add(benchmarkInstanceResource, model.createProperty(BENCHMARK_URI+"#SPARQL_ENDPOINT_URL"), "http://172.17.0.2:8890/sparql");
-        model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#messages"), model.createTypedLiteral("100", "xsd:unsignedInt"));
-
+        model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#messages"),"100");
         ModelsHandler.fillTheInstanceWithDefaultModelValues(model, experimentResource, BENCHMARK_URI);
 
         return model;
@@ -182,23 +178,10 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         byte[] bytes = FileUtils.readFileToByteArray(new File("system.ttl"));
         Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
 
-        Resource experimentInstanceResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
-        //model.add(benchmarkInstanceResource, model.createProperty(BENCHMARK_URI+"#neptuneInstanceType"), model.createTypedLiteral("db.r4.2xlarge", "xsd:string"));
+        Resource experimentResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
+        model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#systemParam123"),"100");
         return model;
     }
-
-//    public static JenaKeyValue createBenchmarkParameters(){
-//        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-//        kv.setValue(BENCHMARK_URI+"#messages", 1000);
-//        return kv;
-//    }
-//
-//    public static JenaKeyValue createSystemParameters(){
-//        JenaKeyValue kv = new JenaKeyValue(NEW_EXPERIMENT_URI);
-//        kv.setValue(SYSTEM_URI+"systemParam1", 123);
-//        //kv.setValue(SYSTEM_URI+SYSTEM_CONTAINERS_COUNT_KEY, 2);
-//        return kv;
-//    }
 
 
 }
