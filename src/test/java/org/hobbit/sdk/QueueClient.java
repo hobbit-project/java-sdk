@@ -74,7 +74,6 @@ public class QueueClient extends EnvironmentVariablesWrapper {
 
         cfg.serializedBenchParams = RabbitMQUtils.writeModel2String(model);
 
-
         queue.add(cfg);
 
         logger.info(benchmarkUri+" submitted with "+systemUri);

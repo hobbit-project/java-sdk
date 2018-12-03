@@ -33,7 +33,7 @@ public class ModelsHandler {
                     objIterator = model.listObjectsOfProperty(parameter, defaultValProperty);
                     while (objIterator.hasNext()) {
                         Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
-                        model.add(benchmarkInstanceResource, parameter, valueLiteral.getString());
+                        model.add(benchmarkInstanceResource, parameter, valueLiteral.getString(), valueLiteral.getDatatype());
                         //model.add(benchmarkInstanceResource, parameter, model.createTypedLiteral(valueL));
                         //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
                     }
