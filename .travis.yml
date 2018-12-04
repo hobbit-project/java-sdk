@@ -1,0 +1,6 @@
+language: java
+script:
+  - make package
+services:
+  - docker
+sudo: required
