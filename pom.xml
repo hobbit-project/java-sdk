@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hobbit</groupId>
     <artifactId>hobbit-java-sdk</artifactId>
-    <version>1.1.14-SNAPHSHOT</version>
+    <version>1.1.14</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.hobbit</groupId>
             <artifactId>core</artifactId>
-            <version>1.0.12</version>
+            <version>1.0.13</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>

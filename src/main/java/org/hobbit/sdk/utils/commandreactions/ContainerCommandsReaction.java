@@ -5,7 +5,6 @@ import com.rabbitmq.client.MessageProperties;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.Component;
 //import org.hobbit.core.data.ExecuteCommandData;
-import org.hobbit.core.data.ExecuteCommandData;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
@@ -249,37 +248,37 @@ public class ContainerCommandsReaction implements CommandReaction {
                 }
             }
         }
-        else if(command==Commands.EXECUTE_ASYNC_COMMAND){
-            //Supported only for the extended core, not supported in the online platform
-            CommandSender commandSender = null;
-            String dataString = RabbitMQUtils.readString(bytes);
-            ExecuteCommandData executeCommandData = gson.fromJson(dataString, ExecuteCommandData.class);
-
-            logger.debug("EXECUTE_COMMAND_IN_CONTAINER {} received", executeCommandData.containerId);
-
-            AbstractDockerizer runningContainer;
-            if(!runningComponents.containsKey(executeCommandData.containerId)){
-                runningContainer = new PullBasedDockersBuilder("container-"+executeCommandData.containerId).containerName(executeCommandData.containerId).build();
-                //logger.error("No running container {} found", executeCommandData.containerId);
-                //return;
-            }else
-                runningContainer = (AbstractDockerizer)runningComponents.get(executeCommandData.containerId);
-
-            Boolean result0 = runningContainer.execAsyncCommand(executeCommandData.containerId, executeCommandData.command);
-            String result = (result0?"Succeeded":"Failed");
-            synchronized (this) {
-                try {
-                    logger.debug("Sending command execution result: {}", result);
-                    new CommandSender(result.getBytes(), MessageProperties.PERSISTENT_BASIC, replyTo).send();
-
-                } catch (Exception e){
-                    logger.error("Failed send reply: ", e.getLocalizedMessage());
-                    Assert.fail(e.getMessage());
-                }
-            }
-
-
-        }
+//        else if(command==Commands.EXECUTE_ASYNC_COMMAND){
+//            //Supported only for the extended core, not supported in the online platform
+//            CommandSender commandSender = null;
+//            String dataString = RabbitMQUtils.readString(bytes);
+//            ExecuteCommandData executeCommandData = gson.fromJson(dataString, ExecuteCommandData.class);
+//
+//            logger.debug("EXECUTE_COMMAND_IN_CONTAINER {} received", executeCommandData.containerId);
+//
+//            AbstractDockerizer runningContainer;
+//            if(!runningComponents.containsKey(executeCommandData.containerId)){
+//                runningContainer = new PullBasedDockersBuilder("container-"+executeCommandData.containerId).containerName(executeCommandData.containerId).build();
+//                //logger.error("No running container {} found", executeCommandData.containerId);
+//                //return;
+//            }else
+//                runningContainer = (AbstractDockerizer)runningComponents.get(executeCommandData.containerId);
+//
+//            Boolean result0 = runningContainer.execAsyncCommand(executeCommandData.containerId, executeCommandData.command);
+//            String result = (result0?"Succeeded":"Failed");
+//            synchronized (this) {
+//                try {
+//                    logger.debug("Sending command execution result: {}", result);
+//                    new CommandSender(result.getBytes(), MessageProperties.PERSISTENT_BASIC, replyTo).send();
+//
+//                } catch (Exception e){
+//                    logger.error("Failed send reply: ", e.getLocalizedMessage());
+//                    Assert.fail(e.getMessage());
+//                }
+//            }
+//
+//
+//        }
 
 
     }

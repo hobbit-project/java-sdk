@@ -3,6 +3,7 @@ package org.hobbit.sdk.examples.dummybenchmark.test;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.ModelCom;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.hobbit.core.Constants.*;
 import static org.hobbit.sdk.Constants.*;
 import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
@@ -144,8 +146,8 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         String benchmarkContainerId = "benchmark";
         String systemContainerId = "system";
 
-        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+NEW_EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(createBenchmarkParameters()) });
-        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(createSystemParameters()) });
+        benchmarkContainerId = commandQueueListener.createContainer(benchmarkBuilder.getImageName(), "benchmark", new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+NEW_EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(ModelsHandler.createMergedParametersModel(createBenchmarkParameters(), ModelsHandler.readModelFromFile("benchmark.ttl")))});
+        systemContainerId = commandQueueListener.createContainer(systemAdapterBuilder.getImageName(), "system" ,new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ RabbitMQUtils.writeModel2String(ModelsHandler.createMergedParametersModel(createSystemParameters(), ModelsHandler.readModelFromFile("system.ttl"))) });
 
         //componentsExecutor.submit(benchmarkController, benchmarkContainerId, new String[]{ HOBBIT_EXPERIMENT_URI_KEY+"="+EXPERIMENT_URI,  BENCHMARK_PARAMETERS_MODEL_KEY+"="+ createBenchmarkParameters() });
         //componentsExecutor.submit(systemAdapter, systemContainerId, new String[]{ SYSTEM_PARAMETERS_MODEL_KEY+"="+ createSystemParameters() });
@@ -163,22 +165,17 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     }
 
     public static Model createBenchmarkParameters() throws IOException {
-        byte[] bytes = FileUtils.readFileToByteArray(new File("benchmark.ttl"));
-        Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
-
-        Resource experimentResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
+        Model model = createDefaultModel();
+        Resource experimentResource = model.createResource(Constants.NEW_EXPERIMENT_URI);
         model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#messages"),"100");
         ModelsHandler.fillTheInstanceWithDefaultModelValues(model, experimentResource, BENCHMARK_URI);
-
         return model;
 
     }
 
     public static Model createSystemParameters() throws IOException {
-        byte[] bytes = FileUtils.readFileToByteArray(new File("system.ttl"));
-        Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
-
-        Resource experimentResource = model.createResource(org.hobbit.core.Constants.NEW_EXPERIMENT_URI);
+        Model model = createDefaultModel();
+        Resource experimentResource = model.createResource(Constants.NEW_EXPERIMENT_URI);
         model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#systemParam123"),"100");
         return model;
     }

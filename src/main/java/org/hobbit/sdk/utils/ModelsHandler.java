@@ -1,11 +1,15 @@
 package org.hobbit.sdk.utils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.hobbit.core.Constants;
 import org.hobbit.vocab.HOBBIT;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +48,42 @@ public class ModelsHandler {
             }
         }
 
+    }
+
+    public static Model readModelFromFile(String path) throws IOException {
+        byte[] bytes = FileUtils.readFileToByteArray(new File(path));
+        Model model =  ModelsHandler.byteArrayToModel(bytes, "TTL");
+        return model;
+    }
+
+    public static Model createMergedParametersModel(Model paramsModel, Model defaultModel){
+
+        Property parameter;
+        NodeIterator objIterator;
+
+        ResIterator iterator0 = paramsModel.listResourcesWithProperty(RDF.type, HOBBIT.Experiment);
+        Resource experimentResource = iterator0.nextResource();
+
+        Property defaultValProperty = paramsModel.getProperty("http://w3id.org/hobbit/vocab#defaultValue");
+        ResIterator iterator = defaultModel.listResourcesWithProperty(RDF.type, HOBBIT.Parameter);
+        while (iterator.hasNext()) {
+            try{
+                parameter = defaultModel.getProperty(iterator.next().getURI());
+                if(experimentResource.getProperty(parameter)==null){
+                    objIterator = defaultModel.listObjectsOfProperty(parameter, defaultValProperty);
+                    while (objIterator.hasNext()) {
+                        Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
+                        //paramsModel.add(experimentResource, parameter, valueLiteral.getString(), valueLiteral.getDatatype());
+                        paramsModel.add(experimentResource, parameter, valueLiteral.getString());
+                        //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
+                    }
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return paramsModel;
     }
 
     public static Model addParameters(Model model, Resource benchmarkInstanceResource, Map<String, Object> params) throws Exception {
