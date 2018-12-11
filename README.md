@@ -1,13 +1,12 @@
 # HOBBIT Java SDK
-Summarizing the experience of the successful co-organization of the DEBS Grand Challenge 2017 on the HOBBIT platform, we made one step towards a more lightweight and productive design-development of HOBBIT-related software components. We are happy to announce a standalone software library called the HOBBIT Java SDK.
-
-The proposed SDK was is targeted to make the design and development of HOBBIT-compatible components easier and to execute them locally without having a running HOBBIT-platform instance. More details about the [HOBBIT platform](https://github.com/hobbit-project/platform) and the HOBBIT project can be found [here](https://project-hobbit.eu/). 
+Develop of HOBBIT-compatible components easier and to execute them locally without having a running HOBBIT-platform instance. 
 
 The SDK helps platform users with the following tasks:
 * Design systems for benchmarking and debug them within a particular benchmark
 * Design a benchmark and debug the interactions between its components
 * Upload results (docker images of your components) to the online platform
 
+# Purspose
 Technically the SDK is focused on the orchestration of docker images/containers for all the required components. Basic implementations of hobbit-related components (described [here](https://github.com/hobbit-project/platform/wiki/Develop-a-component-in-Java)) are also included into SDK to demonstrate how the local debugging process may be organized. 
 
 As a result users may execute and debug their systems/benchmarks either “as is” (and hit the breakpoints in the code) or being packed into docker containers (the same manner as components will be operated by the online platform). The SDK provides users with internal log messages from the containers, which make the debugging process more effective and less error-prone. 
