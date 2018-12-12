@@ -5,7 +5,6 @@ package:
 	mvn -DskipTests -DincludeDeps=true package
 
 build-images:
-	make package
 	mvn -Dtest=BenchmarkTest#buildImages test
 
 test-dockerized-benchmark:

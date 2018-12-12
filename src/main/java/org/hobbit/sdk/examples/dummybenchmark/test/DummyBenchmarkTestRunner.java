@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.ModelCom;
+import org.apache.jena.vocabulary.RDF;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
@@ -17,6 +18,7 @@ import org.hobbit.sdk.docker.builders.hobbit.*;
 import org.hobbit.sdk.examples.dummybenchmark.*;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.CommandReactionsBuilder;
+import org.hobbit.vocab.HOBBIT;
 import org.junit.Assert;
 
 import java.io.File;
@@ -167,6 +169,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     public static Model createBenchmarkParameters() throws IOException {
         Model model = createDefaultModel();
         Resource experimentResource = model.createResource(Constants.NEW_EXPERIMENT_URI);
+        model.add(experimentResource, RDF.type, HOBBIT.Experiment);
         model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#messages"),"100");
         ModelsHandler.fillTheInstanceWithDefaultModelValues(model, experimentResource, BENCHMARK_URI);
         return model;
@@ -176,6 +179,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
     public static Model createSystemParameters() throws IOException {
         Model model = createDefaultModel();
         Resource experimentResource = model.createResource(Constants.NEW_EXPERIMENT_URI);
+        model.add(experimentResource, RDF.type, HOBBIT.Experiment);
         model.add(experimentResource, model.createProperty(BENCHMARK_URI+"#systemParam123"),"100");
         return model;
     }
