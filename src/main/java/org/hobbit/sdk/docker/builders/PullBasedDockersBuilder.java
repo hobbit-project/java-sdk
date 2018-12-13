@@ -9,7 +9,7 @@ public class PullBasedDockersBuilder extends AbstractDockersBuilder {
         super(imageName);
         super.imageName(imageName);
         String[] splitted = imageName.split("/");
-        super.containerName(splitted[splitted.length-1]);
+        super.containerName(splitted[splitted.length-1].split(":")[0]);
     }
 
 

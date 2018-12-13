@@ -161,7 +161,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         commandQueueListener.terminate();
         componentsExecutor.shutdown();
 
-        //rabbitMqDockerizer.stop();
+        rabbitMqDockerizer.stop();
 
         Assert.assertFalse(componentsExecutor.anyExceptions());
     }

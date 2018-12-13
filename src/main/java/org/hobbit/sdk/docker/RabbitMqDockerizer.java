@@ -77,7 +77,7 @@ public class RabbitMqDockerizer extends PullBasedDockerizer {
             containerName("rabbit");
             imageName("rabbitmq:latest");
             addPortBindings("5672/tcp", PortBinding.of("0.0.0.0", 5672));
-            useCachedContainer(true);
+            //useCachedContainer(true);
             skipLogsReading(true);
             addNetworks(HOBBIT_NETWORKS);
         }
