@@ -9,6 +9,7 @@ import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.utils.commandreactions.CommandReaction;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractCommandReceivingComponent;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +32,15 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
 
     private CommandReaction[] commandReactions=new CommandReaction[0];
     private String replyTo;
-
+    private final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     @Override
     public void init() throws Exception {
         logger.debug("Initializing...");
+        String originalRabbitHostName = System.getenv(Constants.RABBIT_MQ_HOST_NAME_KEY);
+        environmentVariables.set(Constants.RABBIT_MQ_HOST_NAME_KEY, "localhost");
         super.init();
+        environmentVariables.set(Constants.RABBIT_MQ_HOST_NAME_KEY, originalRabbitHostName);
         addCommandHeaderId(Constants.HOBBIT_SESSION_ID_FOR_BROADCASTS);
     }
 

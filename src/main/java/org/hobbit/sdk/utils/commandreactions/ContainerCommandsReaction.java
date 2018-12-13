@@ -157,7 +157,7 @@ public class ContainerCommandsReaction implements CommandReaction {
                 customContainersRunning.put(imageName, runningCustomContainersCount);
             }else{
                 String imgName = startCommandData.image;
-                if(!imgName.endsWith(":latest"))
+                if(!imgName.contains(":"))
                     imgName+=":latest";
                 logger.info("Trying to create container with imageName="+imgName);
                 compToSubmit = new PullBasedDockersBuilder(imgName).addNetworks(HOBBIT_NETWORKS).build();
