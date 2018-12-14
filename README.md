@@ -1,6 +1,4 @@
-# HOBBIT Java SDK
-
-[![Build Status](https://travis-ci.org/hobbit-project/java-sdk.svg?branch=master)](https://travis-ci.org/hobbit-project/java-sdk)
+# HOBBIT Java SDK [![Build Status](https://travis-ci.org/hobbit-project/java-sdk.svg?branch=master)](https://travis-ci.org/hobbit-project/java-sdk)
 
 Develop of HOBBIT-compatible components easier and to execute them locally without having a running HOBBIT-platform instance. 
 
