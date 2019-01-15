@@ -8,6 +8,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
+import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.EnvironmentVariablesWrapper;
 import org.hobbit.sdk.JenaKeyValue;
@@ -38,7 +39,7 @@ import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
 
-    private RabbitMqDockerizer rabbitMqDockerizer;
+    private AbstractDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
 
@@ -101,7 +102,7 @@ public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
         Boolean useCachedImages = true;
         init(useCachedImages);
 
-        rabbitMqDockerizer = RabbitMqDockerizer.builder().build();
+        rabbitMqDockerizer = RabbitMqDockerizer.builder().useCachedContainer().build();
 
 
         commandQueueListener = new CommandQueueListener();

@@ -162,7 +162,7 @@ public class ContainerCommandsReaction implements CommandReaction {
 
                 componentsExecutor.submit(compToSubmit, containerId, startCommandData.getEnvironmentVariables());
                 runningComponents.put(containerId, compToSubmit);
-                synchronized (this) {
+                //synchronized (this) {
                     if (containerId!=null){
                         try {
                             new CommandSender(containerId.getBytes(), MessageProperties.PERSISTENT_BASIC, replyTo).send();
@@ -173,7 +173,7 @@ public class ContainerCommandsReaction implements CommandReaction {
                     }else{
                         String test="123";
                     }
-                }
+                //}
             }else{
                 logger.error("No component to submit for the imageName="+startCommandData.image);
                 //throw new Exception("No component to submit for the imageName="+startCommandData.image);

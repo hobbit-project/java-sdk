@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Pavel Smirnov. (psmirnov@agtinternational.com / smirnp@gmail.com)
  */
 public class QueueClient extends EnvironmentVariablesWrapper {
-    private static final Logger logger = LoggerFactory.getLogger(DummyBenchmarkController.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueueClient.class);
     ExperimentQueueImpl queue;
     String username;
 
