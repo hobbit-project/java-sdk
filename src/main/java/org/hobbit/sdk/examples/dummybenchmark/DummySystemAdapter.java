@@ -2,7 +2,6 @@ package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.AbstractSystemAdapter;
-import org.hobbit.sdk.JenaKeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,7 @@ import java.io.IOException;
 
 public class DummySystemAdapter extends AbstractSystemAdapter {
     private Logger logger = LoggerFactory.getLogger(DummySystemAdapter.class);;
-    private static JenaKeyValue parameters;
+    //private static JenaKeyValue parameters;
     private String containerId;
 
     @Override
@@ -26,7 +25,7 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
         // Your initialization code comes here...
 
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
-        parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
+        //parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
 
        //containerId = createContainer("apiwise/allegrograph", new String[]{});
         //containerId = createContainer("nginx", new String[]{});
@@ -42,7 +41,7 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
 //        }else
 //            logger = LoggerFactory.getLogger(DummySystemAdapter.class+"_slave");
 
-        logger.debug("SystemModel: "+parameters.encodeToString());
+        //logger.debug("SystemModel: "+parameters.encodeToString());
     }
 
     @Override

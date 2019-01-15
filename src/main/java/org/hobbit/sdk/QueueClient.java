@@ -10,7 +10,6 @@ import org.hobbit.controller.queue.ExperimentQueueImpl;
 import org.hobbit.core.Constants;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.EnvironmentVariablesWrapper;
-import org.hobbit.sdk.JenaKeyValue;
 import org.hobbit.sdk.examples.dummybenchmark.DummyBenchmarkController;
 import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.vocab.HOBBIT;

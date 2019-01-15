@@ -3,7 +3,6 @@ package org.hobbit.sdk.examples.dummybenchmark;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.AbstractBenchmarkController;
-import org.hobbit.sdk.JenaKeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ import static org.hobbit.sdk.Constants.*;
 
 public class DummyBenchmarkController extends AbstractBenchmarkController {
     private static final Logger logger = LoggerFactory.getLogger(DummyBenchmarkController.class);
-    private static JenaKeyValue parameters;
+    //private static JenaKeyValue parameters;
 
     @Override
     public void init() throws Exception {
@@ -28,15 +27,15 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
 
         // Your initialization code comes here...
 
-        parameters = new JenaKeyValue.Builder().buildFrom(benchmarkParamModel);
-        logger.debug("BenchmarkModel: "+parameters.encodeToString());
+        //parameters = new JenaKeyValue.Builder().buildFrom(benchmarkParamModel);
+        //logger.debug("BenchmarkModel: "+parameters.encodeToString());
         // Create the other components
 
         // Create data generators
         logger.debug("createDataGenerators()");
 
         int numberOfDataGenerators = 1;
-        String [] envVariables = parameters.mapToArray();
+        String [] envVariables = new String[]{};
         createDataGenerators(DUMMY_DATAGEN_IMAGE_NAME, numberOfDataGenerators, envVariables);
 
         logger.debug("createTaskGenerators()");
@@ -82,7 +81,7 @@ public class DummyBenchmarkController extends AbstractBenchmarkController {
 
         // Create the evaluation module
 
-        String [] envVariables = parameters.mapToArray();
+        String [] envVariables = new String[]{};
         logger.debug("createEvaluationModule()");
         createEvaluationModule(DUMMY_EVALMODULE_IMAGE_NAME, envVariables);
 

@@ -11,7 +11,6 @@ import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.EnvironmentVariablesWrapper;
-import org.hobbit.sdk.JenaKeyValue;
 import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
@@ -29,7 +28,6 @@ import java.util.Date;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.hobbit.core.Constants.*;
 import static org.hobbit.sdk.Constants.*;
-import static org.hobbit.sdk.examples.dummybenchmark.test.DummyDockersBuilder.*;
 
 /**
  * @author Pavel Smirnov
