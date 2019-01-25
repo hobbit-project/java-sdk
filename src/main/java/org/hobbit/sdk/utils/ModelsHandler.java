@@ -25,30 +25,30 @@ public class ModelsHandler {
         return m;
     }
 
-    public static void fillTheInstanceWithDefaultModelValues(Model model, Resource benchmarkInstanceResource, String namespaceUri){
-        Property parameter;
-        NodeIterator objIterator;
-        ResIterator iterator = model.listResourcesWithProperty(RDF.type, HOBBIT.Parameter);
-        Property defaultValProperty = model.getProperty("http://w3id.org/hobbit/vocab#defaultValue");
-        while (iterator.hasNext()) {
-            try{
-                parameter = model.getProperty(iterator.next().getURI());
-                if(benchmarkInstanceResource.getProperty(parameter)==null){
-                    objIterator = model.listObjectsOfProperty(parameter, defaultValProperty);
-                    while (objIterator.hasNext()) {
-                        Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
-                        model.add(benchmarkInstanceResource, parameter, valueLiteral.getString(), valueLiteral.getDatatype());
-                        //model.add(benchmarkInstanceResource, parameter, model.createTypedLiteral(valueL));
-                        //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
-                    }
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-    }
+//    public static void fillTheInstanceWithDefaultModelValues(Model model, Resource benchmarkInstanceResource, String namespaceUri){
+//        Property parameter;
+//        NodeIterator objIterator;
+//        ResIterator iterator = model.listResourcesWithProperty(RDF.type, HOBBIT.Parameter);
+//        Property defaultValProperty = model.getProperty("http://w3id.org/hobbit/vocab#defaultValue");
+//        while (iterator.hasNext()) {
+//            try{
+//                parameter = model.getProperty(iterator.next().getURI());
+//                if(benchmarkInstanceResource.getProperty(parameter)==null){
+//                    objIterator = model.listObjectsOfProperty(parameter, defaultValProperty);
+//                    while (objIterator.hasNext()) {
+//                        Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
+//                        model.add(benchmarkInstanceResource, parameter, valueLiteral.getString(), valueLiteral.getDatatype());
+//                        //model.add(benchmarkInstanceResource, parameter, model.createTypedLiteral(valueL));
+//                        //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
+//                    }
+//                }
+//            }
+//            catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }
+//
+//    }
 
     public static Model readModelFromFile(String path) throws IOException {
         byte[] bytes = FileUtils.readFileToByteArray(new File(path));
