@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hobbit</groupId>
     <artifactId>hobbit-java-sdk</artifactId>
-    <version>1.1.17-SNAPHSHOT</version>
+    <version>1.1.18-SNAPHSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
