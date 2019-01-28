@@ -1,4 +1,4 @@
-package org.hobbit.sdk.examples.dummybenchmark.test;
+package org.hobbit.sdk;
 
 import org.hobbit.core.run.ComponentStarter;
 import org.hobbit.sdk.docker.builders.DynamicDockerFileBuilder;

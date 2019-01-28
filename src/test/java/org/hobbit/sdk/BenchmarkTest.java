@@ -1,15 +1,15 @@
 package org.hobbit.sdk;
 
-import org.hobbit.sdk.examples.dummybenchmark.test.DummyBenchmarkTestRunner;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import java.util.Date;
 
 import static org.hobbit.sdk.Constants.DUMMY_SYSTEM_IMAGE_NAME;
 import static org.hobbit.sdk.Constants.*;
-import static org.hobbit.sdk.examples.dummybenchmark.test.DummyBenchmarkTestRunner.createBenchmarkParameters;
+import static org.hobbit.sdk.DummyBenchmarkTestRunner.createBenchmarkParameters;
 
 /**
  * @author Pavel Smirnov
@@ -17,8 +17,9 @@ import static org.hobbit.sdk.examples.dummybenchmark.test.DummyBenchmarkTestRunn
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
-public class BenchmarkTest extends EnvironmentVariablesWrapper {
+public class BenchmarkTest {
 
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
     DummyBenchmarkTestRunner sampleSystemTestRunner;
 
     @Before

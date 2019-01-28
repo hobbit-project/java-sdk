@@ -1,16 +1,13 @@
-package org.hobbit.sdk.examples.dummybenchmark.test;
+package org.hobbit.sdk;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.ModelCom;
 import org.apache.jena.vocabulary.RDF;
 import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.utils.ComponentsExecutor;
-import org.hobbit.sdk.EnvironmentVariablesWrapper;
 import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
 import org.hobbit.sdk.docker.RabbitMqDockerizer;
@@ -20,10 +17,9 @@ import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.commandreactions.CommandReactionsBuilder;
 import org.hobbit.vocab.HOBBIT;
 import org.junit.Assert;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.hobbit.core.Constants.*;
@@ -35,8 +31,9 @@ import static org.hobbit.sdk.Constants.*;
  * For your projects please use code from the https://github.com/hobbit-project/java-sdk-example
  */
 
-public class DummyBenchmarkTestRunner extends EnvironmentVariablesWrapper {
+public class DummyBenchmarkTestRunner {
 
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
     private AbstractDockerizer rabbitMqDockerizer;
     private ComponentsExecutor componentsExecutor;
     private CommandQueueListener commandQueueListener;
