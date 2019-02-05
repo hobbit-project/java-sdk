@@ -60,7 +60,7 @@ public class MultiThreadedImageBuilder {
 
     public void build() throws Exception {
 
-        long started = new Date().getTime();
+        double started = new Date().getTime();
         if(es!=null){
             List res = es.invokeAll(tasks);
             for(Object task : res){
@@ -73,7 +73,7 @@ public class MultiThreadedImageBuilder {
                 task.call();
 
 
-        long took = (new Date().getTime()-started)/1000;
+        double took = (new Date().getTime()-started)/1000;
         System.out.println("Building took "+took+" seconds");
     }
 }
