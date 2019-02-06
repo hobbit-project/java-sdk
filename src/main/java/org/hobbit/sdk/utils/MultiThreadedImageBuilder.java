@@ -46,12 +46,7 @@ public class MultiThreadedImageBuilder {
        return new Callable<String>(){
             @Override
             public String call() throws Exception {
-                try {
-                    dockerizer.prepareImage();
-                }
-                catch (Exception e){
-                    logger.error("Failed to build image {}: {}", dockerizer.getName(), e.getMessage());
-                }
+                dockerizer.prepareImage();
                 return null;
             }
         };
@@ -67,6 +62,8 @@ public class MultiThreadedImageBuilder {
                 FutureTask t = ((FutureTask)task);
                 if(!t.isDone())
                     throw new Exception("Task "+t.get().toString()+" not finished");
+                // Throw if task threw an exception.
+                t.get();
             }
         }else
             for(Callable task : tasks)
