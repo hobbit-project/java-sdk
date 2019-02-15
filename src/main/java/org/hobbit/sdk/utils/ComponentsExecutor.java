@@ -54,6 +54,7 @@ public class ComponentsExecutor {
 
         executor.submit(() -> {
         //new Thread(() -> {
+        try {
             String componentName = component.getClass().getSimpleName();
             if(AbstractDockerizer.class.isInstance(component)) {
                 componentName = ((AbstractDockerizer) component).getName();
@@ -76,9 +77,8 @@ public class ComponentsExecutor {
                 component.run();
                 //component.close();
             } catch (Throwable e) {
+                logger.error("Error while running component {}:", componentName, e);
                 String message = componentName+" error: "+ e.getMessage();
-                logger.error(message);
-                e.printStackTrace();
                 exceptions.add(new Exception(message));
                 exitCode = 1;
             } finally {
@@ -105,6 +105,9 @@ public class ComponentsExecutor {
                         }
 
               }
+        } catch(Exception e) {
+            logger.error("Error while running: {}", e);
+        }
         });
     }
 
