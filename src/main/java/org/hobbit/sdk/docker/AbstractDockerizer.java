@@ -22,6 +22,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.hobbit.core.Constants.HOBBIT_EXPERIMENT_URI_KEY;
@@ -210,6 +213,12 @@ public abstract class AbstractDockerizer implements Component {
         removeAllSameNamesContainers();
 
         this.environmentVariables = Arrays.asList(envVars);
+
+        Optional<String> exposePorts = this.environmentVariables.stream().filter(env -> env.indexOf("HOBBIT_SDK_PUBLISH_PORTS=") == 0).findFirst();
+        if (exposePorts.isPresent()) {
+          portBindings = Stream.of(exposePorts.get().split("=", 2)[1].split(",")).collect(Collectors.toMap(Function.identity(), port -> Arrays.asList(PortBinding.of("0.0.0.0", port))));
+        }
+
         containerId = createContainer();
 
         return containerId;
