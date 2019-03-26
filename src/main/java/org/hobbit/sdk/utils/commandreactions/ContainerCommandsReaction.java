@@ -129,7 +129,7 @@ public class ContainerCommandsReaction implements CommandReaction {
                 systemContainersCount++;
             }else if(customContainers.containsKey(startCommandData.image)){
 
-                Component customComponent = customContainers.get(cleanedImageName);
+                Component customComponent = customContainers.get(startCommandData.image);
                 int runningCustomContainersCount = (customContainersRunning.containsKey(cleanedImageName)? customContainersRunning.get(cleanedImageName) :0);
 
                 if(AbstractDockerizer.class.isInstance(customComponent)){
