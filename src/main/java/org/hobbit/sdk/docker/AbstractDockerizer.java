@@ -104,8 +104,14 @@ public abstract class AbstractDockerizer implements Component {
     }
 
     public DockerClient getDockerClient() throws DockerCertificateException {
-        if(dockerClient==null)
-            dockerClient = DefaultDockerClient.fromEnv().build();
+        if(dockerClient==null){
+            try {
+                dockerClient = DefaultDockerClient.fromEnv().build();
+            }
+            catch (Exception e){
+                logger.error("Exception: {}", e);
+            }
+        }
         return dockerClient;
     }
 

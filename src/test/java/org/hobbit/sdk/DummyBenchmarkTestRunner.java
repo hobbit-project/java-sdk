@@ -70,7 +70,7 @@ public class DummyBenchmarkTestRunner {
 
         init(false);
 
-        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(6);
+        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(1);
         builder.addTask(benchmarkBuilder);
         builder.addTask(dataGeneratorBuilder);
         builder.addTask(taskGeneratorBuilder);
