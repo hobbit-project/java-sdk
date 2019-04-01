@@ -7,6 +7,7 @@ import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
@@ -44,6 +45,8 @@ public class DummyBenchmarkTestRunner {
     EvalStorageDockerBuilder evalStorageBuilder;
     SystemAdapterDockerBuilder systemAdapterBuilder;
     EvalModuleDockerBuilder evalModuleBuilder;
+    BuildBasedDockersBuilder customComponentBuilder;
+
     String systemImageName;
     String sessionId;
 
@@ -59,6 +62,7 @@ public class DummyBenchmarkTestRunner {
         evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(DummyEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
         systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
         evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
+        customComponentBuilder = new DummyDockersBuilder(DummyCustomComponent.class, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME).useCachedImage(useCachedImages);
     }
 
 
@@ -73,6 +77,7 @@ public class DummyBenchmarkTestRunner {
         builder.addTask(evalStorageBuilder);
         builder.addTask(systemAdapterBuilder);
         builder.addTask(evalModuleBuilder);
+        builder.addTask(customComponentBuilder);
         builder.build();
 
     }
@@ -110,6 +115,7 @@ public class DummyBenchmarkTestRunner {
         Component taskGen = new DummyTaskGenerator();
         Component evalStorage  = new DummyEvalStorage();
         Component systemAdapter = new DummySystemAdapter();
+        Component customComponent = new DummyCustomComponent();
         Component evalModule = new DummyEvalModule();
 
         if(dockerize) {
@@ -118,6 +124,7 @@ public class DummyBenchmarkTestRunner {
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
+            customComponent =
             evalModule = evalModuleBuilder.build();
         }
 
@@ -129,7 +136,7 @@ public class DummyBenchmarkTestRunner {
                                                                 .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                                                                 .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
                                                                 .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
-                                                                //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
+                                                                .customContainerImage(customComponent, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME)
                                                                 ;
 
         commandQueueListener.setCommandReactions(
