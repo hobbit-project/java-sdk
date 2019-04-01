@@ -1,40 +1,29 @@
 package org.hobbit.sdk.examples.dummybenchmark;
 
 import org.hobbit.core.components.AbstractCommandReceivingComponent;
+import org.hobbit.core.components.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class DummyCustomComponent extends AbstractCommandReceivingComponent {
+public class DummyCustomComponent implements Component {
     private Logger logger = LoggerFactory.getLogger(DummyCustomComponent.class);
+
 
     @Override
     public void init() throws Exception {
-        super.init();
-        logger.debug("Init()");
+
     }
 
     @Override
-    public void run() throws Exception {
-        logger.debug("Initialized: {}", getHobbitSessionId());
-        close();
-        logger.debug("Terminated");
+    public void run() {
+        logger.debug("Running DummyCustomComponent & closing it");
     }
-
 
 
     @Override
     public void close() throws IOException {
-        // Free the resources you requested here
-        logger.debug("close()");
-
-        // Always close the super class after yours!
-        super.close();
-    }
-
-    @Override
-    public void receiveCommand(byte command, byte[] data) {
-
+        logger.debug("Terminated");
     }
 }

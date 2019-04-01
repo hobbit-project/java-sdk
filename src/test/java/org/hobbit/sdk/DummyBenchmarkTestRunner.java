@@ -62,7 +62,12 @@ public class DummyBenchmarkTestRunner {
         evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(DummyEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
         systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
         evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
-        customComponentBuilder = new DummyDockersBuilder(DummyCustomComponent.class, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME).useCachedImage(useCachedImages);
+        customComponentBuilder = new DummyDockersBuilder(DummyCustomComponent.class, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME)
+                .addEnvironmentVariable(RABBIT_MQ_HOST_NAME_KEY, (String)System.getenv().get(RABBIT_MQ_HOST_NAME_KEY))
+                .addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY))
+                .addNetworks(HOBBIT_NETWORKS)
+                .addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY))
+                .useCachedImage(useCachedImages);
     }
 
 
@@ -124,7 +129,7 @@ public class DummyBenchmarkTestRunner {
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
-            customComponent =
+            customComponent = customComponentBuilder.build();
             evalModule = evalModuleBuilder.build();
         }
 
