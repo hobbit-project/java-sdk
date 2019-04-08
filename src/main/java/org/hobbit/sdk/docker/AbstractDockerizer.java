@@ -244,8 +244,10 @@ public abstract class AbstractDockerizer implements Component {
     public void startContainer() throws Exception {
         logger.debug("Starting container (imageName={}, containerId={})", imageName, containerId);
         //getDockerClient().restartContainer(containerId);
-        getDockerClient().startContainer(containerId);
+        // Connect container to networks before it's started.
+        // Otherwise, the started java process may be unable to see hostnames from the added network.
         connectContainerToNetworks(networks);
+        getDockerClient().startContainer(containerId);
         //logger.debug("Waiting till container will start (imageName={})", imageName);
         //awaitRunning(dockerClient, containerId);
         logger.debug("Container started (imageName={}, containerId={})", imageName, containerId);
