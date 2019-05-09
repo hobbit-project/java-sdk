@@ -216,7 +216,16 @@ public abstract class AbstractDockerizer implements Component {
 
         Optional<String> exposePorts = this.environmentVariables.stream().filter(env -> env.indexOf("HOBBIT_SDK_PUBLISH_PORTS=") == 0).findFirst();
         if (exposePorts.isPresent()) {
-          portBindings = Stream.of(exposePorts.get().split("=", 2)[1].split(",")).collect(Collectors.toMap(Function.identity(), port -> Arrays.asList(PortBinding.of("0.0.0.0", port))));
+            portBindings = Stream.of(exposePorts.get().split("=", 2)[1].split(","))
+                .map(binding -> {
+                    String[] ports = (binding).split(":", 2);
+                    if (ports.length == 2) {
+                        return ports;
+                    } else {
+                        return new String[]{binding, binding};
+                    }
+                })
+                .collect(Collectors.toMap(ports -> ports[1], ports -> Arrays.asList(PortBinding.of("0.0.0.0", ports[0]))));
         }
 
         containerId = createContainer();
