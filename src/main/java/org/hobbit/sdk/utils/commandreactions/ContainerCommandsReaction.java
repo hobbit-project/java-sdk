@@ -8,6 +8,7 @@ import org.hobbit.core.components.Component;
 import org.hobbit.core.data.StartCommandData;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.PullBasedDockersBuilder;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
@@ -87,6 +88,7 @@ public class ContainerCommandsReaction implements CommandReaction {
 
             String[] splitted = startCommandData.getImage().split("/");
             String cleanedImageName=splitted[splitted.length-1].split(":")[0];
+            List<String> envVars = new ArrayList<>(Arrays.asList(startCommandData.environmentVariables));
 
             if (benchmarkController!=null && startCommandData.image.equals(benchmarkControllerImageName)) {
                 compToSubmit = benchmarkController;
@@ -133,7 +135,6 @@ public class ContainerCommandsReaction implements CommandReaction {
                 int runningCustomContainersCount = (customContainersRunning.containsKey(cleanedImageName)? customContainersRunning.get(cleanedImageName) :0);
 
                 if(AbstractDockerizer.class.isInstance(customComponent)){
-                    List<String> envVars = new ArrayList(Arrays.asList(startCommandData.environmentVariables));
                     compToSubmit = ((AbstractDockerizer)customComponent).clone(envVars);
                     containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(envVars.toArray(new String[0]));
                 }else {
@@ -147,7 +148,16 @@ public class ContainerCommandsReaction implements CommandReaction {
                 if(!imgName.contains(":"))
                     imgName+=":latest";
                 logger.info("Trying to create container with imageName="+imgName);
-                compToSubmit = new PullBasedDockersBuilder(imgName).addNetworks(HOBBIT_NETWORKS).build();
+                AbstractDockersBuilder compBuilder = new PullBasedDockersBuilder(imgName).addNetworks(HOBBIT_NETWORKS);
+
+                // Allow to specify custom container name.
+                // Mainly so we can use the same image twice without the SDK removing first instance when starting second one.
+                Optional<String> containerName = envVars.stream().filter(env -> env.indexOf("HOBBIT_SDK_CONTAINER_NAME=") == 0).findFirst();
+                if (containerName.isPresent()) {
+                    compBuilder.containerName(containerName.get().split("=", 2)[1]);
+                }
+
+                compToSubmit = compBuilder.build();
                 containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(startCommandData.environmentVariables);
             }
 
