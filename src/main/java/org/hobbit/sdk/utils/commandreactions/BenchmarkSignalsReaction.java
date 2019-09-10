@@ -3,6 +3,7 @@ package org.hobbit.sdk.utils.commandreactions;
 import com.google.gson.Gson;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.Component;
+import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.utils.CommandQueueListener;
 import org.hobbit.sdk.utils.CommandSender;
@@ -78,6 +79,10 @@ public class BenchmarkSignalsReaction implements CommandReaction {
         if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
             logger.debug("BENCHMARK_FINISHED_SIGNAL received");
             try {
+                assert bytes != null;
+                assert bytes.length != 0;
+                componentsExecutor.resultModel = RabbitMQUtils.readModel(bytes);
+
                 commandQueueListener.terminate();
                 componentsExecutor.shutdown();
             } catch (InterruptedException e) {

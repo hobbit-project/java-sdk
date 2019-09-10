@@ -1,5 +1,6 @@
 package org.hobbit.sdk.utils;
 
+import org.apache.jena.rdf.model.Model;
 import org.hobbit.core.components.Component;
 import org.hobbit.sdk.docker.AbstractDockerizer;
 import org.hobbit.sdk.docker.ServiceLogsReader;
@@ -25,6 +26,8 @@ public class ComponentsExecutor {
 
     private final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
     private final ExecutorService executor;
+
+    public Model resultModel = null;
 
     public ComponentsExecutor(){
         this(CORE_POOL_SIZE);
