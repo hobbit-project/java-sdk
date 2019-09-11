@@ -87,7 +87,7 @@ public class ContainerCommandsReaction implements CommandReaction {
             Component compToSubmit = null;
 
             String[] splitted = startCommandData.getImage().split("/");
-            String cleanedImageName=splitted[splitted.length-1].split(":")[0];
+            String cleanedImageName = splitted[splitted.length-1].split(":")[0].replaceAll("[^-a-z0-9]", "-");
             List<String> envVars = new ArrayList<>(Arrays.asList(startCommandData.environmentVariables));
 
             if (benchmarkController!=null && startCommandData.image.equals(benchmarkControllerImageName)) {
