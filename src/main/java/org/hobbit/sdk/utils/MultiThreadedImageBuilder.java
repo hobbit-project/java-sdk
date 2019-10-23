@@ -46,12 +46,7 @@ public class MultiThreadedImageBuilder {
        return new Callable<String>(){
             @Override
             public String call() throws Exception {
-                try {
-                    dockerizer.prepareImage();
-                }
-                catch (Exception e){
-                    logger.error("Failed to build image {}: {}", dockerizer.getName(), e.getMessage());
-                }
+                dockerizer.prepareImage();
                 return null;
             }
         };
@@ -60,20 +55,22 @@ public class MultiThreadedImageBuilder {
 
     public void build() throws Exception {
 
-        long started = new Date().getTime();
+        double started = new Date().getTime();
         if(es!=null){
             List res = es.invokeAll(tasks);
             for(Object task : res){
                 FutureTask t = ((FutureTask)task);
                 if(!t.isDone())
                     throw new Exception("Task "+t.get().toString()+" not finished");
+                // Throw if task threw an exception.
+                t.get();
             }
         }else
             for(Callable task : tasks)
                 task.call();
 
 
-        long took = (new Date().getTime()-started)/1000;
+        double took = (new Date().getTime()-started)/1000;
         System.out.println("Building took "+took+" seconds");
     }
 }

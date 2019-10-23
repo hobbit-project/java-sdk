@@ -4,7 +4,7 @@ import org.hobbit.sdk.docker.builders.AbstractDockersBuilder;
 import org.hobbit.sdk.docker.builders.BothTypesDockersBuilder;
 
 import static org.hobbit.core.Constants.*;
-import static org.hobbit.sdk.Constants.HOBBIT_NETWORKS;
+import static org.hobbit.sdk.Constants.*;
 
 
 /**
@@ -23,7 +23,7 @@ public class DataGenDockerBuilder extends BothTypesDockersBuilder {
     public void addEnvVars(AbstractDockersBuilder ret) {
         ret.addEnvironmentVariable(RABBIT_MQ_HOST_NAME_KEY, (String)System.getenv().get(RABBIT_MQ_HOST_NAME_KEY));
         ret.addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY));
-        ret.addNetworks(HOBBIT_NETWORKS);
+        ret.addNetworks(new String[]{ HOBBIT_NETWORK_NAME });
 
         ret.addEnvironmentVariable(GENERATOR_ID_KEY, (String)System.getenv().get(GENERATOR_ID_KEY));
         ret.addEnvironmentVariable(GENERATOR_COUNT_KEY, (String)System.getenv().get(GENERATOR_COUNT_KEY));
