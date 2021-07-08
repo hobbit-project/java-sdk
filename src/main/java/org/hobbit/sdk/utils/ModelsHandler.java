@@ -72,10 +72,7 @@ public class ModelsHandler {
                 if(experimentResource.getProperty(parameter)==null){
                     objIterator = defaultModel.listObjectsOfProperty(parameter, defaultValProperty);
                     while (objIterator.hasNext()) {
-                        Literal valueLiteral = (Literal) objIterator.next();//.asLiteral().getString();
-                        //paramsModel.add(experimentResource, parameter, valueLiteral.getString(), valueLiteral.getDatatype());
-                        paramsModel.add(experimentResource, parameter, valueLiteral.getString());
-                        //parameters.put(namespaceUri + "#" + parameter.getLocalName(), value);
+                        paramsModel.add(experimentResource, parameter, objIterator.next());
                     }
                 }
             }
