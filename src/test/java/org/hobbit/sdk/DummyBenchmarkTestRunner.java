@@ -7,6 +7,7 @@ import org.hobbit.core.Constants;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
 import org.hobbit.sdk.docker.AbstractDockerizer;
+import org.hobbit.sdk.docker.builders.BuildBasedDockersBuilder;
 import org.hobbit.sdk.utils.ComponentsExecutor;
 import org.hobbit.sdk.utils.ModelsHandler;
 import org.hobbit.sdk.utils.MultiThreadedImageBuilder;
@@ -44,6 +45,8 @@ public class DummyBenchmarkTestRunner {
     EvalStorageDockerBuilder evalStorageBuilder;
     SystemAdapterDockerBuilder systemAdapterBuilder;
     EvalModuleDockerBuilder evalModuleBuilder;
+    BuildBasedDockersBuilder customComponentBuilder;
+
     String systemImageName;
     String sessionId;
 
@@ -59,6 +62,12 @@ public class DummyBenchmarkTestRunner {
         evalStorageBuilder = new EvalStorageDockerBuilder(new DummyDockersBuilder(DummyEvalStorage.class, DUMMY_EVAL_STORAGE_IMAGE_NAME).useCachedImage(useCachedImages));
         systemAdapterBuilder = new SystemAdapterDockerBuilder(new DummyDockersBuilder(DummySystemAdapter.class, DUMMY_SYSTEM_IMAGE_NAME).useCachedImage(useCachedImages));
         evalModuleBuilder = new EvalModuleDockerBuilder(new DummyDockersBuilder(DummyEvalModule.class, DUMMY_EVALMODULE_IMAGE_NAME).useCachedImage(useCachedImages));
+        customComponentBuilder = new DummyDockersBuilder(DummyCustomComponent.class, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME)
+                .addEnvironmentVariable(RABBIT_MQ_HOST_NAME_KEY, (String)System.getenv().get(RABBIT_MQ_HOST_NAME_KEY))
+                .addEnvironmentVariable(HOBBIT_SESSION_ID_KEY, (String)System.getenv().get(HOBBIT_SESSION_ID_KEY))
+                .addNetworks(HOBBIT_NETWORKS)
+                .addEnvironmentVariable(HOBBIT_EXPERIMENT_URI_KEY, (String)System.getenv().get(HOBBIT_EXPERIMENT_URI_KEY))
+                .useCachedImage(useCachedImages);
     }
 
 
@@ -66,13 +75,14 @@ public class DummyBenchmarkTestRunner {
 
         init(false);
 
-        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(6);
+        MultiThreadedImageBuilder builder = new MultiThreadedImageBuilder(1);
         builder.addTask(benchmarkBuilder);
         builder.addTask(dataGeneratorBuilder);
         builder.addTask(taskGeneratorBuilder);
         builder.addTask(evalStorageBuilder);
         builder.addTask(systemAdapterBuilder);
         builder.addTask(evalModuleBuilder);
+        builder.addTask(customComponentBuilder);
         builder.build();
 
     }
@@ -110,6 +120,7 @@ public class DummyBenchmarkTestRunner {
         Component taskGen = new DummyTaskGenerator();
         Component evalStorage  = new DummyEvalStorage();
         Component systemAdapter = new DummySystemAdapter();
+        Component customComponent = new DummyCustomComponent();
         Component evalModule = new DummyEvalModule();
 
         if(dockerize) {
@@ -118,6 +129,7 @@ public class DummyBenchmarkTestRunner {
             taskGen = taskGeneratorBuilder.build();
             evalStorage = evalStorageBuilder.build();
             systemAdapter = systemAdapterBuilder.build();
+            customComponent = customComponentBuilder.build();
             evalModule = evalModuleBuilder.build();
         }
 
@@ -129,7 +141,7 @@ public class DummyBenchmarkTestRunner {
                                                                 .evalStorage(evalStorage).evalStorageImageName(DUMMY_EVAL_STORAGE_IMAGE_NAME)
                                                                 .evalModule(evalModule).evalModuleImageName(DUMMY_EVALMODULE_IMAGE_NAME)
                                                                 .systemAdapter(systemAdapter).systemAdapterImageName(systemImageName)
-                                                                //.customContainerImage(systemAdapter, DUMMY_SYSTEM_IMAGE_NAME)
+                                                                .customContainerImage(customComponent, DUMMY_CUSTOM_COMPONENT_IMAGE_NAME)
                                                                 ;
 
         commandQueueListener.setCommandReactions(

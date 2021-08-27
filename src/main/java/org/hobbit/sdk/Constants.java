@@ -27,6 +27,7 @@ public class Constants {
     public static final String DUMMY_TASKGEN_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"taskgen";
     public static final String DUMMY_EVAL_STORAGE_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"eval-storage";
     public static final String DUMMY_EVALMODULE_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"eval-module";
+    public static final String DUMMY_CUSTOM_COMPONENT_IMAGE_NAME = GIT_REPO_PATH+PROJECT_NAME +"custom-component";
 
     public static final String BENCHMARK_URI = "http://project-hobbit.eu/"+PROJECT_NAME;
     public static final String SYSTEM_URI = "http://project-hobbit.eu/"+PROJECT_NAME+"system";

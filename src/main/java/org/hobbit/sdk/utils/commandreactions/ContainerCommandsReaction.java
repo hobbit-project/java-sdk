@@ -129,19 +129,10 @@ public class ContainerCommandsReaction implements CommandReaction {
                 compToSubmit = systemAdapter;
                 containerId = cleanedImageName+"_"+systemContainersCount;
                 systemContainersCount++;
-            }else if(customContainers.containsKey(startCommandData.image)){
-
-                Component customComponent = customContainers.get(startCommandData.image);
-                int runningCustomContainersCount = (customContainersRunning.containsKey(cleanedImageName)? customContainersRunning.get(cleanedImageName) :0);
-
-                if(AbstractDockerizer.class.isInstance(customComponent)){
-                    compToSubmit = ((AbstractDockerizer)customComponent).clone(envVars);
-                    containerId = ((AbstractDockerizer)compToSubmit).createContainerWithRemoveAllPrevs(envVars.toArray(new String[0]));
-                }else {
-                    compToSubmit = customComponent.getClass().getConstructor().newInstance();
-                    containerId = cleanedImageName+"_"+runningCustomContainersCount;
-                }
-                runningCustomContainersCount++;
+            }else if(customContainers.containsKey(cleanedImageName)){
+                compToSubmit = customContainers.get(cleanedImageName);
+                int runningCustomContainersCount = (customContainersRunning.containsKey(cleanedImageName)? customContainersRunning.get(cleanedImageName)+1 :0);
+                containerId = cleanedImageName+"_"+runningCustomContainersCount;
                 customContainersRunning.put(cleanedImageName, runningCustomContainersCount);
             }else{
                 String imgName = startCommandData.image;

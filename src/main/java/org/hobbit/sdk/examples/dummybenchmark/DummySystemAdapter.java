@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.hobbit.sdk.Constants.DUMMY_CUSTOM_COMPONENT_IMAGE_NAME;
+
 
 /**
  * This code is here just for testing and debugging the SDK.
@@ -26,7 +28,9 @@ public class DummySystemAdapter extends AbstractSystemAdapter {
 
         // You can access the RDF model this.systemParamModel to retrieve meta data about this system adapter
         //parameters = new JenaKeyValue.Builder().buildFrom(systemParamModel);
-
+        logger.debug("Starting custom image {}", DUMMY_CUSTOM_COMPONENT_IMAGE_NAME);
+        containerId = createContainer(DUMMY_CUSTOM_COMPONENT_IMAGE_NAME, new String[]{});
+        logger.debug("Custom image {} started with containerId={}", DUMMY_CUSTOM_COMPONENT_IMAGE_NAME, containerId);
        //containerId = createContainer("apiwise/allegrograph", new String[]{});
         //containerId = createContainer("nginx", new String[]{});
 
