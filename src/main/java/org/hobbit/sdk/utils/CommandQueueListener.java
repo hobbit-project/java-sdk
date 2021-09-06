@@ -1,23 +1,13 @@
 package org.hobbit.sdk.utils;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.QueueingConsumer;
-import org.hobbit.core.Commands;
-import org.hobbit.core.components.AbstractPlatformConnectorComponent;
-import org.hobbit.core.data.StartCommandData;
-import org.hobbit.core.rabbit.RabbitMQUtils;
-import org.hobbit.sdk.utils.commandreactions.CommandReaction;
-import org.hobbit.core.Constants;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+
+import org.hobbit.core.Constants;
+import org.hobbit.core.components.AbstractPlatformConnectorComponent;
+import org.hobbit.sdk.utils.commandreactions.CommandReaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Roman Katerinenko
@@ -29,9 +19,11 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
     private final Semaphore terminationSemaphore = new Semaphore(0, true);
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    private CommandReaction[] commandReactions=new CommandReaction[0];
+    private CommandReaction[] commandReactions = new CommandReaction[0];
     private String replyTo;
-    private final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+//    private final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    private boolean catchedExceptions = false;
 
     @Override
     public void init() throws Exception {
@@ -50,26 +42,29 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
         logger.debug("Terminated");
     }
 
-    public String submit(String imageName, String[] envVariables){
+    public String submit(String imageName, String[] envVariables) {
         return super.createContainer(imageName, envVariables);
     }
 
-    public String createContainer(String imageName, String[] envVariables){
+    public String createContainer(String imageName, String[] envVariables) {
         return super.createContainer(imageName, envVariables);
     }
 
-    public String createContainer(String imageName, String containerType, String[] envVariables){
+    public String createContainer(String imageName, String containerType, String[] envVariables) {
         String ret = super.createContainer(imageName, containerType, envVariables);
         return ret;
     }
 
-
 //    @Override
     protected void handleCmd(byte[] bytes, String replyTo) {
         this.replyTo = replyTo;
-        super.handleCmd(bytes, replyTo);
+        try {
+            super.handleCmd(bytes, replyTo);
+        } catch (Throwable e) {
+            logger.error("Catched exception while handling command.", e);
+            catchedExceptions = true;
+        }
     }
-
 
     public void waitForInitialisation() throws InterruptedException {
         countDownLatch.await();
@@ -94,10 +89,15 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
         for (CommandReaction commandReaction : commandReactions) {
             try {
                 commandReaction.handleCmd(command, data, replyTo);
-            } catch (Exception e) {
-                logger.error("Failed to handle command with {}",commandReaction.getClass().getSimpleName(), e);
+            } catch (Throwable e) {
+                logger.error("Failed to handle command with {}", commandReaction.getClass().getSimpleName(), e);
+                catchedExceptions = true;
             }
         }
+    }
+
+    public boolean anyExceptions() {
+        return catchedExceptions;
     }
 
 }
