@@ -59,10 +59,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
     }
 
     public String createContainer(String imageName, String containerType, String[] envVariables){
-        String originalRabbitHostName = rabbitMQHostName;
-        rabbitMQHostName = "rabbit";
         String ret = super.createContainer(imageName, containerType, envVariables);
-        rabbitMQHostName = originalRabbitHostName;
         return ret;
     }
 
@@ -98,7 +95,7 @@ public class CommandQueueListener extends AbstractPlatformConnectorComponent {
             try {
                 commandReaction.handleCmd(command, data, replyTo);
             } catch (Exception e) {
-                logger.error("Failed to handle command with {}: {}",commandReaction.getClass().getSimpleName(), e.getMessage());
+                logger.error("Failed to handle command with {}",commandReaction.getClass().getSimpleName(), e);
             }
         }
     }
