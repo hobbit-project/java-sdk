@@ -1,6 +1,8 @@
 package org.hobbit.sdk.utils.commandreactions;
 
 import com.google.gson.Gson;
+
+import org.apache.jena.rdf.model.ModelFactory;
 import org.hobbit.core.Commands;
 import org.hobbit.core.components.Component;
 import org.hobbit.core.rabbit.RabbitMQUtils;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class BenchmarkSignalsReaction implements CommandReaction {
     private static final Logger logger = LoggerFactory.getLogger(BenchmarkSignalsReaction.class);
@@ -51,23 +52,23 @@ public class BenchmarkSignalsReaction implements CommandReaction {
     private boolean startBenchmarkCommandSent = false;
     private Map<String, Component> customContainers = new HashMap<>();
     private Map<String, Integer> customContainersRunning = new HashMap<>();
-    //private String systemContainerId = null;
+    // private String systemContainerId = null;
 
-    public BenchmarkSignalsReaction(CommandReactionsBuilder builder){
+    public BenchmarkSignalsReaction(CommandReactionsBuilder builder) {
         this.componentsExecutor = builder.componentsExecutor;
         this.commandQueueListener = builder.commandQueueListener;
 
-        this.benchmarkController=builder.benchmarkController;
-        this.dataGenerator=builder.dataGenerator;
-        this.taskGenerator=builder.taskGenerator;
-        this.evalStorage=builder.evalStorage;
-        this.evalModule=builder.evalModule;
-        this.systemAdapter=builder.systemAdapter;
+        this.benchmarkController = builder.benchmarkController;
+        this.dataGenerator = builder.dataGenerator;
+        this.taskGenerator = builder.taskGenerator;
+        this.evalStorage = builder.evalStorage;
+        this.evalModule = builder.evalModule;
+        this.systemAdapter = builder.systemAdapter;
 
         this.benchmarkControllerImageName = builder.benchmarkControllerImageName;
         this.dataGeneratorImageName = builder.dataGeneratorImageName;
         this.taskGeneratorImageName = builder.taskGeneratorImageName;
-        this.evalStorageImageName = builder.evalStorageImageName ;
+        this.evalStorageImageName = builder.evalStorageImageName;
         this.evalModuleImageName = builder.evalModuleImageName;
         this.systemAdapterImageName = builder.systemAdapterImageName;
         this.customContainers = builder.customContainers;
@@ -76,18 +77,19 @@ public class BenchmarkSignalsReaction implements CommandReaction {
     @Override
     public void handleCmd(Byte command, byte[] bytes, String replyTo) throws Exception {
 
-        if (command == Commands.BENCHMARK_FINISHED_SIGNAL){
+        if (command == Commands.BENCHMARK_FINISHED_SIGNAL) {
             logger.debug("BENCHMARK_FINISHED_SIGNAL received");
             try {
                 assert bytes != null;
                 assert bytes.length != 0;
                 componentsExecutor.resultModel = RabbitMQUtils.readModel(bytes);
-
+            } catch (Throwable e) {
+                // The exception will be handled somewhere else. However, we should make sure
+                // that there is some model set
+                componentsExecutor.resultModel = ModelFactory.createDefaultModel();
+            } finally {
                 commandQueueListener.terminate();
                 componentsExecutor.shutdown();
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-                //Assert.fail(e.getMessage());
             }
         }
 
@@ -114,37 +116,38 @@ public class BenchmarkSignalsReaction implements CommandReaction {
         if (command == Commands.SYSTEM_READY_SIGNAL) {
             systemReady = true;
             logger.debug("SYSTEM_READY_SIGNAL signal received");
-            if(!System.getenv().containsKey("SYSTEM_CONTAINER_ID"))
-                throw new Exception("SYSTEM_CONTAINER_ID is not specified as env variable. Specify it where you submit system/create system container in checkHealth");
+            if (!System.getenv().containsKey("SYSTEM_CONTAINER_ID"))
+                throw new Exception(
+                        "SYSTEM_CONTAINER_ID is not specified as env variable. Specify it where you submit system/create system container in checkHealth");
         }
 
-        synchronized (this){
+        synchronized (this) {
             List<String> waitForComponents = new ArrayList<>();
-            if(!benchmarkReady)
+            if (!benchmarkReady)
                 waitForComponents.add("benchmarkController");
-            if(dataGenerator!=null && !dataGenReady)
+            if (dataGenerator != null && !dataGenReady)
                 waitForComponents.add("dataGenerator");
-            if(taskGenerator!=null && !taskGenReady)
+            if (taskGenerator != null && !taskGenReady)
                 waitForComponents.add("taskGenerator");
-            if(evalStorage!=null && !evalStorageReady)
+            if (evalStorage != null && !evalStorageReady)
                 waitForComponents.add("evalStorage");
-            if(!systemReady)
+            if (!systemReady)
                 waitForComponents.add("systemAdapter");
-            if(waitForComponents.size()>0)
+            if (waitForComponents.size() > 0)
                 logger.debug("Waiting ready signals for {}", String.join(", ", waitForComponents));
-            else if (!startBenchmarkCommandSent){
+            else if (!startBenchmarkCommandSent) {
                 logger.debug("sending START_BENCHMARK_SIGNAL");
                 try {
-                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, System.getenv().get("SYSTEM_CONTAINER_ID")).send();
+                    new CommandSender(Commands.START_BENCHMARK_SIGNAL, System.getenv().get("SYSTEM_CONTAINER_ID"))
+                            .send();
                     startBenchmarkCommandSent = true;
                 } catch (Exception e) {
                     logger.error("Failed to send START_BENCHMARK_SIGNAL: {}", e.getMessage());
-                    //Assert.fail(e.getMessage());
+                    // Assert.fail(e.getMessage());
                 }
             }
         }
 
     }
-
 
 }

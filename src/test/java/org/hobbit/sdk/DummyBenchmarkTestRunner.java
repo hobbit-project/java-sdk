@@ -175,6 +175,7 @@ public class DummyBenchmarkTestRunner {
         rabbitMqDockerizer.stop();
 
         Assert.assertFalse(componentsExecutor.anyExceptions());
+        Assert.assertFalse(commandQueueListener.anyExceptions());
     }
 
     public static Model createBenchmarkParameters() throws IOException {

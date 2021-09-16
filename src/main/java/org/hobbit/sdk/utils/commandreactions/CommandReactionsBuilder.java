@@ -90,10 +90,11 @@ public class CommandReactionsBuilder{
     }
 
     public CommandReactionsBuilder customContainerImage(Component component, String imageName){
-        String[] splitted = imageName.split("/");
-        String cleanedImageName=splitted[splitted.length-1].split(":")[0];
-
-        customContainers.put(cleanedImageName, component);
+//        String[] splitted = imageName.split("/");
+//        String cleanedImageName=splitted[splitted.length-1].split(":")[0];
+//
+//        customContainers.put(cleanedImageName, component);
+        customContainers.put(imageName, component);
         return this;
     }
 
