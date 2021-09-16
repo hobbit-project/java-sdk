@@ -129,8 +129,8 @@ public class ContainerCommandsReaction implements CommandReaction {
                 compToSubmit = systemAdapter;
                 containerId = cleanedImageName+"_"+systemContainersCount;
                 systemContainersCount++;
-            }else if(customContainers.containsKey(cleanedImageName)){
-                compToSubmit = customContainers.get(cleanedImageName);
+            }else if(customContainers.containsKey(startCommandData.image)){
+                compToSubmit = customContainers.get(startCommandData.image);
                 int runningCustomContainersCount = (customContainersRunning.containsKey(cleanedImageName)? customContainersRunning.get(cleanedImageName)+1 :0);
                 containerId = cleanedImageName+"_"+runningCustomContainersCount;
                 customContainersRunning.put(cleanedImageName, runningCustomContainersCount);
